@@ -8,8 +8,8 @@ import {
 const { version, description } = require('../package.json');
 
 export const catalog: ManifestCatalog = {
-  id: 'easynews-plus',
-  name: 'Easynews+',
+  id: 'easynews-plus-plus',
+  name: 'Easynews++',
   type: 'tv',
   extra: [{ name: 'search', isRequired: true }],
 };
@@ -19,7 +19,7 @@ const sortOptions = humanReadableSortOptions as any;
 const directionOptions = humanReadableDirections as any;
 
 export const manifest: Manifest = {
-  id: 'community.easynews-plus',
+  id: 'community.easynews-plus-plus',
   version,
   description,
   catalogs: [catalog],
@@ -29,7 +29,7 @@ export const manifest: Manifest = {
     { name: 'stream', types: ['movie', 'series'], idPrefixes: ['tt'] },
   ],
   types: ['movie', 'series', 'tv'],
-  name: 'Easynews+',
+  name: 'Easynews++',
   background:
     'https://images.pexels.com/photos/518543/pexels-photo-518543.jpeg',
   logo: 'https://pbs.twimg.com/profile_images/479627852757733376/8v9zH7Yo_400x400.jpeg',

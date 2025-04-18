@@ -1,18 +1,18 @@
-import { createBasic } from './utils';
 import { EasynewsSearchResponse, FileData, SearchOptions } from './types';
+import { createBasic } from './utils';
 
 export class EasynewsAPI {
   private readonly baseUrl = 'https://members.easynews.com';
-  private readonly headers: Headers;
+  private readonly username: string;
+  private readonly password: string;
 
   constructor(options: { username: string; password: string }) {
     if (!options) {
       throw new Error('Missing options');
     }
 
-    this.headers = new Headers();
-    const basic = createBasic(options.username, options.password);
-    this.headers.append('Authorization', basic);
+    this.username = options.username;
+    this.password = options.password;
   }
 
   async search({
@@ -51,7 +51,9 @@ export class EasynewsAPI {
     url.search = new URLSearchParams(searchParams).toString();
 
     const res = await fetch(url, {
-      headers: this.headers,
+      headers: {
+        Authorization: createBasic(this.username, this.password),
+      },
       signal: AbortSignal.timeout(20_000), // 20 seconds
     });
 

@@ -4,7 +4,6 @@ import landingTemplate from 'stremio-addon-sdk/src/landingTemplate';
 import { catalog, manifest } from './manifest';
 import {
   buildSearchQuery,
-  createStreamAuth,
   createStreamPath,
   createStreamUrl,
   createThumbnailUrl,
@@ -17,7 +16,7 @@ import {
   logError,
   matchesTitle,
 } from './utils';
-import { EasynewsAPI, SearchOptions, createBasic } from '@easynews/api';
+import { EasynewsAPI, SearchOptions } from '@easynews/api';
 import { publicMetaProvider } from './meta';
 import { fromHumanReadable, toDirection } from './sort-option';
 
@@ -79,7 +78,7 @@ builder.defineMetaHandler(
               fileExtension: getFileExtension(file),
               duration: getDuration(file),
               size: getSize(file),
-              url: `${createStreamUrl(res)}/${createStreamPath(file)}|${createStreamAuth(username, password)}`,
+              url: `${createStreamUrl(res, username, password)}/${createStreamPath(file)}`,
               videoSize: file.rawSize,
             }),
           ],
@@ -191,7 +190,7 @@ builder.defineStreamHandler(
             duration: getDuration(file),
             size: getSize(file),
             title,
-            url: `${createStreamUrl(res)}/${createStreamPath(file)}`,
+            url: `${createStreamUrl(res, username, password)}/${createStreamPath(file)}`,
             videoSize: file.rawSize,
           })
         );
@@ -233,7 +232,7 @@ function mapStream({
   const quality = getQuality(title, fullResolution);
 
   return {
-    name: `Easynews+${quality ? `\n${quality}` : ''}`,
+    name: `Easynews++${quality ? `\n${quality}` : ''}`,
     description: [
       `${title}${fileExtension}`,
       `🕛 ${duration ?? 'unknown duration'}`,
@@ -242,30 +241,13 @@ function mapStream({
     url: url,
     behaviorHints: {
       notWebReady: true,
-      proxyHeaders: {
-        request: {
-          'User-Agent': 'Stremio',
-          Authorization: createBasic(username, password),
-        },
-      },
-      fileName: title,
-      videoSize,
-    } as Stream['behaviorHints'],
+    },
   };
 }
 
 function getCacheOptions(itemsLength: number): Partial<Cache> {
-  if (itemsLength === 0) {
-    return {};
-  }
-
-  const oneDay = 3600 * 24;
-  const oneWeek = oneDay * 7;
-
   return {
-    cacheMaxAge: oneWeek,
-    staleError: oneDay,
-    staleRevalidate: oneDay,
+    cacheMaxAge: (Math.min(itemsLength, 10) / 10) * 3600 * 24 * 7, // up to 1 week of cache for items
   };
 }
 

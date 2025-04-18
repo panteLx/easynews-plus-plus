@@ -1,6 +1,6 @@
 {
   "name": "@easynews/core",
-  "version": "1.3.5",
+  "version": "1.0.0",
   "main": "dist/server.js",
   "scripts": {
     "test": "npm run test --workspaces",
@@ -18,7 +18,7 @@
     "stremio easynews addon",
     "stremio easynews"
   ],
-  "author": "Sleeyax",
+  "author": "panteLx",
   "license": "MIT",
   "description": "Provides content from Easynews & includes a search catalog. This addon can also be self-hosted.",
   "workspaces": [
