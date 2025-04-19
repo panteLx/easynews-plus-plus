@@ -1,7 +1,9 @@
-import { extractDigits } from './utils';
+import { extractDigits, getAlternativeTitles } from './utils';
 
 export type MetaProviderResponse = {
   name: string;
+  originalName?: string; // Original name before any translation
+  alternativeNames?: string[]; // Alternative names/translations
   year?: number;
   season?: string;
   episode?: string;
@@ -17,7 +19,20 @@ export async function imdbMetaProvider(
     .then((json) => {
       return json.d.find((item: { id: string }) => item.id === tt);
     })
-    .then(({ l, y }) => ({ name: l, year: y, season, episode }));
+    .then(({ l, y }) => {
+      // Get original name and potential translations
+      const originalName = l;
+      const alternativeNames = getAlternativeTitles(originalName);
+
+      return {
+        name: originalName,
+        originalName,
+        alternativeNames,
+        year: y,
+        season,
+        episode,
+      };
+    });
 }
 
 export async function cinemetaMetaProvider(
@@ -33,8 +48,14 @@ export async function cinemetaMetaProvider(
       const name = meta.name;
       const year = extractDigits(meta.year ?? meta.releaseInfo);
 
+      // Get original name and potential translations
+      const originalName = name;
+      const alternativeNames = getAlternativeTitles(originalName);
+
       return {
         name,
+        originalName,
+        alternativeNames,
         year,
         episode,
         season,
