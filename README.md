@@ -26,6 +26,7 @@ Public instance: [https://easynews-cloudflare-worker.jqrw92fchz.workers.dev/conf
 - File size-based sorting when resolutions match
 - Better quality detection from file names with multiple resolution and format patterns
 - Subtitle fetching should be more reliable
+- Configurable strict title matching to filter out results that don't exactly match the movie or series title (default: off)
 
 ### Title Translation Feature
 

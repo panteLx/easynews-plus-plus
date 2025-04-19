@@ -53,9 +53,34 @@ export function sanitizeTitle(title: string) {
  */
 export function matchesTitle(title: string, query: string, strict: boolean) {
   const sanitizedQuery = sanitizeTitle(query);
+  const sanitizedTitle = sanitizeTitle(title);
 
-  // For strict mode (typically movies), we try to extract the exact title
+  // Extract the main title part for comparison (excluding episode info)
+  const mainQueryPart = sanitizedQuery.split(/s\d+e\d+/i)[0].trim();
+  const isSeriesQuery = /s\d+e\d+/i.test(sanitizedQuery);
+
+  // For strict mode, we require an exact title match or proper prefix match
   if (strict) {
+    // For series with season/episode pattern like S01E01
+    const seasonEpisodePattern = /s\d+e\d+/i;
+    const hasSeasonEpisodePattern = seasonEpisodePattern.test(sanitizedQuery);
+
+    if (hasSeasonEpisodePattern) {
+      // 1. Check if the title STARTS with the main part of the query (not just contains it)
+      // This catches cases like "the.state.s01e01" but excludes "how.the.states.got.their.shapes.s01e01"
+      if (!sanitizedTitle.startsWith(mainQueryPart)) {
+        return false;
+      }
+
+      // 2. Make sure the title contains the season/episode pattern
+      const seMatch = sanitizedQuery.match(seasonEpisodePattern);
+      if (seMatch && seMatch[0]) {
+        const pattern = seMatch[0].toLowerCase();
+        return sanitizedTitle.includes(pattern);
+      }
+    }
+
+    // For movies or other non-series content
     const { title: parsedTitle, year } = parseTorrentTitle(title);
 
     if (parsedTitle) {
@@ -77,13 +102,12 @@ export function matchesTitle(title: string, query: string, strict: boolean) {
         );
       }
     }
+
+    // If we're in strict mode and haven't matched by now, return false
+    return false;
   }
 
-  // For TV shows and less strict matching
-  const sanitizedTitle = sanitizeTitle(title);
-
-  // Check for word boundary match to avoid partial word matches
-  const queryWords = sanitizedQuery.split(/\s+/);
+  // Non-strict mode below (original behavior)
 
   // For series with season/episode pattern like S01E01
   const seasonEpisodePattern = /s\d+e\d+/i;
@@ -99,6 +123,7 @@ export function matchesTitle(title: string, query: string, strict: boolean) {
   }
 
   // Check that all words in the query appear in the title
+  const queryWords = sanitizedQuery.split(/\s+/);
   const allWordsMatch = queryWords.every((word) => {
     // Skip very short words (1-2 chars) to avoid false positives
     if (word.length <= 2) return true;

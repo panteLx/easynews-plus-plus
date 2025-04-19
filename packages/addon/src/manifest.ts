@@ -38,6 +38,12 @@ export const manifest: Manifest = {
     { title: 'username', key: 'username', type: 'text' },
     { title: 'password', key: 'password', type: 'password' },
     {
+      title: 'Strict Title Matching',
+      key: 'strictTitleMatching',
+      type: 'checkbox',
+      default: 'false',
+    },
+    {
       title: 'Sort 1st',
       key: 'sort1',
       type: 'select',

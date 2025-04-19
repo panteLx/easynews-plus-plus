@@ -40,6 +40,7 @@ interface AddonConfig {
   username: string;
   password: string;
   customTitles?: string;
+  strictTitleMatching?: string;
   sort1?: string;
   sort1Direction?: string;
   sort2?: string;
@@ -283,7 +284,13 @@ builder.defineStreamHandler(
     type: ContentType;
     config: AddonConfig;
   }) => {
-    const { username, password, customTitles, ...options } = config;
+    const {
+      username,
+      password,
+      customTitles,
+      strictTitleMatching,
+      ...options
+    } = config;
 
     if (!id.startsWith('tt')) {
       return {
@@ -291,7 +298,9 @@ builder.defineStreamHandler(
       };
     }
 
-    const cacheKey = id;
+    // Include strictTitleMatching setting in cache key to ensure
+    // users with different settings get different cache results
+    const cacheKey = `${id}:strict=${strictTitleMatching === 'on' || strictTitleMatching === 'true'}`;
     const cached = getFromCache<{ streams: Stream[] }>(cacheKey);
 
     if (cached) {
@@ -302,6 +311,14 @@ builder.defineStreamHandler(
       if (!username || !password) {
         throw new Error('Missing username or password');
       }
+
+      // Parse strictTitleMatching option (checkbox returns string 'on' or undefined)
+      const useStrictMatching =
+        strictTitleMatching === 'on' || strictTitleMatching === 'true';
+      console.log(
+        'Strict title matching enabled:',
+        useStrictMatching ? 'YES' : 'NO'
+      );
 
       // Combine config-provided custom titles with titles from file
       let titleTranslations = { ...translationsFromFile };
@@ -549,7 +566,10 @@ builder.defineStreamHandler(
               queries.push(buildSearchQuery(type, episodeMeta));
             }
 
-            if (!queries.some((q) => matchesTitle(title, q, false))) {
+            // Use strictTitleMatching setting if enabled for series
+            if (
+              !queries.some((q) => matchesTitle(title, q, useStrictMatching))
+            ) {
               continue;
             }
           }
@@ -561,7 +581,12 @@ builder.defineStreamHandler(
               ...meta,
               name: titleVariant,
             });
-            return matchesTitle(title, variantQuery, type === 'movie');
+            // For movies, always use strictTitleMatching if enabled, otherwise default to movie behavior
+            return matchesTitle(
+              title,
+              variantQuery,
+              type === 'movie' || useStrictMatching
+            );
           });
 
           if (!matchesAnyVariant) {
