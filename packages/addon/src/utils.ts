@@ -1,4 +1,4 @@
-import { EasynewsSearchResponse, FileData } from '@easynews/api';
+import { EasynewsSearchResponse, FileData } from '@easynews-plus-plus/api';
 import { MetaProviderResponse } from './meta';
 import { ContentType } from 'stremio-addon-sdk';
 import { parse as parseTorrentTitle } from 'parse-torrent-title';

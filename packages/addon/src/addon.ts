@@ -16,7 +16,7 @@ import {
   logError,
   matchesTitle,
 } from './utils';
-import { EasynewsAPI, SearchOptions } from '@easynews/api';
+import { EasynewsAPI, SearchOptions } from '@easynews-plus-plus/api';
 import { publicMetaProvider } from './meta';
 import { fromHumanReadable, toDirection } from './sort-option';
 

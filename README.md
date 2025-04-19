@@ -4,7 +4,7 @@
 > I am not affiliated with Easynews in any way. This project is a fan-made addon for Stremio that provides access to Easynews content. You need an active Easynews subscription to use this addon.
 
 > [!NOTE]  
-> This fork is only usefull for Omni or Vidi users! There are no additional features! The only difference is the auth implementation.
+> This addon is a fork of the original Easynews+ addon with a different auth implementation that works with Omni and Vidi instances.
 
 Provides content from Easynews & includes a search catalog. This addon can also be [self-hosted](#self-hosting).
 
@@ -87,7 +87,7 @@ If you'd rather run directly from source, you can do so with [Node.js](https://n
 $ node -v
 # version must be >= 7
 $ npm -v
-$ git clone https://github.com/pantelx-easynews-plus-plus.git && cd easynews-plus-plus
+$ git clone https://github.com/pantelx/easynews-plus-plus.git && cd easynews-plus-plus
 $ npm i
 $ npm run build
 # starts the addon in production mode
