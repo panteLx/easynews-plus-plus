@@ -1,24 +1,4 @@
 {
-  "Mufasa: The Lion King": ["Mufasa: Der Koenig der Loewen"],
-  "The Lion King": ["Der Koenig der Loewen"],
-  "The Godfather": ["Der Pate"],
-  "The Lord of the Rings": ["Der Herr der Ringe"],
-  "Pirates of the Caribbean": ["Fluch der Karibik"],
-  "The Hunger Games": ["Die Tribute von Panem"],
-  "Fast and Furious": ["Fast & Furious", "The Fast and the Furious"],
-  "The Avengers": ["Marvel's The Avengers", "Die Rächer"],
-  "Finding Nemo": ["Findet Nemo"],
-  "Inside Out": ["Alles steht Kopf"],
-  "Frozen": ["Die Eiskönigin"],
-  "Moana": ["Vaiana"],
-  "Wreck-It Ralph": ["Ralph reichts"],
-  "The Super Mario Bros. Movie": ["Der Super Mario Bros. Film"],
-  "The Little Mermaid": ["Arielle, die Meerjungfrau"],
-  "Fast X": ["Fast & Furious 10", "Fast X"],
-  "Avatar: The Way of Water": ["Avatar: Der Weg des Wassers"],
   "Walking Dead": ["The Walking Dead"],
-  "Money Heist": ["Haus des Geldes", "La Casa de Papel"],
-  "House of the Dragon": ["House of the Dragon", "Haus des Drachen"],
-  "The Mandalorian": ["The Mandalorian", "Der Mandalorianer"],
-  "Wednesday": ["Wednesday", "Addams Family: Wednesday"]
+  "Money Heist": ["Haus des Geldes", "La Casa de Papel"]
 }

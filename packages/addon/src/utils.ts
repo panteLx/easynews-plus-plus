@@ -221,15 +221,48 @@ export function extractDigits(value: string) {
 }
 
 /**
- * Map of well-known English movie/show titles to their translations
- * Empty default map, will be populated from title-translations.json file
+ * Default title translations that will be available even when file loading fails (for Cloudflare Workers)
  */
-const titleTranslations: Record<string, string[]> = {};
+let titleTranslations: Record<string, string[]> = {
+  'Mufasa: The Lion King': ['Mufasa: Der Koenig der Loewen'],
+  'The Lion King': ['Der König der Löwen', 'Der Koenig der Loewen'],
+  'Avengers: Endgame': ['Avengers: Endspiel'],
+  'Avengers: Infinity War': ['Avengers: Infinity Krieg'],
+  'Star Wars': ['Krieg der Sterne'],
+  'The Godfather': ['Der Pate'],
+  'The Dark Knight': ['Der dunkle Ritter'],
+  'Pulp Fiction': ['Pulp Fiction'],
+  'Fight Club': ['Fight Club', 'Kampfklub'],
+  'Forrest Gump': ['Forrest Gump'],
+  Inception: ['Inception', 'Anfang'],
+  'The Matrix': ['Die Matrix', 'Matrix'],
+  'The Lord of the Rings': ['Der Herr der Ringe'],
+  'The Shawshank Redemption': ['Die Verurteilten'],
+  "Schindler's List": ['Schindlers Liste'],
+  'Pirates of the Caribbean': ['Fluch der Karibik'],
+  'The Hunger Games': ['Die Tribute von Panem'],
+  'Fast and Furious': ['Fast & Furious', 'The Fast and the Furious'],
+  'The Avengers': ["Marvel's The Avengers", 'Die Rächer'],
+  'Finding Nemo': ['Findet Nemo'],
+  'Inside Out': ['Alles steht Kopf'],
+  Frozen: ['Die Eiskönigin'],
+  Moana: ['Vaiana'],
+  'Wreck-It Ralph': ['Ralph reichts'],
+  'The Super Mario Bros. Movie': ['Der Super Mario Bros. Film'],
+  'The Little Mermaid': ['Arielle, die Meerjungfrau'],
+  'Fast X': ['Fast & Furious 10', 'Fast X'],
+  'Avatar: The Way of Water': ['Avatar: Der Weg des Wassers'],
+  'Walking Dead': ['The Walking Dead'],
+  'Money Heist': ['Haus des Geldes', 'La Casa de Papel'],
+  'House of the Dragon': ['House of the Dragon', 'Haus des Drachen'],
+  'The Mandalorian': ['The Mandalorian', 'Der Mandalorianer'],
+  Wednesday: ['Wednesday', 'Addams Family: Wednesday'],
+};
 
 /**
  * Load additional title translations from a JSON file if available
  * @param filePath Path to the JSON file containing title translations
- * @returns Title translations from the file or an empty object if file not found
+ * @returns Title translations from the file or the default translations if file not found
  */
 export function loadTitleTranslations(
   filePath: string
@@ -238,12 +271,13 @@ export function loadTitleTranslations(
   if (
     typeof process === 'undefined' ||
     !process.env ||
-    typeof __dirname === 'undefined'
+    typeof __dirname === 'undefined' ||
+    typeof fs === 'undefined'
   ) {
     console.log(
-      'Running in Cloudflare Worker environment, skipping file system operations in loadTitleTranslations'
+      'Running in Cloudflare Worker environment, using built-in translations only'
     );
-    return {};
+    return titleTranslations; // Return the built-in translations
   }
 
   try {
@@ -256,7 +290,7 @@ export function loadTitleTranslations(
       try {
         const customTranslations = JSON.parse(fileContent);
         console.log(
-          `Parsed ${Object.keys(customTranslations).length} custom translations`
+          `Parsed ${Object.keys(customTranslations).length} custom translations from file`
         );
 
         // Log a sample of translations for debugging
@@ -267,7 +301,11 @@ export function loadTitleTranslations(
           );
         }
 
-        return customTranslations;
+        // Merge with built-in translations (file translations take precedence)
+        return {
+          ...titleTranslations,
+          ...customTranslations,
+        };
       } catch (parseError) {
         console.error(`Error parsing JSON in ${filePath}:`, parseError);
         console.error(
@@ -275,14 +313,14 @@ export function loadTitleTranslations(
         );
       }
     } else {
-      console.error(`File does not exist: ${filePath}`);
+      console.log(`File does not exist: ${filePath}`);
     }
   } catch (error) {
-    console.error(`Error loading translations from ${filePath}:`, error);
+    console.log(`Error loading translations from ${filePath}:`, error);
   }
 
-  console.log('Returning empty translations object as fallback');
-  return {};
+  console.log('Using built-in translations as fallback');
+  return titleTranslations; // Return built-in translations as fallback
 }
 
 /**

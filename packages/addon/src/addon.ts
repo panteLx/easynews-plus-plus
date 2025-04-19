@@ -81,13 +81,7 @@ function setCache<T>(key: string, data: T): void {
 let translationsFromFile: Record<string, string[]> = {};
 let loadedPath: string | null = null;
 
-// Check if we're in a Cloudflare Worker environment
-const isCloudflareWorker =
-  typeof process === 'undefined' ||
-  !process.env ||
-  typeof __dirname === 'undefined';
-
-if (!isCloudflareWorker) {
+try {
   const possiblePaths = [
     // In the same directory as the running code
     path.join(__dirname, 'title-translations.json'),
@@ -95,7 +89,7 @@ if (!isCloudflareWorker) {
     path.join(__dirname, '..', 'title-translations.json'),
     // Two levels up (packages directory)
     path.join(__dirname, '..', '..', 'title-translations.json'),
-    // In Base directory
+    // Three levels up (project root)
     path.join(__dirname, '..', '..', '..', 'title-translations.json'),
     // In current working directory
     path.join(process.cwd(), 'title-translations.json'),
@@ -128,30 +122,28 @@ if (!isCloudflareWorker) {
             );
           }
         } else {
-          console.error(
+          console.log(
             'No translations were loaded from the file. The file might be empty or have invalid format.'
           );
         }
-
         break;
       }
     } catch (error) {
-      console.error(`Error checking path ${filePath}:`, error);
+      console.log(`Error checking path ${filePath}: ${error}`);
     }
   }
 
   if (!loadedPath) {
-    console.error(
-      'Could not find title-translations.json file. Checked paths:',
+    console.log(
+      'Could not find title-translations.json file. Using built-in translations only. Checked paths:',
       possiblePaths
     );
   } else {
     console.log('Using title translations from:', loadedPath);
   }
-} else {
-  console.log(
-    'Running in Cloudflare Worker environment, skipping file system operations'
-  );
+} catch (error) {
+  console.log('Error loading title translations file:', error);
+  console.log('Using built-in translations as fallback');
 }
 
 builder.defineCatalogHandler(async ({ extra: { search } }) => {
