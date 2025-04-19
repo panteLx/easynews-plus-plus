@@ -1,13 +1,13 @@
 # Easynews++
 
 > [!NOTE]  
-> This addon is a fork of the Easynews+ addon which is great too. It uses a different auth implementation than other Easynews addons to function as expected on multiple platforms like Stremio, Omni & Vidi and has some additional enhancements.
+> This addon is based on the Easynews+ addon which is great too. It uses a different auth implementation than other Easynews addons to function as expected on multiple platforms like Stremio, Omni & Vidi and has additional enhancements and features.
 
 Public instance: [https://easynews-cloudflare-worker.jqrw92fchz.workers.dev/configure](https://easynews-cloudflare-worker.jqrw92fchz.workers.dev/configure) or [https://en.pantelx.com](https://en.pantelx.com). Want to build it yourself? Check out the [Self-Hosting Guide](#self-hosting).
 
 ---
 
-## Enhancements compared to the Easynews+ and original addon
+## Enhancements/Features compared to the Easynews(+) addons
 
 ### Performance Improvements
 
@@ -27,7 +27,7 @@ Public instance: [https://easynews-cloudflare-worker.jqrw92fchz.workers.dev/conf
 - Better quality detection from file names with multiple resolution and format patterns
 - Subtitle fetching should be more reliable
 
-### Title Translation Enhancement
+### Title Translation Feature
 
 I've recently improved the title translation functionality to better handle alternative titles and translations. The addon now properly combines (Example: Original - Mufasa: The Lion King; German: Mufasa: Der Koenig der Loewen):
 
