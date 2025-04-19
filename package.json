@@ -3,16 +3,14 @@
   "version": "1.0.1",
   "main": "dist/server.js",
   "scripts": {
-    "test": "npm run test --workspaces",
+    "test": "npm run build && npm run test --workspaces",
     "format": "prettier --write .",
     "build": "npm -w packages/api run build && npm -w packages/addon run build",
-    "build:watch": "tsc --build --watch",
-    "start:addon": "npm -w packages/addon start",
-    "start:addon:dev": "npm -w packages/addon run start:dev",
-    "start:cloudflare-worker:dev": "npm -w packages/cloudflare-worker run dev",
+    "start:addon": "npm run build && npm -w packages/addon start",
+    "start:addon:dev": "npm run build && npm -w packages/addon run start:dev",
+    "start:cloudflare-worker:dev": "npm run build && npm -w packages/cloudflare-worker run dev",
     "deploy:beamup": "beamup",
-    "deploy:cloudflare-worker": "npm -w packages/cloudflare-worker run deploy",
-    "version": "npm version $npm_package_version --workspaces && git add **/package.json"
+    "deploy:cloudflare-worker": "npm run build && npm -w packages/cloudflare-worker run deploy"
   },
   "keywords": [
     "stremio easynews addon",
