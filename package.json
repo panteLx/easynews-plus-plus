@@ -11,9 +11,12 @@
     "start:cloudflare-worker:dev": "npm run build && npm -w packages/cloudflare-worker run dev",
     "deploy:beamup": "beamup",
     "deploy:cloudflare-worker": "npm run build && npm -w packages/cloudflare-worker run deploy",
-    "version:patch": "npm version patch --workspaces && git add . && git commit -m 'chore: bump version' && git push --follow-tags",
-    "version:minor": "npm version minor --workspaces && git add . && git commit -m 'chore: bump version' && git push --follow-tags",
-    "version:major": "npm version major --workspaces && git add . && git commit -m 'chore: bump version' && git push --follow-tags"
+    "version:patch": "npm version patch --no-git-tag-version && npm version patch --workspaces --no-git-tag-version && git add . && git commit -m 'chore: bump version' && git tag v$(node -p \"require('./package.json').version\") && git push && git push --tags",
+    "version:minor": "npm version minor --no-git-tag-version && npm version minor --workspaces --no-git-tag-version && git add . && git commit -m 'chore: bump version' && git tag v$(node -p \"require('./package.json').version\") && git push && git push --tags",
+    "version:major": "npm version major --no-git-tag-version && npm version major --workspaces --no-git-tag-version && git add . && git commit -m 'chore: bump version' && git tag v$(node -p \"require('./package.json').version\") && git push && git push --tags",
+    "bump:patch": "npm version patch --no-git-tag-version && npm version patch --workspaces --no-git-tag-version",
+    "bump:minor": "npm version minor --no-git-tag-version && npm version minor --workspaces --no-git-tag-version",
+    "bump:major": "npm version major --no-git-tag-version && npm version major --workspaces --no-git-tag-version"
   },
   "keywords": [
     "stremio easynews addon",
