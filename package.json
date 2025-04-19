@@ -11,9 +11,9 @@
     "start:cloudflare-worker:dev": "npm run build && npm -w packages/cloudflare-worker run dev",
     "deploy:beamup": "beamup",
     "deploy:cloudflare-worker": "npm run build && npm -w packages/cloudflare-worker run deploy",
-    "version:patch": "npm version patch --workspaces && npm version patch && git add . && git commit -m 'chore: bump version' && git push --follow-tags",
-    "version:minor": "npm version minor --workspaces && npm version minor && git add . && git commit -m 'chore: bump version' && git push --follow-tags",
-    "version:major": "npm version major --workspaces && npm version major && git add . && git commit -m 'chore: bump version' && git push --follow-tags"
+    "version:patch": "npm version patch --workspaces",
+    "version:minor": "npm version minor --workspaces && git add . && git commit -m 'chore: bump version' && git push --follow-tags",
+    "version:major": "npm version major --workspaces && git add . && git commit -m 'chore: bump version' && git push --follow-tags"
   },
   "keywords": [
     "stremio easynews addon",
@@ -23,7 +23,8 @@
   "license": "MIT",
   "description": "Provides content from Easynews & includes a search catalog. This addon can also be self-hosted. It uses a different auth implementation than other Easynews addons and has other enhancements that works on multiple plattforms. Check out the Github repo for more information.",
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "/"
   ],
   "engines": {
     "node": ">=20.0.0",
