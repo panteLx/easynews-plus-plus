@@ -23,8 +23,7 @@
   "license": "MIT",
   "description": "This addon provides content from Easynews & includes a search catalog. It uses a different auth implementation than other Easynews addons to function as expected on multiple plattforms and has some additional enhancements. Self-Host Guide & more infos: https://github.com/panteLx/easynews-plus-plus-addon",
   "workspaces": [
-    "packages/*",
-    "/"
+    "packages/*"
   ],
   "engines": {
     "node": ">=20.0.0",
