@@ -10,7 +10,7 @@
     "start": "node dist/server.js",
     "start:dev": "cross-env NODE_ENV=dev tsx watch src/server.ts"
   },
-  "description": "Provides content from Easynews & includes a search catalog. This addon can also be self-hosted.",
+  "description": "Provides content from Easynews & includes a search catalog. This addon can also be self-hosted. Uses a different auth implementation than other Easynews addons to make it work on all platforms.",
   "devDependencies": {
     "@types/stremio-addon-sdk": "^1.6.11"
   },
