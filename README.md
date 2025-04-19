@@ -121,11 +121,10 @@ $ npm run start:cloudflare-worker:dev
 
 ### Release on Github
 
-To release a new version of the addon:
+To release a new version of the addon and commit it to Github:
 
 ```bash
-$ npm version <major|minor|patch> --workspaces
-$ git push --follow-tags
+$ npm run version:<patch|minor|major>
 ```
 
 Finally, create a new release targeting the tag you just pushed on GitHub and include some release notes.
