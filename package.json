@@ -10,7 +10,10 @@
     "start:addon:dev": "npm run build && npm -w packages/addon run start:dev",
     "start:cloudflare-worker:dev": "npm run build && npm -w packages/cloudflare-worker run dev",
     "deploy:beamup": "beamup",
-    "deploy:cloudflare-worker": "npm run build && npm -w packages/cloudflare-worker run deploy"
+    "deploy:cloudflare-worker": "npm run build && npm -w packages/cloudflare-worker run deploy",
+    "version:patch": "npm version patch --workspaces && npm version patch && git add . && git commit -m 'chore: bump version' && git push --follow-tags",
+    "version:minor": "npm version minor --workspaces && npm version minor && git add . && git commit -m 'chore: bump version' && git push --follow-tags",
+    "version:major": "npm version major --workspaces && npm version major && git add . && git commit -m 'chore: bump version' && git push --follow-tags"
   },
   "keywords": [
     "stremio easynews addon",
