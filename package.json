@@ -20,7 +20,7 @@
   ],
   "author": "panteLx",
   "license": "MIT",
-  "description": "Provides content from Easynews & includes a search catalog. This addon can also be self-hosted.",
+  "description": "Provides content from Easynews & includes a search catalog. This addon can also be self-hosted. Uses a different auth implementation than other Easynews addons to make it work on all platforms.",
   "workspaces": [
     "packages/*"
   ],
