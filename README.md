@@ -1,13 +1,13 @@
 # Easynews++
 
 > [!NOTE]  
-> This addon is a fork of the Easynews+ addon. It uses a different auth implementation than other Easynews addons to function as expected on multiple plattforms like Stremio, Omni & Vidi and has some additional enhancements.
+> This addon is a fork of the Easynews+ addon which is great too. It uses a different auth implementation than other Easynews addons to function as expected on multiple plattforms like Stremio, Omni & Vidi and has some additional enhancements.
 
 Public instance: [https://easynews-cloudflare-worker.jqrw92fchz.workers.dev/configure](https://easynews-cloudflare-worker.jqrw92fchz.workers.dev/configure) or [https://en.pantelx.com](https://en.pantelx.com). Want to build it yourself? Check out the [Self-Hosting Guide](#self-hosting).
 
 ---
 
-## Enhancements compared to the Easynews+ addon
+## Enhancements compared to the Easynews+ and original addon
 
 ### Performance Improvements
 
@@ -31,22 +31,24 @@ Public instance: [https://easynews-cloudflare-worker.jqrw92fchz.workers.dev/conf
 
 I've recently improved the title translation functionality to better handle alternative titles and translations. The addon now properly combines (Example: Original - Mufasa: The Lion King; German: Mufasa: Der Koenig der Loewen):
 
-1. Original titles
-2. Direct translations from the translations file
-3. Alternative titles from metadata
-4. Additional titles from partial matches
+- Original titles
+- Direct translations from the translations file
+- Alternative titles from metadata
+- Additional titles from partial matches
 
 This enhancement is currently only available in the self-hosted version. If you'd like to see your translated title added to the public version, please create a new issue.
 
 ### Compatibility
 
-- This addon does not use basic auth headers to stream media because it isnt supported on multiple plattforms like Omni and Vidi
+- This addon does not use basic auth headers to stream media because it isnt supported on multiple plattforms like Omni and Vidi.
 
 ---
 
 ## Self-Hosting
 
 To get results in a fast and private manner, you may wish to self-host the addon. This is easy to do, and only requires a few steps. We support multiple ways of self-hosting:
+
+> Optional: Add some custom/translated titles to title-translations.json
 
 ### Docker
 
@@ -148,30 +150,19 @@ Finally, create a new release targeting the tag you just pushed on GitHub and in
 
 Easynews is a premium Usenet provider that offers a web-based Usenet browser. It allows you to search, preview, and download files from Usenet newsgroups without the need for a newsreader. Easynews is known for its user-friendly interface and fast download speeds. The Easynews addon for Stremio provides access to Easynews content directly within the Stremio app. You can search for and stream movies, TV shows, and other media files from Easynews using the addon. In a way it can serve as an alternative to debrid services (Real-Debrid, Premiumize, AllDebrid etc.). An Easynews account with an active subscription is required to use the addon.
 
-### Why not extend the existing Easynews+ addon?
-
-The auth implementation on the existing Easynews+ addon is fine for streamio so there is no need to update that addon.
-The only difference between both addons is the different auth implementation (No basic auth header auth). My fork is only useful for Omni or Vidi instances because they didnt support basic auth headers (yet).
-
-### Why not extend the existing original Easynews addon?
-
-The code is closed source and this is a fork of the open source Easynews+ addon.
-
 ### Why can't I find show X or movie Y?
 
 Golden rule of thumb: look it up on [Easynews web search](https://members.easynews.com/). If you can't find it there, or it's only returning bad quality results (duration < 5 minutes, marked as spam, no video etc.), you won't find it using the addon either.
 
-If you do find your content through the web search however, it may be because the addon can't match the resulting titles returned by the Easynews API names with the metadata from Stremio, or it's in the wrong format.
+If you do find your content through the web search however, it may be because the addon can't match the resulting titles returned by the Easynews API names with the metadata from Stremio, or it's in the wrong format. You can selfhost your own Easynews++ addon and add a translated/custom title for that movie.
 
-A couple of examples where the addon won't be able to find results:
+A couple of examples where the addon won't be able to find results without adding translated/custom titles:
 
 - The anime series `death note` doesn't follow the conventional season number + episode number standard. The show has titles like `Death Note 02` instead of the expected format `Death Note S01E02`.
 - For the movie `Mission: Impossible - Dead Reckoning Part One (2023)` Stremio's metadata returns only `dead reckoning` for this title, making it impossible (pun not intended) to match. Movie titles are strictly matched by their full title.
 - The real title of the movie `WALL-E (2008)` contains an annoying 'dot' special character: `WALL·E`. This should be converted to a `-` character, but the addon converts that character already to a space because this sanitization is needed for 99% of the other titles. No results for `WALL E` will be returned (actually, no results for `WALL-E` either, but it still serves as a good example).
 
-There are more oddly titled file names returned by EasyNews. The good news is they are a minority. The bad news is that addon can't possibly support all of these edge cases because that would slow down the search query exponentially and put more stress on both the addon's server and Easynews API, ultimately impacting the performance.
-
-We try to match most shows, but for the remaining 10-20% of edge cases we currently require you to use the EN+ search catalog instead.
+Create a new issue if you're unsuccessful with the translated/custom title.
 
 ### Why am I limited to 50 streams when searching for content?
 
