@@ -224,6 +224,7 @@ export function extractDigits(value: string) {
  * Default title translations that will be available even when file loading fails (for Cloudflare Workers)
  */
 let titleTranslations: Record<string, string[]> = {
+  'Rain or Shine': ['Just between Lovers'],
   'Mufasa: The Lion King': ['Mufasa: Der Koenig der Loewen'],
   'The Lion King': ['Der König der Löwen', 'Der Koenig der Loewen'],
   'Avengers: Endgame': ['Avengers: Endspiel'],
