@@ -97,7 +97,9 @@ The addon can be deployed as a [Cloudflare worker](https://workers.cloudflare.co
 ```bash
 $ git clone https://github.com/pantelx/easynews-plus-plus.git && cd easynews-plus-plus
 $ npm i
-$ npm run deploy:cloudflare-worker
+$ npm run deploy:cf
+# You can also preview your changes first if enabled on the Cloudflare worker dashboard
+$ npm run preview:cf
 ```
 
 You will see the Cloudflare URL in the terminal.
@@ -130,7 +132,7 @@ Run the easynews addon in development mode:
 # addon
 $ npm run start:addon:dev
 # cloudflare worker deployment in development mode
-$ npm run start:cloudflare-worker:dev
+$ npm run start:cf:dev
 ```
 
 ### Release on Github

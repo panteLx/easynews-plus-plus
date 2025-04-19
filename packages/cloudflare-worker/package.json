@@ -5,6 +5,7 @@
     "test": "vitest run --passWithNoTests",
     "dev": "wrangler dev src/index.ts",
     "deploy": "wrangler deploy --minify src/index.ts",
+    "preview": "wrangler versions upload --script src/index.ts",
     "build": "exit 0"
   },
   "dependencies": {
