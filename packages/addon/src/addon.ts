@@ -594,13 +594,27 @@ builder.defineStreamHandler(
         const aQuality = a.name?.includes('\n') ? a.name.split('\n')[1] : '';
         const bQuality = b.name?.includes('\n') ? b.name.split('\n')[1] : '';
 
-        // Prioritize 4K/2160p over 1080p over 720p
-        if (aQuality?.includes('4K') && !bQuality?.includes('4K')) return -1;
-        if (!aQuality?.includes('4K') && bQuality?.includes('4K')) return 1;
-        if (aQuality?.includes('1080p') && !bQuality?.includes('1080p'))
-          return -1;
-        if (!aQuality?.includes('1080p') && bQuality?.includes('1080p'))
-          return 1;
+        // Get quality scores (higher = better quality)
+        const getQualityScore = (quality: string): number => {
+          if (
+            quality?.includes('4K') ||
+            quality?.includes('2160p') ||
+            quality?.includes('UHD')
+          )
+            return 4;
+          if (quality?.includes('1080p')) return 3;
+          if (quality?.includes('720p')) return 2;
+          if (quality?.includes('480p')) return 1;
+          return 0; // unknown quality
+        };
+
+        const aScore = getQualityScore(aQuality);
+        const bScore = getQualityScore(bQuality);
+
+        // Higher score should come first
+        if (aScore !== bScore) {
+          return bScore - aScore; // Reverse order so higher score comes first
+        }
 
         // If same quality, prioritize by file size (larger typically better quality)
         const aSize = aDesc.length > 2 ? aDesc[2] : '';
@@ -612,6 +626,18 @@ builder.defineStreamHandler(
           const bGB = parseFloat(bSize.match(/[\d.]+/)?.[0] || '0');
           if (aGB > bGB) return -1;
           if (aGB < bGB) return 1;
+        }
+
+        // Compare MB to GB (GB is always larger)
+        if (aSize.includes('GB') && bSize.includes('MB')) return -1;
+        if (aSize.includes('MB') && bSize.includes('GB')) return 1;
+
+        // Compare MB files
+        if (aSize.includes('MB') && bSize.includes('MB')) {
+          const aMB = parseFloat(aSize.match(/[\d.]+/)?.[0] || '0');
+          const bMB = parseFloat(bSize.match(/[\d.]+/)?.[0] || '0');
+          if (aMB > bMB) return -1;
+          if (aMB < bMB) return 1;
         }
 
         return 0;
