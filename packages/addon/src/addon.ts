@@ -81,6 +81,10 @@ function setCache<T>(key: string, data: T): void {
 let translationsFromFile: Record<string, string[]> = {};
 let loadedPath: string | null = null;
 
+// Start with the built-in translations by calling loadTitleTranslations with a non-existent path
+// This will return the default built-in translations
+translationsFromFile = loadTitleTranslations('');
+
 try {
   const possiblePaths = [
     // In the same directory as the running code
@@ -135,9 +139,14 @@ try {
 
   if (!loadedPath) {
     console.log(
-      'Could not find title-translations.json file. Using built-in translations only. Checked paths:',
-      possiblePaths
+      'Could not find title-translations.json file. Using built-in translations only. Built-in translations count:',
+      Object.keys(translationsFromFile).length
     );
+    console.log('Some examples of built-in translations:');
+    const examples = Object.entries(translationsFromFile).slice(0, 5);
+    for (const [original, translations] of examples) {
+      console.log(`  "${original}" -> "${translations.join('", "')}"`);
+    }
   } else {
     console.log('Using title translations from:', loadedPath);
   }
@@ -298,7 +307,7 @@ builder.defineStreamHandler(
       let titleTranslations = { ...translationsFromFile };
 
       console.log(
-        `Using ${Object.keys(titleTranslations).length} title translations from file`
+        `Using ${Object.keys(titleTranslations).length} title translations (${Object.keys(translationsFromFile).length} from built-in/file + additional from config)`
       );
 
       // Add any custom titles from configuration
