@@ -5,7 +5,7 @@
 
 Provides content from Easynews & includes a search catalog. This addon can also be [self-hosted](#self-hosting).
 
-Public instance: [https://easynews-cloudflare-worker.jqrw92fchz.workers.dev/configure](https://easynews-cloudflare-worker.jqrw92fchz.workers.dev/configure).
+Public instance: [https://easynews-cloudflare-worker.jqrw92fchz.workers.dev/configure](https://easynews-cloudflare-worker.jqrw92fchz.workers.dev/configure) or [https://en.pantelx.com](https://en.pantelx.com).
 
 ---
 
