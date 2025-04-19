@@ -234,6 +234,18 @@ const titleTranslations: Record<string, string[]> = {};
 export function loadTitleTranslations(
   filePath: string
 ): Record<string, string[]> {
+  // Check if we're in a Cloudflare Worker environment
+  if (
+    typeof process === 'undefined' ||
+    !process.env ||
+    typeof __dirname === 'undefined'
+  ) {
+    console.log(
+      'Running in Cloudflare Worker environment, skipping file system operations in loadTitleTranslations'
+    );
+    return {};
+  }
+
   try {
     if (fs.existsSync(filePath)) {
       console.log(`Loading translations from file: ${filePath}`);

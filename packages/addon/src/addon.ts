@@ -78,66 +78,80 @@ function setCache<T>(key: string, data: T): void {
 
 // Load custom title translations from file if available
 // Try multiple possible locations for the file
-const possiblePaths = [
-  // In the same directory as the running code
-  path.join(__dirname, 'title-translations.json'),
-  // One level up (addon root directory)
-  path.join(__dirname, '..', 'title-translations.json'),
-  // Two levels up (packages directory)
-  path.join(__dirname, '..', '..', 'title-translations.json'),
-  // In Base directory
-  path.join(__dirname, '..', '..', '..', 'title-translations.json'),
-  // In current working directory
-  path.join(process.cwd(), 'title-translations.json'),
-  // In addon subdirectory of current working directory
-  path.join(process.cwd(), 'addon', 'title-translations.json'),
-  // In dist subdirectory of current working directory
-  path.join(process.cwd(), 'dist', 'title-translations.json'),
-];
-
 let translationsFromFile: Record<string, string[]> = {};
 let loadedPath: string | null = null;
 
-// Try each path until we find the file
-for (const filePath of possiblePaths) {
-  try {
-    if (fs.existsSync(filePath)) {
-      console.log(`Found title-translations.json at: ${filePath}`);
-      translationsFromFile = loadTitleTranslations(filePath);
-      loadedPath = filePath;
+// Check if we're in a Cloudflare Worker environment
+const isCloudflareWorker =
+  typeof process === 'undefined' ||
+  !process.env ||
+  typeof __dirname === 'undefined';
 
-      // Log some details about the loaded translations
-      const numTranslations = Object.keys(translationsFromFile).length;
-      console.log(`Successfully loaded ${numTranslations} title translations`);
+if (!isCloudflareWorker) {
+  const possiblePaths = [
+    // In the same directory as the running code
+    path.join(__dirname, 'title-translations.json'),
+    // One level up (addon root directory)
+    path.join(__dirname, '..', 'title-translations.json'),
+    // Two levels up (packages directory)
+    path.join(__dirname, '..', '..', 'title-translations.json'),
+    // In Base directory
+    path.join(__dirname, '..', '..', '..', 'title-translations.json'),
+    // In current working directory
+    path.join(process.cwd(), 'title-translations.json'),
+    // In addon subdirectory of current working directory
+    path.join(process.cwd(), 'addon', 'title-translations.json'),
+    // In dist subdirectory of current working directory
+    path.join(process.cwd(), 'dist', 'title-translations.json'),
+  ];
 
-      if (numTranslations > 0) {
-        // Log a few examples to verify they're loaded correctly
-        const examples = Object.entries(translationsFromFile).slice(0, 3);
-        for (const [original, translations] of examples) {
-          console.log(
-            `Example translation: "${original}" -> "${translations.join('", "')}"`
+  // Try each path until we find the file
+  for (const filePath of possiblePaths) {
+    try {
+      if (fs.existsSync(filePath)) {
+        console.log(`Found title-translations.json at: ${filePath}`);
+        translationsFromFile = loadTitleTranslations(filePath);
+        loadedPath = filePath;
+
+        // Log some details about the loaded translations
+        const numTranslations = Object.keys(translationsFromFile).length;
+        console.log(
+          `Successfully loaded ${numTranslations} title translations`
+        );
+
+        if (numTranslations > 0) {
+          // Log a few examples to verify they're loaded correctly
+          const examples = Object.entries(translationsFromFile).slice(0, 3);
+          for (const [original, translations] of examples) {
+            console.log(
+              `Example translation: "${original}" -> "${translations.join('", "')}"`
+            );
+          }
+        } else {
+          console.error(
+            'No translations were loaded from the file. The file might be empty or have invalid format.'
           );
         }
-      } else {
-        console.error(
-          'No translations were loaded from the file. The file might be empty or have invalid format.'
-        );
+
+        break;
       }
-
-      break;
+    } catch (error) {
+      console.error(`Error checking path ${filePath}:`, error);
     }
-  } catch (error) {
-    console.error(`Error checking path ${filePath}:`, error);
   }
-}
 
-if (!loadedPath) {
-  console.error(
-    'Could not find title-translations.json file. Checked paths:',
-    possiblePaths
-  );
+  if (!loadedPath) {
+    console.error(
+      'Could not find title-translations.json file. Checked paths:',
+      possiblePaths
+    );
+  } else {
+    console.log('Using title translations from:', loadedPath);
+  }
 } else {
-  console.log('Using title translations from:', loadedPath);
+  console.log(
+    'Running in Cloudflare Worker environment, skipping file system operations'
+  );
 }
 
 builder.defineCatalogHandler(async ({ extra: { search } }) => {
