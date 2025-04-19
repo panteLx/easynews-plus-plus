@@ -126,7 +126,7 @@ $ npm run start:cloudflare-worker:dev
 To release a new version of the addon:
 
 ```bash
-$ npm version <major|minor|patch>
+$ npm version <major|minor|patch> --workspaces
 $ git push --follow-tags
 ```
 
