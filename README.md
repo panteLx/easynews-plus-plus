@@ -27,6 +27,17 @@ Public instance: [https://easynews-cloudflare-worker.jqrw92fchz.workers.dev/conf
 - Better quality detection from file names with multiple resolution and format patterns
 - Subtitle fetching should be more reliable
 
+### Title Translation Enhancement
+
+I've recently improved the title translation functionality to better handle alternative titles and translations. The addon now properly combines (Example: Original - Mufasa: The Lion King; German: Mufasa: Der Koenig der Loewen):
+
+1. Original titles
+2. Direct translations from the translations file
+3. Alternative titles from metadata
+4. Additional titles from partial matches
+
+This enhancement is currently only available in the self-hosted version. If you'd like to see your translated title added to the public version, please create a new issue.
+
 ### Compatibility
 
 - This addon does not use basic auth headers to stream media because it isnt supported on multiple plattforms like Omni and Vidi

@@ -1,11 +1,15 @@
 import { Stream as StremioStream } from 'stremio-addon-sdk';
 
-export interface Stream extends StremioStream {
+export type Stream = {
+  name: string;
+  url: string;
+  description?: string;
   behaviorHints?: {
     notWebReady?: boolean;
-    countryWhitelist?: string[];
-    group?: string;
-    headers?: any;
+    bingeGroup?: string;
+    headers?: {
+      [key: string]: string;
+    };
     filename?: string;
   };
-}
+};

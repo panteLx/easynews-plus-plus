@@ -2,6 +2,8 @@ import { EasynewsSearchResponse, FileData } from '@easynews-plus-plus/api';
 import { MetaProviderResponse } from './meta';
 import { ContentType } from 'stremio-addon-sdk';
 import { parse as parseTorrentTitle } from 'parse-torrent-title';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export function isBadVideo(file: FileData) {
   const duration = file['14'] ?? '';
@@ -216,6 +218,293 @@ export function extractDigits(value: string) {
   }
 
   return undefined;
+}
+
+/**
+ * Map of well-known English movie/show titles to their translations
+ * Empty default map, will be populated from title-translations.json file
+ */
+const titleTranslations: Record<string, string[]> = {};
+
+/**
+ * Load additional title translations from a JSON file if available
+ * @param filePath Path to the JSON file containing title translations
+ * @returns Title translations from the file or an empty object if file not found
+ */
+export function loadTitleTranslations(
+  filePath: string
+): Record<string, string[]> {
+  try {
+    if (fs.existsSync(filePath)) {
+      console.log(`Loading translations from file: ${filePath}`);
+      const fileContent = fs.readFileSync(filePath, 'utf-8');
+      console.log(`File content length: ${fileContent.length} bytes`);
+
+      // Try to parse the file content
+      try {
+        const customTranslations = JSON.parse(fileContent);
+        console.log(
+          `Parsed ${Object.keys(customTranslations).length} custom translations`
+        );
+
+        // Log a sample of translations for debugging
+        const sampleKeys = Object.keys(customTranslations).slice(0, 3);
+        for (const key of sampleKeys) {
+          console.log(
+            `Sample translation: "${key}" -> ${JSON.stringify(customTranslations[key])}`
+          );
+        }
+
+        return customTranslations;
+      } catch (parseError) {
+        console.error(`Error parsing JSON in ${filePath}:`, parseError);
+        console.error(
+          `First 100 characters of file: ${fileContent.substring(0, 100)}...`
+        );
+      }
+    } else {
+      console.error(`File does not exist: ${filePath}`);
+    }
+  } catch (error) {
+    console.error(`Error loading translations from ${filePath}:`, error);
+  }
+
+  console.log('Returning empty translations object as fallback');
+  return {};
+}
+
+/**
+ * Parses custom title translations from a configuration string
+ * @param customTitlesStr String from the configuration (JSON format preferred)
+ * @returns Record of original titles to arrays of alternative titles
+ */
+export function parseCustomTitles(
+  customTitlesStr: string | any
+): Record<string, string[]> {
+  // Handle empty/null input
+  if (!customTitlesStr) {
+    return {};
+  }
+
+  // If already an object, process it directly
+  if (typeof customTitlesStr === 'object' && !Array.isArray(customTitlesStr)) {
+    const result: Record<string, string[]> = {};
+
+    try {
+      // Validate the object structure
+      for (const [key, value] of Object.entries(customTitlesStr)) {
+        if (typeof key === 'string') {
+          let valueArray: string[] = [];
+
+          // Handle string value
+          if (typeof value === 'string') {
+            valueArray = [value.trim()];
+          }
+          // Handle array value
+          else if (Array.isArray(value)) {
+            valueArray = (value as any[])
+              .filter((item) => typeof item === 'string')
+              .map((item) => item.trim())
+              .filter((item) => item !== '');
+          }
+
+          if (valueArray.length > 0) {
+            result[key.trim()] = valueArray;
+          }
+        }
+      }
+
+      return result;
+    } catch (objError) {
+      console.error('Error processing object custom titles:', objError);
+    }
+  }
+
+  // Convert to string if needed
+  if (typeof customTitlesStr !== 'string') {
+    try {
+      customTitlesStr = String(customTitlesStr);
+    } catch (strError) {
+      return {};
+    }
+  }
+
+  // Trim input
+  const trimmedInput = customTitlesStr.trim();
+
+  if (trimmedInput === '') {
+    return {};
+  }
+
+  const result: Record<string, string[]> = {};
+  try {
+    // Try to parse as JSON first (preferred)
+    if (trimmedInput.startsWith('{') && trimmedInput.endsWith('}')) {
+      try {
+        const parsed = JSON.parse(trimmedInput);
+
+        // Validate the parsed object and its structure
+        for (const [key, value] of Object.entries(parsed)) {
+          if (typeof key === 'string') {
+            let valueArray: string[] = [];
+
+            // Handle string value
+            if (typeof value === 'string') {
+              valueArray = [value.trim()];
+            }
+            // Handle array value
+            else if (Array.isArray(value)) {
+              valueArray = (value as any[])
+                .filter((item) => typeof item === 'string')
+                .map((item) => item.trim())
+                .filter((item) => item !== '');
+            }
+
+            if (valueArray.length > 0) {
+              result[key.trim()] = valueArray;
+            }
+          }
+        }
+
+        return result;
+      } catch (jsonError) {
+        // Fall through to legacy string parsing
+      }
+    }
+
+    // Legacy string format parsing (backward compatibility)
+    // Format: "Original Title:Alternative Title 1,Alternative Title 2;Another Original:Alternative"
+    const pairs = trimmedInput.split(';');
+
+    for (const pair of pairs) {
+      // Each pair should be in format "Original:Alternative1,Alternative2"
+      const [original, alternativesStr] = pair.split(':');
+
+      if (!original || !alternativesStr) {
+        continue;
+      }
+
+      const originalTitle = original.trim();
+      const alternatives = alternativesStr
+        .split(',')
+        .map((alt: string) => alt.trim())
+        .filter((alt: string) => alt !== '');
+
+      if (originalTitle && alternatives.length > 0) {
+        result[originalTitle] = alternatives;
+      }
+    }
+  } catch (error) {
+    console.error('Error parsing custom titles:', error);
+  }
+
+  return result;
+}
+
+/**
+ * Gets combined title translations from custom string and existing translations
+ * @param customTitlesStr String from the configuration
+ * @param existingTranslations Existing translations to combine with
+ * @returns Combined record of original titles to arrays of alternative titles
+ */
+export function getCombinedTitleTranslations(
+  customTitlesStr: string,
+  existingTranslations: Record<string, string[]> = {}
+): Record<string, string[]> {
+  const customTitles = parseCustomTitles(customTitlesStr);
+
+  // Combine existing translations with custom ones
+  // Custom translations take precedence if there's a conflict
+  return {
+    ...existingTranslations,
+    ...customTitles,
+  };
+}
+
+/**
+ * Gets potential alternative titles in other languages based on the original title
+ * @param title The original title
+ * @param customTitlesStr Optional string with custom title translations from configuration
+ * @returns Array of potential alternative titles including the original one
+ */
+export function getAlternativeTitles(
+  title: string,
+  customTitlesStr?: string
+): string[] {
+  // Use custom translations or empty object if not provided
+  const combined = customTitlesStr ? parseCustomTitles(customTitlesStr) : {};
+
+  // If no translations available, just return the original title
+  if (Object.keys(combined).length === 0) {
+    return [title];
+  }
+
+  // First check for exact matches
+  if (combined[title]) {
+    return [title, ...combined[title]];
+  }
+
+  // Check for case-insensitive matches
+  const lowerCaseTitle = title.toLowerCase();
+  for (const [key, values] of Object.entries(combined)) {
+    if (key.toLowerCase() === lowerCaseTitle) {
+      return [title, ...values];
+    }
+  }
+
+  // Then check for partial matches (e.g. "The Lion King 2" should match "The Lion King")
+  const alternatives: string[] = [title];
+
+  let foundMatch = false;
+
+  // Check for sub-string matches
+  for (const [englishTitle, translations] of Object.entries(combined)) {
+    // Skip checking very short titles (3 characters or less) to avoid false matches
+    if (englishTitle.length <= 3) continue;
+
+    if (title.toLowerCase().includes(englishTitle.toLowerCase())) {
+      foundMatch = true;
+      // Title contains a known English title, add the translated equivalents
+      for (const translation of translations) {
+        const translatedTitle = title.replace(
+          new RegExp(englishTitle, 'i'),
+          translation
+        );
+        if (!alternatives.includes(translatedTitle)) {
+          alternatives.push(translatedTitle);
+        }
+      }
+    }
+
+    // Also check if the title might be a translated title we know
+    for (const translatedTitle of translations) {
+      // Skip checking very short titles to avoid false matches
+      if (translatedTitle.length <= 3) continue;
+
+      if (title.toLowerCase().includes(translatedTitle.toLowerCase())) {
+        foundMatch = true;
+        // Title contains a known translated title, add the English equivalent
+        const englishTitle1 = title.replace(
+          new RegExp(translatedTitle, 'i'),
+          englishTitle
+        );
+        if (!alternatives.includes(englishTitle1)) {
+          alternatives.push(englishTitle1);
+        }
+      }
+    }
+  }
+
+  // Log whether we found any matches
+  if (foundMatch) {
+    console.log(
+      `Found ${alternatives.length - 1} alternative titles for "${title}"`
+    );
+  } else {
+    console.log(`No alternative titles found for "${title}"`);
+  }
+
+  return alternatives;
 }
 
 /**

@@ -15,11 +15,39 @@ import {
   isBadVideo,
   logError,
   matchesTitle,
+  getAlternativeTitles,
+  parseCustomTitles,
+  loadTitleTranslations,
 } from './utils';
-import { EasynewsAPI, SearchOptions } from '@easynews-plus-plus/api';
+import {
+  EasynewsAPI,
+  SearchOptions,
+  EasynewsSearchResponse,
+} from '@easynews-plus-plus/api';
 import { publicMetaProvider } from './meta';
-import { fromHumanReadable, toDirection } from './sort-option';
+import {
+  fromHumanReadable,
+  toDirection,
+  SortOption,
+  SortOptionKey,
+} from './sort-option';
 import { Stream } from './types';
+import * as path from 'path';
+import * as fs from 'fs';
+
+// Erweiterte Konfigurationsschnittstelle
+interface AddonConfig {
+  username: string;
+  password: string;
+  customTitles?: string;
+  sort1?: string;
+  sort1Direction?: string;
+  sort2?: string;
+  sort2Direction?: string;
+  sort3?: string;
+  sort3Direction?: string;
+  [key: string]: any;
+}
 
 // Definiere ValidPosterShape als Workaround für fehlendes PosterShape-Type
 type ValidPosterShape = 'square' | 'regular' | 'landscape';
@@ -48,6 +76,70 @@ function setCache<T>(key: string, data: T): void {
   requestCache.set(key, { data, timestamp: Date.now() });
 }
 
+// Load custom title translations from file if available
+// Try multiple possible locations for the file
+const possiblePaths = [
+  // In the same directory as the running code
+  path.join(__dirname, 'title-translations.json'),
+  // One level up (addon root directory)
+  path.join(__dirname, '..', 'title-translations.json'),
+  // Two levels up (packages directory)
+  path.join(__dirname, '..', '..', 'title-translations.json'),
+  // In Base directory
+  path.join(__dirname, '..', '..', '..', 'title-translations.json'),
+  // In current working directory
+  path.join(process.cwd(), 'title-translations.json'),
+  // In addon subdirectory of current working directory
+  path.join(process.cwd(), 'addon', 'title-translations.json'),
+  // In dist subdirectory of current working directory
+  path.join(process.cwd(), 'dist', 'title-translations.json'),
+];
+
+let translationsFromFile: Record<string, string[]> = {};
+let loadedPath: string | null = null;
+
+// Try each path until we find the file
+for (const filePath of possiblePaths) {
+  try {
+    if (fs.existsSync(filePath)) {
+      console.log(`Found title-translations.json at: ${filePath}`);
+      translationsFromFile = loadTitleTranslations(filePath);
+      loadedPath = filePath;
+
+      // Log some details about the loaded translations
+      const numTranslations = Object.keys(translationsFromFile).length;
+      console.log(`Successfully loaded ${numTranslations} title translations`);
+
+      if (numTranslations > 0) {
+        // Log a few examples to verify they're loaded correctly
+        const examples = Object.entries(translationsFromFile).slice(0, 3);
+        for (const [original, translations] of examples) {
+          console.log(
+            `Example translation: "${original}" -> "${translations.join('", "')}"`
+          );
+        }
+      } else {
+        console.error(
+          'No translations were loaded from the file. The file might be empty or have invalid format.'
+        );
+      }
+
+      break;
+    }
+  } catch (error) {
+    console.error(`Error checking path ${filePath}:`, error);
+  }
+}
+
+if (!loadedPath) {
+  console.error(
+    'Could not find title-translations.json file. Checked paths:',
+    possiblePaths
+  );
+} else {
+  console.log('Using title translations from:', loadedPath);
+}
+
 builder.defineCatalogHandler(async ({ extra: { search } }) => {
   return {
     metas: [
@@ -67,7 +159,17 @@ builder.defineCatalogHandler(async ({ extra: { search } }) => {
 });
 
 builder.defineMetaHandler(
-  async ({ id, type, config: { username, password } }) => {
+  async ({
+    id,
+    type,
+    config,
+  }: {
+    id: string;
+    type: ContentType;
+    config: AddonConfig;
+  }) => {
+    const { username, password } = config;
+
     if (!id.startsWith(catalog.id)) {
       return { meta: null as unknown as MetaDetail };
     }
@@ -157,119 +259,314 @@ builder.defineMetaHandler(
 );
 
 builder.defineStreamHandler(
-  async ({ id, type, config: { username, password, ...options } }) => {
+  async ({
+    id,
+    type,
+    config,
+  }: {
+    id: string;
+    type: ContentType;
+    config: AddonConfig;
+  }) => {
+    const { username, password, customTitles, ...options } = config;
+
     if (!id.startsWith('tt')) {
-      return { streams: [] };
+      return {
+        streams: [],
+      };
     }
 
-    // Validate credentials
-    if (!username || !password) {
-      logError({
-        message: 'Missing credentials',
-        error: new Error('Username and password are required'),
-        context: { resource: 'stream', id, type },
-      });
-      return { streams: [] };
-    }
+    const cacheKey = id;
+    const cached = getFromCache<{ streams: Stream[] }>(cacheKey);
 
-    // Check cache for this request
-    const optionsKey = JSON.stringify(options);
-    const cacheKey = `stream:${id}:${type}:${username}:${optionsKey}`;
-    const cachedResult = getFromCache<{ streams: Stream[] } & Cache>(cacheKey);
-    if (cachedResult) {
-      return cachedResult;
+    if (cached) {
+      return cached;
     }
 
     try {
-      // Sort options are profiled as human-readable strings in the manifest.
-      // so we need to convert them back to their internal representation
-      // before passing them to the search function below.
+      if (!username || !password) {
+        throw new Error('Missing username or password');
+      }
+
+      // Combine config-provided custom titles with titles from file
+      let titleTranslations = { ...translationsFromFile };
+
+      console.log(
+        `Using ${Object.keys(titleTranslations).length} title translations from file`
+      );
+
+      // Add any custom titles from configuration
+      if (customTitles) {
+        console.log('Additional custom titles provided in configuration');
+        const customTitlesObj = parseCustomTitles(customTitles);
+        const customCount = Object.keys(customTitlesObj).length;
+        console.log(`Parsed ${customCount} custom titles from configuration`);
+
+        if (customCount > 0) {
+          // Merge translations, custom titles take precedence
+          titleTranslations = {
+            ...translationsFromFile,
+            ...customTitlesObj,
+          };
+          console.log(
+            `Combined title translations count: ${Object.keys(titleTranslations).length}`
+          );
+        }
+      }
+
+      // sort options
       const sortOptions: Partial<SearchOptions> = {
-        sort1: fromHumanReadable(options.sort1),
-        sort2: fromHumanReadable(options.sort2),
-        sort3: fromHumanReadable(options.sort3),
-        sort1Direction: toDirection(options.sort1Direction),
-        sort2Direction: toDirection(options.sort2Direction),
-        sort3Direction: toDirection(options.sort3Direction),
+        query: '', // Wird später für jede Suche gesetzt
       };
 
+      // Sortieroptionen verarbeiten
+      const sort1 = options.sort1 as string | undefined;
+      if (sort1) {
+        const sortValue = fromHumanReadable(sort1);
+        if (sortValue) {
+          sortOptions.sort1 = sortValue;
+        }
+      }
+
+      const sort1Direction = options.sort1Direction as string | undefined;
+      if (sort1Direction) {
+        sortOptions.sort1Direction = toDirection(sort1Direction);
+      }
+
       const meta = await publicMetaProvider(id, type);
-      if (!meta || !meta.name) {
-        return { streams: [] };
+      console.log('Searching for:', meta.name);
+
+      // Check if we have a translation for this title directly
+      if (titleTranslations[meta.name]) {
+        console.log(
+          `Direct translation found for "${meta.name}": "${titleTranslations[meta.name].join('", "')}"`
+        );
+      } else {
+        console.log(
+          `No direct translation found for "${meta.name}", checking partial matches`
+        );
+
+        // Look for partial matches in title keys
+        for (const [key, values] of Object.entries(titleTranslations)) {
+          if (
+            meta.name.toLowerCase().includes(key.toLowerCase()) ||
+            key.toLowerCase().includes(meta.name.toLowerCase())
+          ) {
+            console.log(
+              `Possible title match: "${meta.name}" ~ "${key}" -> "${values.join('", "')}"`
+            );
+          }
+        }
       }
 
       const api = new EasynewsAPI({ username, password });
 
-      // First try without year to get more potential matches
-      let query = buildSearchQuery(type, { ...meta, year: undefined });
-      let res = await api.search({
-        ...sortOptions,
-        query,
-      });
+      // Use alternativeNames from metadata if available, or generate them
+      // Convert translations to JSON string for getAlternativeTitles
+      const titlesJson = JSON.stringify(titleTranslations);
 
-      // If we get no or few results, try with year included for more specificity
+      console.log('Getting alternative titles for:', meta.name);
+
+      // Initialize with the original title
+      let allTitles = [meta.name];
+
+      // Add any direct translations found in titleTranslations
       if (
-        (res?.data?.length <= 1 || res?.data?.length > 100) &&
-        meta.year !== undefined
+        titleTranslations[meta.name] &&
+        titleTranslations[meta.name].length > 0
       ) {
-        query = buildSearchQuery(type, meta);
-        res = await api.search({
-          ...sortOptions,
-          query,
-        });
+        console.log(
+          `Adding direct translations for "${meta.name}": "${titleTranslations[meta.name].join('", "')}"`
+        );
+        allTitles = [...allTitles, ...titleTranslations[meta.name]];
       }
 
-      if (!res || !res.data) {
+      // Add any alternative names from meta (if available)
+      if (meta.alternativeNames && meta.alternativeNames.length > 0) {
+        console.log(
+          `Adding ${meta.alternativeNames.length} alternative names from metadata`
+        );
+        // Filter out duplicates
+        const newAlternatives = meta.alternativeNames.filter(
+          (alt) => !allTitles.includes(alt)
+        );
+        allTitles = [...allTitles, ...newAlternatives];
+      }
+
+      // Use getAlternativeTitles to find additional matches (like partial matches)
+      const additionalTitles = getAlternativeTitles(
+        meta.name,
+        titlesJson
+      ).filter((alt) => !allTitles.includes(alt) && alt !== meta.name);
+
+      if (additionalTitles.length > 0) {
+        console.log(
+          `Adding ${additionalTitles.length} additional titles from partial matches`
+        );
+        allTitles = [...allTitles, ...additionalTitles];
+      }
+
+      console.log(`Will search for ${allTitles.length} titles:`, allTitles);
+
+      // Store all search results here
+      const allSearchResults: {
+        query: string;
+        result: EasynewsSearchResponse;
+      }[] = [];
+
+      // First try without year for each title variant
+      for (const titleVariant of allTitles) {
+        // Skip empty titles
+        if (!titleVariant.trim()) continue;
+
+        const titleMeta = { ...meta, name: titleVariant, year: undefined };
+        const query = buildSearchQuery(type, titleMeta);
+        console.log(`Searching without year for: "${query}"`);
+
+        try {
+          const res = await api.search({
+            ...sortOptions,
+            query,
+          });
+
+          const resultCount = res?.data?.length || 0;
+          console.log(`Found ${resultCount} results for "${query}"`);
+
+          if (resultCount > 0) {
+            allSearchResults.push({ query, result: res });
+
+            // Log a few examples of the results
+            const examples = res.data.slice(0, 2);
+            for (const file of examples) {
+              const title = getPostTitle(file);
+              console.log(
+                `  Example result: "${title}" (${file['4'] || 'unknown size'})`
+              );
+            }
+          }
+        } catch (error) {
+          console.error(`Error searching for ${query}:`, error);
+          // Continue with other titles even if one fails
+        }
+      }
+
+      // If we get no or few results, try with year included for more specificity
+      if (allSearchResults.length === 0 && meta.year !== undefined) {
+        console.log(
+          `No results found without year, trying with year: ${meta.year}`
+        );
+
+        for (const titleVariant of allTitles) {
+          // Skip empty titles
+          if (!titleVariant.trim()) continue;
+
+          const titleMeta = { ...meta, name: titleVariant, year: meta.year };
+          const query = buildSearchQuery(type, titleMeta);
+          console.log(`Searching with year for: "${query}"`);
+
+          try {
+            const res = await api.search({
+              ...sortOptions,
+              query,
+            });
+
+            const resultCount = res?.data?.length || 0;
+            console.log(`Found ${resultCount} results for "${query}"`);
+
+            if (resultCount > 0) {
+              allSearchResults.push({ query, result: res });
+
+              // Log a few examples of the results
+              const examples = res.data.slice(0, 2);
+              for (const file of examples) {
+                const title = getPostTitle(file);
+                console.log(
+                  `  Example result: "${title}" (${file['4'] || 'unknown size'})`
+                );
+              }
+            }
+          } catch (error) {
+            console.error(`Error searching for ${query}:`, error);
+            // Continue with other titles even if one fails
+          }
+        }
+      }
+
+      if (allSearchResults.length === 0) {
         return { streams: [] };
       }
 
       const streams: Stream[] = [];
       const processedHashes = new Set<string>(); // To avoid duplicate files
 
-      for (const file of res.data ?? []) {
-        const title = getPostTitle(file);
-        const fileHash = file['0']; // Use file hash to detect duplicates
+      // Process all search results
+      for (const { query, result: res } of allSearchResults) {
+        for (const file of res.data ?? []) {
+          const title = getPostTitle(file);
+          const fileHash = file['0']; // Use file hash to detect duplicates
 
-        if (isBadVideo(file) || processedHashes.has(fileHash)) {
-          continue;
-        }
-
-        processedHashes.add(fileHash);
-
-        // For series there are multiple possible queries that could match the title.
-        // We check if at least one of them matches.
-        if (type === 'series') {
-          const queries = [
-            // full query with season and episode (and optionally year)
-            query,
-            // query with episode only
-            buildSearchQuery(type, { name: meta.name, episode: meta.episode }),
-          ];
-
-          if (!queries.some((query) => matchesTitle(title, query, false))) {
+          if (isBadVideo(file) || processedHashes.has(fileHash)) {
             continue;
           }
-        }
 
-        // Movie titles should match the query strictly.
-        // Other content types are loosely matched.
-        if (!matchesTitle(title, query, type === 'movie')) {
-          continue;
-        }
+          processedHashes.add(fileHash);
 
-        streams.push(
-          mapStream({
-            username,
-            password,
-            fullResolution: file.fullres,
-            fileExtension: getFileExtension(file),
-            duration: getDuration(file),
-            size: getSize(file),
-            title,
-            url: `${createStreamUrl(res, username, password)}/${createStreamPath(file)}`,
-            videoSize: file.rawSize,
-          })
-        );
+          // For series there are multiple possible queries that could match the title.
+          // We check if at least one of them matches.
+          if (type === 'series') {
+            // Create queries for all title variants
+            const queries: string[] = [];
+
+            for (const titleVariant of allTitles) {
+              // Add full query with season and episode
+              const fullMeta = {
+                ...meta,
+                name: titleVariant,
+                year: meta.year,
+              };
+              queries.push(buildSearchQuery(type, fullMeta));
+
+              // Add query with episode only
+              const episodeMeta = {
+                name: titleVariant,
+                episode: meta.episode,
+              };
+              queries.push(buildSearchQuery(type, episodeMeta));
+            }
+
+            if (!queries.some((q) => matchesTitle(title, q, false))) {
+              continue;
+            }
+          }
+
+          // For movies, check if title matches any of the query variants
+          // Other content types are loosely matched
+          const matchesAnyVariant = allTitles.some((titleVariant) => {
+            const variantQuery = buildSearchQuery(type, {
+              ...meta,
+              name: titleVariant,
+            });
+            return matchesTitle(title, variantQuery, type === 'movie');
+          });
+
+          if (!matchesAnyVariant) {
+            continue;
+          }
+
+          streams.push(
+            mapStream({
+              username,
+              password,
+              fullResolution: file.fullres,
+              fileExtension: getFileExtension(file),
+              duration: getDuration(file),
+              size: getSize(file),
+              title,
+              url: `${createStreamUrl(res, username, password)}/${createStreamPath(file)}`,
+              videoSize: file.rawSize,
+            })
+          );
+        }
       }
 
       // Sort streams - prioritize higher quality videos
