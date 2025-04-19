@@ -15,10 +15,16 @@ export function isBadVideo(file: FileData) {
     // malicious
     file.virus ||
     // not a video
-    file.type.toUpperCase() !== 'VIDEO'
+    file.type.toUpperCase() !== 'VIDEO' ||
+    // very small file size (likely a sample or broken file, < 20MB)
+    (file.rawSize && file.rawSize < 20 * 1024 * 1024)
   );
 }
 
+/**
+ * Sanitize a title for case-insensitive comparison.
+ * Handles special characters, accented letters, and common separators.
+ */
 export function sanitizeTitle(title: string) {
   return (
     title
@@ -26,6 +32,8 @@ export function sanitizeTitle(title: string) {
       .replaceAll('&', 'and')
       // replace common separators (., _, -, whitespace) with a single space
       .replace(/[\.\-_:\s]+/g, ' ')
+      // handle brackets and parentheses - replace with space
+      .replace(/[\[\]\(\){}]/g, ' ')
       // remove non-alphanumeric characters except for accented characters
       .replace(/[^\w\sÀ-ÿ]/g, '')
       // to lowercase + remove spaces at the beginning and end
@@ -34,19 +42,86 @@ export function sanitizeTitle(title: string) {
   );
 }
 
+/**
+ * Improved title matching with more accurate results
+ * @param title The content title to check
+ * @param query The search query to match against
+ * @param strict Whether to perform exact matching (for movies)
+ * @returns Whether the title matches the query
+ */
 export function matchesTitle(title: string, query: string, strict: boolean) {
   const sanitizedQuery = sanitizeTitle(query);
 
+  // For strict mode (typically movies), we try to extract the exact title
   if (strict) {
-    const { title: movieTitle } = parseTorrentTitle(title);
-    if (movieTitle) {
-      return sanitizeTitle(movieTitle) === sanitizedQuery;
+    const { title: parsedTitle, year } = parseTorrentTitle(title);
+
+    if (parsedTitle) {
+      const sanitizedParsedTitle = sanitizeTitle(parsedTitle);
+
+      // Check for exact match, or match with year
+      if (sanitizedParsedTitle === sanitizedQuery) {
+        return true;
+      }
+
+      // If query has a year and parsed title has a year, both must match
+      const queryYearMatch = sanitizedQuery.match(/\b(\d{4})\b/);
+      if (queryYearMatch && year) {
+        const queryYear = queryYearMatch[1];
+        return (
+          sanitizedParsedTitle.replace(queryYear, '').trim() ===
+            sanitizedQuery.replace(queryYear, '').trim() &&
+          year.toString() === queryYear
+        );
+      }
     }
   }
 
+  // For TV shows and less strict matching
   const sanitizedTitle = sanitizeTitle(title);
-  const re = new RegExp(`\\b${sanitizedQuery}\\b`, 'i'); // match the whole word; e.g. query "deadpool 2" shouldn't match "deadpool 2016"
-  return re.test(sanitizedTitle);
+
+  // Check for word boundary match to avoid partial word matches
+  const queryWords = sanitizedQuery.split(/\s+/);
+
+  // For series with season/episode pattern like S01E01
+  const seasonEpisodePattern = /s\d+e\d+/i;
+  const hasSeasonEpisodePattern = seasonEpisodePattern.test(sanitizedQuery);
+
+  if (hasSeasonEpisodePattern) {
+    // Extract season/episode pattern
+    const seMatch = sanitizedQuery.match(seasonEpisodePattern);
+    if (seMatch && seMatch[0]) {
+      const pattern = seMatch[0].toLowerCase();
+      return sanitizedTitle.includes(pattern);
+    }
+  }
+
+  // Check that all words in the query appear in the title
+  const allWordsMatch = queryWords.every((word) => {
+    // Skip very short words (1-2 chars) to avoid false positives
+    if (word.length <= 2) return true;
+    return sanitizedTitle.includes(word);
+  });
+
+  // For multiple word queries, ensure the title contains the full phrase
+  // or at least a high percentage of matching words
+  if (queryWords.length > 1 && !strict) {
+    // Count matching words
+    const matchingWords = queryWords.filter(
+      (word) => word.length > 2 && sanitizedTitle.includes(word)
+    ).length;
+
+    // If more than 70% of significant words match, consider it a match
+    const significantWords = queryWords.filter(
+      (word) => word.length > 2
+    ).length;
+    if (significantWords > 0) {
+      const matchRatio = matchingWords / significantWords;
+      return matchRatio >= 0.7;
+    }
+  }
+
+  return allWordsMatch;
 }
 
 export function createStreamUrl(
@@ -87,11 +162,39 @@ export function getSize(file: FileData) {
   return file['4'] ?? '';
 }
 
+/**
+ * Extract video quality information from the title or fallback resolution
+ */
 export function getQuality(
   title: string,
   fallbackResolution?: string
 ): string | undefined {
   const { resolution } = parseTorrentTitle(title);
+
+  // Try to find quality indicators in the title if resolution not found
+  if (!resolution && title) {
+    const qualityPatterns = [
+      // Common resolution patterns
+      { pattern: /\b720p\b/i, quality: '720p' },
+      { pattern: /\b1080p\b/i, quality: '1080p' },
+      { pattern: /\b2160p\b/i, quality: '4K/2160p' },
+      { pattern: /\b4k\b/i, quality: '4K' },
+      { pattern: /\buhd\b/i, quality: '4K/UHD' },
+      { pattern: /\bhdr\b/i, quality: 'HDR' },
+      // Common quality indicators
+      { pattern: /\bhq\b/i, quality: 'HQ' },
+      { pattern: /\bbdrip\b/i, quality: 'BDRip' },
+      { pattern: /\bbluray\b/i, quality: 'BluRay' },
+      { pattern: /\bweb-?dl\b/i, quality: 'WEB-DL' },
+    ];
+
+    for (const { pattern, quality } of qualityPatterns) {
+      if (pattern.test(title)) {
+        return quality;
+      }
+    }
+  }
+
   return resolution ?? fallbackResolution;
 }
 
@@ -115,6 +218,9 @@ export function extractDigits(value: string) {
   return undefined;
 }
 
+/**
+ * Build a search query for different content types
+ */
 export function buildSearchQuery(
   type: ContentType,
   meta: MetaProviderResponse

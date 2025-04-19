@@ -1,11 +1,39 @@
 # Easynews++
 
 > [!NOTE]  
-> This addon is a fork of the original Easynews+ addon with a different auth implementation that works with Omni and Vidi instances.
+> This addon is a fork of the Easynews+ addon with a different auth implementation and other enhancements that works on multiple platforms like Stremio, Omni and Vidi.
 
 Provides content from Easynews & includes a search catalog. This addon can also be [self-hosted](#self-hosting).
 
 Public instance: [https://easynews-cloudflare-worker.jqrw92fchz.workers.dev/configure](https://easynews-cloudflare-worker.jqrw92fchz.workers.dev/configure).
+
+---
+
+## Enhancements
+
+### Performance Improvements
+
+- Multi-level caching system to reduce API calls
+- In-memory result caching with TTL (Time-To-Live) control
+- Stream count limitation to optimize player performance
+- Efficient duplicate detection using hash tracking
+
+### Search Improvements
+
+- Smart title matching with percentage-based similarity for multi-word titles
+- Support for various naming conventions and special character handling
+- Enhanced content filtering (removes samples, broken files, etc.)
+- Fallback search strategies for difficult-to-find content
+
+### Quality of Life
+
+- Smart quality sorting prioritizing 4K/UHD → 1080p → 720p
+- File size-based sorting when resolutions match
+- Better quality detection from file names with multiple resolution and format patterns
+
+### Compatibility
+
+- This addon does not use basic auth headers to stream media because it isnt supported on multiple plattforms like Omni and Vidi
 
 ---
 
@@ -138,6 +166,10 @@ A couple of examples where the addon won't be able to find results:
 There are more oddly titled file names returned by EasyNews. The good news is they are a minority. The bad news is that addon can't possibly support all of these edge cases because that would slow down the search query exponentially and put more stress on both the addon's server and Easynews API, ultimately impacting the performance.
 
 We try to match most shows, but for the remaining 10-20% of edge cases we currently require you to use the EN+ search catalog instead.
+
+### Why am I limited to 50 streams when searching for content?
+
+The addon limits results to the top 50 highest quality streams to prevent overwhelming the Stremio player and to improve performance. These streams are intelligently sorted by quality (4K/UHD prioritized over 1080p, etc.) and by file size within the same resolution to ensure you're seeing the best options first.
 
 ## License
 
