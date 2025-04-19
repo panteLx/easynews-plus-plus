@@ -3,13 +3,11 @@
 > [!NOTE]  
 > This addon is a fork of the Easynews+ addon with a different auth implementation and other enhancements that works on multiple platforms like Stremio, Omni and Vidi.
 
-Provides content from Easynews & includes a search catalog. This addon can also be [self-hosted](#self-hosting).
-
-Public instance: [https://easynews-cloudflare-worker.jqrw92fchz.workers.dev/configure](https://easynews-cloudflare-worker.jqrw92fchz.workers.dev/configure) or [https://en.pantelx.com](https://en.pantelx.com).
+Public instance: [https://easynews-cloudflare-worker.jqrw92fchz.workers.dev/configure](https://easynews-cloudflare-worker.jqrw92fchz.workers.dev/configure) or [https://en.pantelx.com](https://en.pantelx.com). Want to build it yourself? Check out the [Self-Hosting Guide](#self-hosting).
 
 ---
 
-## Enhancements
+## Enhancements compared to the Easynews+ addon
 
 ### Performance Improvements
 
