@@ -21,7 +21,7 @@
   ],
   "author": "panteLx",
   "license": "MIT",
-  "description": "Provides content from Easynews & includes a search catalog. This addon can also be self-hosted. It uses a different auth implementation than other Easynews addons and has other enhancements that works on multiple plattforms. Check out the Github repo for more information.",
+  "description": "This addon provides content from Easynews & includes a search catalog. It uses a different auth implementation than other Easynews addons to function as expected on multiple plattforms and has some additional enhancements. Self-Host Guide & more infos: https://github.com/panteLx/easynews-plus-plus-addon",
   "workspaces": [
     "packages/*",
     "/"
