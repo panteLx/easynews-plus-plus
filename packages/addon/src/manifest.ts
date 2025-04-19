@@ -30,15 +30,15 @@ export const manifest: Manifest = {
   ],
   types: ['movie', 'series', 'tv'],
   name: 'Easynews++',
-  background:
-    'https://images.pexels.com/photos/518543/pexels-photo-518543.jpeg',
+  background: 'https://i.imgur.com/QPPXf5T.jpeg',
   logo: 'https://pbs.twimg.com/profile_images/479627852757733376/8v9zH7Yo_400x400.jpeg',
   behaviorHints: { configurable: true, configurationRequired: true },
   config: [
     { title: 'username', key: 'username', type: 'text' },
     { title: 'password', key: 'password', type: 'password' },
     {
-      title: 'Strict Title Matching',
+      title:
+        "Strict Title Matching (to filter out results that don't exactly match the movie or series title)",
       key: 'strictTitleMatching',
       type: 'checkbox',
       default: 'false',

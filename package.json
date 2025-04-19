@@ -4,6 +4,7 @@
   "main": "dist/server.js",
   "scripts": {
     "test": "npm run build && npm run test --workspaces",
+    "release": "commit-and-tag-version",
     "format": "prettier --write .",
     "build": "npm -w packages/api run build && npm -w packages/addon run build",
     "start:addon": "npm run build && npm -w packages/addon start",
@@ -35,6 +36,7 @@
   "devDependencies": {
     "@types/node": "^20.14.10",
     "beamup-cli": "^1.3.0",
+    "commit-and-tag-version": "^12.5.1",
     "cross-env": "^7.0.3",
     "prettier": "^3.3.2",
     "tsx": "^4.16.2",
