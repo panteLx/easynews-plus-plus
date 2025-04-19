@@ -1,10 +1,4 @@
-import {
-  Cache,
-  ContentType,
-  MetaDetail,
-  MetaVideo,
-  Stream,
-} from 'stremio-addon-sdk';
+import { Cache, ContentType, MetaDetail, MetaVideo } from 'stremio-addon-sdk';
 import addonBuilder from 'stremio-addon-sdk/src/builder';
 import landingTemplate from 'stremio-addon-sdk/src/landingTemplate';
 import { catalog, manifest } from './manifest';
@@ -25,6 +19,7 @@ import {
 import { EasynewsAPI, SearchOptions } from '@easynews-plus-plus/api';
 import { publicMetaProvider } from './meta';
 import { fromHumanReadable, toDirection } from './sort-option';
+import { Stream } from './types';
 
 // Definiere ValidPosterShape als Workaround für fehlendes PosterShape-Type
 type ValidPosterShape = 'square' | 'regular' | 'landscape';
@@ -365,6 +360,7 @@ function mapStream({
     url: url,
     behaviorHints: {
       notWebReady: true,
+      filename: `${title}${fileExtension}`,
     },
   };
 }

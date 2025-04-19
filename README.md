@@ -16,18 +16,16 @@ Public instance: [https://easynews-cloudflare-worker.jqrw92fchz.workers.dev/conf
 - Stream count limitation to optimize player performance
 - Efficient duplicate detection using hash tracking
 
-### Search Improvements
+### Search/Streaming Improvements
 
 - Smart title matching with percentage-based similarity for multi-word titles
 - Support for various naming conventions and special character handling
 - Enhanced content filtering (removes samples, broken files, etc.)
 - Fallback search strategies for difficult-to-find content
-
-### Quality of Life
-
 - Smart quality sorting prioritizing 4K/UHD → 1080p → 720p
 - File size-based sorting when resolutions match
 - Better quality detection from file names with multiple resolution and format patterns
+- Subtitle fetching should be more reliable
 
 ### Compatibility
 
