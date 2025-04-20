@@ -6,8 +6,5 @@
     "test": "vitest run --passWithNoTests",
     "build": "tsc"
   },
-  "description": "Easynews API library",
-  "devDependencies": {
-    "typescript": "^5.4.2"
-  }
+  "description": "Easynews API library"
 }

@@ -2,9 +2,6 @@ FROM node:22-alpine AS builder
 
 WORKDIR /build
 
-# Install TypeScript globally
-RUN npm install -g typescript
-
 # Copy LICENSE file.
 COPY LICENSE ./
 
