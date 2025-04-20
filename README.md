@@ -41,16 +41,16 @@
 - Subtitle fetching should be more reliable
 - Configurable strict title matching to filter out results that don't exactly match the movie or series title (default: off)
 
-### 🌐 Title Translation Feature
+### 🌐 Custom Title Feature
 
-I've recently improved the title translation functionality to better handle alternative titles and translations. The addon now properly combines (Example: Original - Mufasa: The Lion King; German: Mufasa: Der Koenig der Loewen):
+I've recently improved the custom title functionality to better handle alternative titles and translations. The addon now properly combines (Example: Original - Mufasa: The Lion King; German: Mufasa: Der Koenig der Loewen):
 
 - Original titles
-- Direct translations from the translations file
+- Direct custom titles from the custom-titles.json file
 - Alternative titles from metadata
 - Additional titles from partial matches
 
-This enhancement is currently only available in the self-hosted version. If you'd like to see your translated title added to the public version, please create a new issue.
+This enhancement is currently only available in the self-hosted version. If you'd like to see your custom titles added to the public version, please create a new issue.
 
 ### 🔄 Compatibility
 
@@ -62,7 +62,7 @@ This enhancement is currently only available in the self-hosted version. If you'
 
 To get results in a fast and private manner, you may wish to self-host the addon. This is easy to do, and only requires a few steps. We support multiple ways of self-hosting:
 
-> Optional: Add some custom/translated titles to title-translations.json
+> Optional: Add some custom/translated titles to custom-titles.json
 
 ### 🐳 Docker
 
