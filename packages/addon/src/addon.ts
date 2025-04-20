@@ -1,6 +1,5 @@
 import { Cache, ContentType, MetaDetail, MetaVideo } from 'stremio-addon-sdk';
 import addonBuilder from 'stremio-addon-sdk/src/builder';
-import landingTemplate from 'stremio-addon-sdk/src/landingTemplate';
 import { catalog, manifest } from './manifest';
 import {
   buildSearchQuery,
@@ -759,4 +758,3 @@ function getCacheOptions(itemsLength: number): Partial<Cache> {
 }
 
 export const addonInterface = builder.getInterface();
-export const landingHTML = landingTemplate(addonInterface.manifest);

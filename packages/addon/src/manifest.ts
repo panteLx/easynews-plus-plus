@@ -34,8 +34,8 @@ export const manifest: Manifest = {
   logo: 'https://pbs.twimg.com/profile_images/479627852757733376/8v9zH7Yo_400x400.jpeg',
   behaviorHints: { configurable: true, configurationRequired: true },
   config: [
-    { title: 'username', key: 'username', type: 'text' },
-    { title: 'password', key: 'password', type: 'password' },
+    { title: 'Username', key: 'username', type: 'text' },
+    { title: 'Password', key: 'password', type: 'password' },
     {
       title:
         "Strict Title Matching (to filter out results that don't exactly match the movie or series title)",
