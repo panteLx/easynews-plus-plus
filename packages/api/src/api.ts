@@ -32,7 +32,7 @@ export class EasynewsAPI {
     return JSON.stringify({
       query: options.query,
       pageNr: options.pageNr || 1,
-      maxResults: options.maxResults || 1000,
+      maxResults: options.maxResults || 100,
       sort1: options.sort1 || 'dsize',
       sort1Direction: options.sort1Direction || '-',
       sort2: options.sort2 || 'relevance',
@@ -62,7 +62,7 @@ export class EasynewsAPI {
   async search({
     query,
     pageNr = 1,
-    maxResults = 1000,
+    maxResults = 50,
     sort1 = 'dsize',
     sort1Direction = '-',
     sort2 = 'relevance',
@@ -160,6 +160,8 @@ export class EasynewsAPI {
     let pageNr = 1;
     const maxPages = 5; // Limit to prevent excessive API calls
     let pageCount = 0;
+    // Get the maxResults if specified, otherwise use a high number
+    const maxResults = options.maxResults || 100;
 
     try {
       while (pageCount < maxPages) {
@@ -180,6 +182,14 @@ export class EasynewsAPI {
         }
 
         data.push(...newData);
+
+        // Stop if we've reached the requested maximum results
+        if (data.length >= maxResults) {
+          // Trim the array to exactly maxResults
+          data.length = maxResults;
+          break;
+        }
+
         pageNr++;
       }
 
