@@ -16,6 +16,9 @@ COPY packages/addon/package*.json ./packages/addon/
 # Install dependencies.
 RUN npm install
 
+# Install typescript.
+RUN npm i typescript
+
 # Copy source files.
 COPY tsconfig.*json ./
 COPY packages/api ./packages/api
