@@ -10,7 +10,7 @@
     "start": "node dist/server.js",
     "start:dev": "cross-env NODE_ENV=dev tsx watch src/server.ts"
   },
-  "description": "This addon provides content from Easynews & includes a search catalog. It uses a different auth implementation than other Easynews addons to function as expected on multiple plattforms and has some additional enhancements. Self-Host Guide & more infos: https://github.com/panteLx/easynews-plus-plus-addon",
+  "description": "Easynews++ is an open-source addon that enhances the Easynews experience with superior performance, advanced search capabilities, and intelligent stream selection. It features custom title support, multi-platform compatibility, and self-hosting options. Join our community on Discord (discord.gg/Ma4SnagqwE) or contribute on GitHub (github.com/panteLx/easynews-plus-plus).",
   "devDependencies": {
     "@types/stremio-addon-sdk": "^1.6.11"
   },

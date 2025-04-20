@@ -3,16 +3,19 @@
 <div align="center">
   
 ![Easynews++ Logo](https://img.shields.io/badge/Easynews%2B%2B-Addon-blue?style=for-the-badge)
+[![Discord](https://img.shields.io/badge/Discord-Join%20our%20Community-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/Ma4SnagqwE)
 [![Buy Me A Coffee](https://img.shields.io/badge/Support-Buy%20Me%20A%20Coffee-orange?style=for-the-badge)](https://buymeacoffee.com/pantel)
 
 </div>
 
 > [!NOTE]  
-> This addon is based on the Easynews+ addon which is great too. It uses a different auth implementation than other Easynews addons to function as expected on multiple platforms like Stremio, Omni & Vidi and has additional enhancements and features.
+> Easynews++ is an open-source addon that enhances the Easynews experience with superior performance, advanced search capabilities, and intelligent stream selection. It features custom title support, multi-platform compatibility, and self-hosting options. Built upon the foundation of Easynews+, it implements a different authentication approach to ensure seamless operation across various platforms including Stremio, Omni, and Vidi.
 
 ## 🔗 Quick Links
 
 **Public instance:** [https://easynews-cloudflare-worker.jqrw92fchz.workers.dev/configure](https://easynews-cloudflare-worker.jqrw92fchz.workers.dev/configure) or [https://en.pantelx.com](https://en.pantelx.com)
+
+**Discord Server:** [Join our Discord](https://discord.gg/Ma4SnagqwE) for community discussions and support
 
 **Self-hosting:** [Check out the Self-Hosting Guide](#self-hosting)
 
@@ -20,55 +23,57 @@
 
 ---
 
-## ✨ Enhancements/Features compared to the Easynews(+) addons
+## ✨ Key Features
 
-### 🚀 Performance Improvements
+### 🚀 Performance Optimizations
 
-- Multi-level caching system to reduce API calls
-- In-memory result caching with TTL (Time-To-Live) control
-- Stream count limitation to optimize player performance
-- Efficient duplicate detection using hash tracking
+- Multi-level caching system to minimize API calls
+- In-memory result caching with configurable TTL (Time-To-Live)
+- Intelligent stream count limitation for optimal player performance
+- Advanced duplicate detection using hash tracking
 
-### 🔍 Search/Streaming Improvements
+### 🔍 Enhanced Search & Streaming
 
-- Smart title matching with percentage-based similarity for multi-word titles
-- Support for various naming conventions and special character handling
-- Enhanced content filtering (removes samples, broken files, etc.)
-- Fallback search strategies for difficult-to-find content
-- Smart quality sorting prioritizing 4K/UHD → 1080p → 720p
-- File size-based sorting when resolutions match
-- Better quality detection from file names with multiple resolution and format patterns
-- Subtitle fetching should be more reliable
-- Configurable strict title matching to filter out results that don't exactly match the movie or series title (default: off)
+- Sophisticated title matching with percentage-based similarity for multi-word titles
+- Comprehensive support for various naming conventions and special characters
+- Advanced content filtering (removes samples, broken files, etc.)
+- Multiple fallback search strategies for challenging content
+- Smart quality prioritization (4K/UHD → 1080p → 720p)
+- File size-based sorting within the same resolution
+- Improved quality detection from complex file names
+- Enhanced subtitle fetching reliability
+- Configurable strict title matching (disabled by default)
 
-### 🌐 Custom Title Feature
+### 🌐 Custom Title Management
 
-I've recently improved the custom title functionality to better handle alternative titles and translations. The addon now properly combines (Example: Original - Mufasa: The Lion King; German: Mufasa: Der Koenig der Loewen):
+The custom title functionality has been significantly enhanced to better handle alternative titles and translations. The addon now intelligently combines:
 
 - Original titles
-- Direct custom titles from the custom-titles.json file
+- Custom titles from the custom-titles.json file
 - Alternative titles from metadata
 - Additional titles from partial matches
 
-This enhancement is currently only available in the self-hosted version. If you'd like to see your custom titles added to the public version, please create a new issue.
+> [!NOTE]  
+> This enhancement is currently exclusive to the self-hosted version. To add additional custom titles to the public version, please create a new issue with the custom titles you want to get supported.
 
-### 🔄 Compatibility
+### 🔄 Platform Compatibility
 
-- This addon does not use basic auth headers to stream media because it isn't supported on multiple platforms like Omni and Vidi.
+- Utilizes a different authentication implementation that works seamlessly across multiple platforms
+- Specifically optimized for Omni and Vidi compatibility
+- No reliance on basic auth headers for media streaming
 
 ---
 
-## 🛠️ Self-Hosting
+## 🛠️ Self-Hosting Guide
 
-To get results in a fast and private manner, you may wish to self-host the addon. This is easy to do, and only requires a few steps. We support multiple ways of self-hosting:
+For optimal performance and privacy, you can self-host the addon. We offer multiple deployment options:
 
-> Optional: Add some custom/translated titles to custom-titles.json
+> [!TIP]  
+> Consider adding custom/translated titles to custom-titles.json for enhanced functionality
 
-### 🐳 Docker
+### 🐳 Docker Deployment
 
-You can use the provided Dockerfile to build and run the addon in a container. To do this, you need to have [Docker](https://docs.docker.com/get-docker/) installed on your system.
-
-#### Build the Docker image:
+Deploy using Docker for a containerized solution:
 
 ```bash
 $ git clone https://github.com/pantelx/easynews-plus-plus.git && cd easynews-plus-plus
@@ -76,48 +81,48 @@ $ docker build -t easynews-plus-plus .
 $ docker run -p 8080:1337 easynews-plus-plus
 ```
 
-Navigate to `http://localhost:8080/` in your browser to verify that the addon is running.
+Verify the installation by visiting `http://localhost:8080/` in your browser.
 
-### 📦 From source
+### 📦 Source Installation
 
-If you'd rather run directly from source, you can do so with [Node.js](https://nodejs.org/en/download/prebuilt-installer/current). Make sure you have NPM 7 or higher installed on your system. We also recommend Node 20 or higher, though older versions might still work.
+For direct source installation, ensure you have:
 
-#### To build the addon from source, run:
+- Node.js 20 or higher
+- NPM 7 or higher
 
 ```bash
-# version should be >= 20
+# Verify Node.js version
 $ node -v
-# version must be >= 7
+# Verify NPM version
 $ npm -v
+# Clone and install
 $ git clone https://github.com/pantelx/easynews-plus-plus.git && cd easynews-plus-plus
 $ npm i
-# starts the addon in production mode
+# Start in production mode
 $ npm run start:addon
 ```
 
-Navigate to `http://localhost:1337/` in your browser to verify that the addon is running. You can set the `PORT` environment variable to change the listener port. For example, to run the addon on port `8080`:
+Access the addon at `http://localhost:1337/`. Customize the port using the `PORT` environment variable:
 
 ```bash
 $ PORT=8080 npm run start:addon
 ```
 
-### ☁️ Deployment to external services
+### ☁️ Cloud Deployment
 
-The addon can be deployed as a [Cloudflare worker](https://workers.cloudflare.com/), which is a serverless platform that runs your code in data centers around the world. It's incredibly fast and reliable, and you can deploy the addon for free.
+#### Cloudflare Worker
 
-#### To deploy the addon to Cloudflare, run:
+Deploy to Cloudflare's global edge network for optimal performance:
 
 ```bash
 $ git clone https://github.com/pantelx/easynews-plus-plus.git && cd easynews-plus-plus
 $ npm i
 $ npm run deploy:cf
-# You can also preview your changes first if enabled on the Cloudflare worker dashboard
+# Preview changes (if enabled in Cloudflare dashboard)
 $ npm run preview:cf
 ```
 
-You will see the Cloudflare URL in the terminal.
-
-#### To deploy the addon to beamup, run:
+#### Beamup Deployment
 
 ```bash
 $ git clone https://github.com/pantelx/easynews-plus-plus.git && cd easynews-plus-plus
@@ -125,13 +130,9 @@ $ npm i
 $ npm run deploy:beamup
 ```
 
-You will see the Beamup URL in the terminal.
-
 ---
 
-### 💻 Development
-
-Clone the repository and install the dependencies:
+### 💻 Development Setup
 
 ```bash
 $ git clone https://github.com/pantelx/easynews-plus-plus.git
@@ -139,62 +140,71 @@ $ cd easynews-plus-plus
 $ npm i
 ```
 
-Run the easynews addon in development mode:
+Development modes:
 
 ```bash
-# addon
+# Addon development
 $ npm run start:addon:dev
-# cloudflare worker deployment in development mode
+# Cloudflare worker development
 $ npm run start:cf:dev
 ```
 
-### 📝 Release on Github
+### 📝 Release Process
 
-To release a new version of the addon and commit it to Github:
+Create a new version:
 
 ```bash
 $ npm run version:<patch|minor|major>
 ```
 
-Finally, create a new release targeting the tag you just pushed on GitHub and include some release notes.
+Create a corresponding release on GitHub with release notes.
 
 ---
 
-## ❓ FAQ
+## ❓ Frequently Asked Questions
 
 ### What is Easynews?
 
-Easynews is a premium Usenet provider that offers a web-based Usenet browser. It allows you to search, preview, and download files from Usenet newsgroups without the need for a newsreader. Easynews is known for its user-friendly interface and fast download speeds. The Easynews addon for multiple platforms provides access to Easynews content directly within platforms like Stremio, Omni or Vidi. You can search for and stream movies, TV shows, and other media files from Easynews using the addon. In a way it can serve as an alternative to debrid services (Real-Debrid, Premiumize, AllDebrid etc.). An Easynews account with an active subscription is required to use the addon.
+Easynews is a premium Usenet provider offering a web-based Usenet browser. It enables users to search, preview, and download files from Usenet newsgroups without requiring a newsreader. Known for its user-friendly interface and fast download speeds, Easynews serves as an alternative to debrid services (Real-Debrid, Premiumize, AllDebrid, etc.). An active Easynews subscription is required to use this addon.
 
-### Why can't I find show X or movie Y?
+### Why can't I find specific content?
 
-Golden rule of thumb: look it up on [Easynews web search](https://members.easynews.com/). If you can't find it there, or it's only returning bad quality results (duration < 5 minutes, marked as spam, no video etc.), you won't find it using the addon either.
+First, verify the content exists on [Easynews web search](https://members.easynews.com/). If unavailable or returning poor quality results (duration < 5 minutes, marked as spam, no video), the addon won't find it either.
 
-If you do find your content through the web search however, it may be because the addon can't match the resulting titles returned by the Easynews API names with the metadata from your media player, or it's in the wrong format. You can selfhost your own Easynews++ addon and add a translated/custom title for that movie.
+If the content exists on Easynews but the addon can't find it, this might be due to:
 
-A couple of examples where the addon won't be able to find results without adding translated/custom titles:
+- Title matching issues between Easynews API and media player metadata
+- Unconventional title formats
+- Special character handling
 
-- The anime series `death note` doesn't follow the conventional season number + episode number standard. The show has titles like `Death Note 02` instead of the expected format `Death Note S01E02`.
-- For the movie `Mission: Impossible - Dead Reckoning Part One (2023)` the metadata returns only `dead reckoning` for this title, making it impossible (pun not intended) to match. Movie titles are strictly matched by their full title.
-- The real title of the movie `WALL-E (2008)` contains an annoying 'dot' special character: `WALL·E`. This should be converted to a `-` character, but the addon converts that character already to a space because this sanitization is needed for 99% of the other titles. No results for `WALL E` will be returned (actually, no results for `WALL-E` either, but it still serves as a good example).
+Examples of challenging cases:
 
-Create a new issue if you're unsuccessful with the translated/custom title.
+- Anime series like `death note` using non-standard episode numbering
+- Movies with partial metadata matches (e.g., `Mission: Impossible - Dead Reckoning Part One`)
+- Special character handling (e.g., `WALL·E` vs `WALL-E`)
 
-### Why am I limited to 50 streams when searching for content?
+For these cases, consider self-hosting and adding custom titles or using the public instance and create a new issue with the custom titles you want to get supported.
 
-The addon limits results to the top 50 highest quality streams to prevent overwhelming the media player and to improve performance. These streams are intelligently sorted by quality (4K/UHD prioritized over 1080p, etc.) and by file size within the same resolution to ensure you're seeing the best options first.
+### Why is there a 50-stream limit?
+
+The addon limits results to the top 50 highest quality streams to:
+
+- Prevent media player overload
+- Optimize performance
+- Ensure quality-focused results (prioritizing 4K/UHD → 1080p → 720p)
+- Sort by file size within the same resolution
 
 ## 💖 Support the Project
 
-If you find this addon useful and would like to support its development, you can buy me a coffee!
+Your support helps maintain and improve this project! Consider:
 
-[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-Support-yellow.svg?style=for-the-badge&logo=buy-me-a-coffee)](https://buymeacoffee.com/pantel)
-
-Your support helps keep this project maintained and improved with new features!
+- [Buying me a coffee](https://buymeacoffee.com/pantel)
+- Joining our [Discord community](https://discord.gg/Ma4SnagqwE) for support and updates
+- Contributing on [GitHub](https://github.com/panteLx/easynews-plus-plus-addon)
 
 ## 📄 License
 
 [MIT](./LICENSE)
 
 > [!NOTE]  
-> I am not affiliated with Easynews in any way. This project is a fan-made addon that provides access to Easynews content. You need an active Easynews subscription to use this addon.
+> This is an independent, fan-made addon for Easynews. An active Easynews subscription is required for use. We are not affiliated with Easynews.
