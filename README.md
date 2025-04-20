@@ -1,22 +1,35 @@
 # Easynews++
 
+<div align="center">
+  
+![Easynews++ Logo](https://img.shields.io/badge/Easynews%2B%2B-Addon-blue?style=for-the-badge)
+[![Buy Me A Coffee](https://img.shields.io/badge/Support-Buy%20Me%20A%20Coffee-orange?style=for-the-badge)](https://buymeacoffee.com/pantel)
+
+</div>
+
 > [!NOTE]  
 > This addon is based on the Easynews+ addon which is great too. It uses a different auth implementation than other Easynews addons to function as expected on multiple platforms like Stremio, Omni & Vidi and has additional enhancements and features.
 
-Public instance: [https://easynews-cloudflare-worker.jqrw92fchz.workers.dev/configure](https://easynews-cloudflare-worker.jqrw92fchz.workers.dev/configure) or [https://en.pantelx.com](https://en.pantelx.com). Want to build it yourself? Check out the [Self-Hosting Guide](#self-hosting).
+## 🔗 Quick Links
+
+**Public instance:** [https://easynews-cloudflare-worker.jqrw92fchz.workers.dev/configure](https://easynews-cloudflare-worker.jqrw92fchz.workers.dev/configure) or [https://en.pantelx.com](https://en.pantelx.com)
+
+**Self-hosting:** [Check out the Self-Hosting Guide](#self-hosting)
+
+**Support the project:** [Buy Me A Coffee](https://buymeacoffee.com/pantel)
 
 ---
 
-## Enhancements/Features compared to the Easynews(+) addons
+## ✨ Enhancements/Features compared to the Easynews(+) addons
 
-### Performance Improvements
+### 🚀 Performance Improvements
 
 - Multi-level caching system to reduce API calls
 - In-memory result caching with TTL (Time-To-Live) control
 - Stream count limitation to optimize player performance
 - Efficient duplicate detection using hash tracking
 
-### Search/Streaming Improvements
+### 🔍 Search/Streaming Improvements
 
 - Smart title matching with percentage-based similarity for multi-word titles
 - Support for various naming conventions and special character handling
@@ -28,7 +41,7 @@ Public instance: [https://easynews-cloudflare-worker.jqrw92fchz.workers.dev/conf
 - Subtitle fetching should be more reliable
 - Configurable strict title matching to filter out results that don't exactly match the movie or series title (default: off)
 
-### Title Translation Feature
+### 🌐 Title Translation Feature
 
 I've recently improved the title translation functionality to better handle alternative titles and translations. The addon now properly combines (Example: Original - Mufasa: The Lion King; German: Mufasa: Der Koenig der Loewen):
 
@@ -39,19 +52,19 @@ I've recently improved the title translation functionality to better handle alte
 
 This enhancement is currently only available in the self-hosted version. If you'd like to see your translated title added to the public version, please create a new issue.
 
-### Compatibility
+### 🔄 Compatibility
 
-- This addon does not use basic auth headers to stream media because it isnt supported on multiple plattforms like Omni and Vidi.
+- This addon does not use basic auth headers to stream media because it isn't supported on multiple platforms like Omni and Vidi.
 
 ---
 
-## Self-Hosting
+## 🛠️ Self-Hosting
 
 To get results in a fast and private manner, you may wish to self-host the addon. This is easy to do, and only requires a few steps. We support multiple ways of self-hosting:
 
 > Optional: Add some custom/translated titles to title-translations.json
 
-### Docker
+### 🐳 Docker
 
 You can use the provided Dockerfile to build and run the addon in a container. To do this, you need to have [Docker](https://docs.docker.com/get-docker/) installed on your system.
 
@@ -65,7 +78,7 @@ $ docker run -p 8080:1337 easynews-plus-plus
 
 Navigate to `http://localhost:8080/` in your browser to verify that the addon is running.
 
-### From source
+### 📦 From source
 
 If you'd rather run directly from source, you can do so with [Node.js](https://nodejs.org/en/download/prebuilt-installer/current). Make sure you have NPM 7 or higher installed on your system. We also recommend Node 20 or higher, though older versions might still work.
 
@@ -88,7 +101,7 @@ Navigate to `http://localhost:1337/` in your browser to verify that the addon is
 $ PORT=8080 npm run start:addon
 ```
 
-### Deployment to external services
+### ☁️ Deployment to external services
 
 The addon can be deployed as a [Cloudflare worker](https://workers.cloudflare.com/), which is a serverless platform that runs your code in data centers around the world. It's incredibly fast and reliable, and you can deploy the addon for free.
 
@@ -116,7 +129,7 @@ You will see the Beamup URL in the terminal.
 
 ---
 
-### Development
+### 💻 Development
 
 Clone the repository and install the dependencies:
 
@@ -135,7 +148,7 @@ $ npm run start:addon:dev
 $ npm run start:cf:dev
 ```
 
-### Release on Github
+### 📝 Release on Github
 
 To release a new version of the addon and commit it to Github:
 
@@ -147,7 +160,7 @@ Finally, create a new release targeting the tag you just pushed on GitHub and in
 
 ---
 
-## FAQ
+## ❓ FAQ
 
 ### What is Easynews?
 
@@ -171,7 +184,15 @@ Create a new issue if you're unsuccessful with the translated/custom title.
 
 The addon limits results to the top 50 highest quality streams to prevent overwhelming the Stremio player and to improve performance. These streams are intelligently sorted by quality (4K/UHD prioritized over 1080p, etc.) and by file size within the same resolution to ensure you're seeing the best options first.
 
-## License
+## 💖 Support the Project
+
+If you find this addon useful and would like to support its development, you can buy me a coffee!
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-Support-yellow.svg?style=for-the-badge&logo=buy-me-a-coffee)](https://buymeacoffee.com/pantel)
+
+Your support helps keep this project maintained and improved with new features!
+
+## 📄 License
 
 [MIT](./LICENSE)
 
