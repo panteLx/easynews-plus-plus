@@ -247,9 +247,9 @@ export function extractDigits(value: string) {
 }
 
 /**
- * Default title translations that will be available even when file loading fails (for Cloudflare Workers)
+ * Default custom titles that will be available even when file loading fails (for Cloudflare Workers)
  */
-let titleTranslations: Record<string, string[]> = {
+let customTranslations: Record<string, string[]> = {
   'Rain or Shine': ['Just between Lovers'],
   'Mufasa: The Lion King': ['Mufasa: Der Koenig der Loewen'],
   'The Lion King': ['Der König der Löwen', 'Der Koenig der Loewen'],
@@ -287,46 +287,44 @@ let titleTranslations: Record<string, string[]> = {
 };
 
 /**
- * Load additional title translations from a JSON file if available
- * @param filePath Path to the JSON file containing title translations
- * @returns Title translations from the file or the default translations if file not found
+ * Load additional custom titles from a JSON file if available
+ * @param filePath Path to the JSON file containing custom titles
+ * @returns Custom titles from the file or the default custom titles if file not found
  */
-export function loadTitleTranslations(
-  filePath: string
-): Record<string, string[]> {
+export function loadCustomTitles(filePath: string): Record<string, string[]> {
   // First check if we're in a Cloudflare Worker environment (no filesystem)
   if (typeof __dirname === 'undefined' || typeof fs === 'undefined') {
     logger.info(
-      'Running in Cloudflare Worker environment, using built-in translations only'
+      'Running in Cloudflare Worker environment, using built-in custom titles only'
     );
-    return titleTranslations; // Return the built-in translations
+    return customTranslations; // Return the built-in custom titles
   }
 
   try {
     if (fs.existsSync(filePath)) {
-      logger.info(`Loading translations from file: ${filePath}`);
+      logger.info(`Loading custom titles from file: ${filePath}`);
       const fileContent = fs.readFileSync(filePath, 'utf-8');
       logger.info(`File content size: ${fileContent.length} bytes`);
 
       // Try to parse the file content
       try {
-        const customTranslations = JSON.parse(fileContent);
+        const customTitles = JSON.parse(fileContent);
         logger.info(
-          `Parsed ${Object.keys(customTranslations).length} custom translations from file`
+          `Parsed ${Object.keys(customTitles).length} custom titles from file`
         );
 
-        // Log a sample of translations for debugging
-        const sampleKeys = Object.keys(customTranslations).slice(0, 3);
+        // Log a sample of custom titles for debugging
+        const sampleKeys = Object.keys(customTitles).slice(0, 3);
         for (const key of sampleKeys) {
           logger.info(
-            `Sample translation: "${key}" -> ${JSON.stringify(customTranslations[key])}`
+            `Sample custom title: "${key}" -> ${JSON.stringify(customTitles[key])}`
           );
         }
 
-        // Merge with built-in translations (file translations take precedence)
+        // Merge with built-in custom titles (file custom titles take precedence)
         return {
-          ...titleTranslations,
           ...customTranslations,
+          ...customTitles,
         };
       } catch (parseError) {
         logger.error(`Error parsing JSON in ${filePath}:`, parseError);
@@ -338,11 +336,11 @@ export function loadTitleTranslations(
       logger.info(`File does not exist: ${filePath}`);
     }
   } catch (error) {
-    logger.info(`Error loading translations from ${filePath}:`, error);
+    logger.info(`Error loading custom titles from ${filePath}:`, error);
   }
 
-  logger.info('Using built-in translations as fallback');
-  return titleTranslations; // Return built-in translations as fallback
+  logger.info('Using built-in custom titles as fallback');
+  return customTranslations; // Return built-in custom titles as fallback
 }
 
 /**
@@ -474,21 +472,21 @@ export function parseCustomTitles(
 }
 
 /**
- * Gets combined title translations from custom string and existing translations
+ * Gets combined custom titles from custom string and existing custom titles
  * @param customTitlesStr String from the configuration
- * @param existingTranslations Existing translations to combine with
+ * @param existingCustomTitles Existing custom titles to combine with
  * @returns Combined record of original titles to arrays of alternative titles
  */
-export function getCombinedTitleTranslations(
+export function getCombinedCustomTitles(
   customTitlesStr: string,
-  existingTranslations: Record<string, string[]> = {}
+  existingCustomTitles: Record<string, string[]> = {}
 ): Record<string, string[]> {
   const customTitles = parseCustomTitles(customTitlesStr);
 
-  // Combine existing translations with custom ones
-  // Custom translations take precedence if there's a conflict
+  // Combine existing custom titles with custom ones
+  // Custom titles from config take precedence if there's a conflict
   return {
-    ...existingTranslations,
+    ...existingCustomTitles,
     ...customTitles,
   };
 }
