@@ -170,19 +170,19 @@ Easynews is a premium Usenet provider that offers a web-based Usenet browser. It
 
 Golden rule of thumb: look it up on [Easynews web search](https://members.easynews.com/). If you can't find it there, or it's only returning bad quality results (duration < 5 minutes, marked as spam, no video etc.), you won't find it using the addon either.
 
-If you do find your content through the web search however, it may be because the addon can't match the resulting titles returned by the Easynews API names with the metadata from Stremio, or it's in the wrong format. You can selfhost your own Easynews++ addon and add a translated/custom title for that movie.
+If you do find your content through the web search however, it may be because the addon can't match the resulting titles returned by the Easynews API names with the metadata from your media player, or it's in the wrong format. You can selfhost your own Easynews++ addon and add a translated/custom title for that movie.
 
 A couple of examples where the addon won't be able to find results without adding translated/custom titles:
 
 - The anime series `death note` doesn't follow the conventional season number + episode number standard. The show has titles like `Death Note 02` instead of the expected format `Death Note S01E02`.
-- For the movie `Mission: Impossible - Dead Reckoning Part One (2023)` Stremio's metadata returns only `dead reckoning` for this title, making it impossible (pun not intended) to match. Movie titles are strictly matched by their full title.
+- For the movie `Mission: Impossible - Dead Reckoning Part One (2023)` the metadata returns only `dead reckoning` for this title, making it impossible (pun not intended) to match. Movie titles are strictly matched by their full title.
 - The real title of the movie `WALL-E (2008)` contains an annoying 'dot' special character: `WALL·E`. This should be converted to a `-` character, but the addon converts that character already to a space because this sanitization is needed for 99% of the other titles. No results for `WALL E` will be returned (actually, no results for `WALL-E` either, but it still serves as a good example).
 
 Create a new issue if you're unsuccessful with the translated/custom title.
 
 ### Why am I limited to 50 streams when searching for content?
 
-The addon limits results to the top 50 highest quality streams to prevent overwhelming the Stremio player and to improve performance. These streams are intelligently sorted by quality (4K/UHD prioritized over 1080p, etc.) and by file size within the same resolution to ensure you're seeing the best options first.
+The addon limits results to the top 50 highest quality streams to prevent overwhelming the media player and to improve performance. These streams are intelligently sorted by quality (4K/UHD prioritized over 1080p, etc.) and by file size within the same resolution to ensure you're seeing the best options first.
 
 ## 💖 Support the Project
 
@@ -197,4 +197,4 @@ Your support helps keep this project maintained and improved with new features!
 [MIT](./LICENSE)
 
 > [!NOTE]  
-> I am not affiliated with Easynews in any way. This project is a fan-made addon for Stremio that provides access to Easynews content. You need an active Easynews subscription to use this addon.
+> I am not affiliated with Easynews in any way. This project is a fan-made addon that provides access to Easynews content. You need an active Easynews subscription to use this addon.

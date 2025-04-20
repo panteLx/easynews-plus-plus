@@ -213,7 +213,10 @@ builder.defineMetaHandler(
       const videos: MetaVideo[] = [];
 
       const api = new EasynewsAPI({ username, password });
-      const res = await api.searchAll({ query: search });
+      const res = await api.searchAll({
+        query: search,
+        maxResults: 50, // Limit results directly from the API
+      });
 
       for (const file of res?.data ?? []) {
         const title = getPostTitle(file);
@@ -459,6 +462,7 @@ builder.defineStreamHandler(
           const res = await api.search({
             ...sortOptions,
             query,
+            maxResults: 50, // Limit results directly from the API
           });
 
           const resultCount = res?.data?.length || 0;
@@ -500,6 +504,7 @@ builder.defineStreamHandler(
             const res = await api.search({
               ...sortOptions,
               query,
+              maxResults: 50, // Limit results directly from the API
             });
 
             const resultCount = res?.data?.length || 0;
@@ -668,11 +673,11 @@ builder.defineStreamHandler(
         return 0;
       });
 
-      // Limit to top 50 streams to prevent overwhelming the player
-      const limitedStreams = streams.slice(0, 50);
+      // Limit to top 25 streams to prevent overwhelming the player
+      // No need to slice here since we're already limiting results at the API level
       const result = {
-        streams: limitedStreams,
-        ...getCacheOptions(limitedStreams.length),
+        streams,
+        ...getCacheOptions(streams.length),
       };
 
       // Cache the result
