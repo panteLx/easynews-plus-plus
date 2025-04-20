@@ -17,7 +17,7 @@
 
 **Discord Server:** [Join our Discord](https://discord.gg/Ma4SnagqwE) for community discussions and support
 
-**Self-hosting:** [Check out the Self-Hosting Guide](#self-hosting)
+**Self-hosting:** [Check out the Self-Hosting Guide](#self-hosting-guide)
 
 **Support the project:** [Buy Me A Coffee](https://buymeacoffee.com/pantel)
 
@@ -200,7 +200,7 @@ Your support helps maintain and improve this project! Consider:
 
 - [Buying me a coffee](https://buymeacoffee.com/pantel)
 - Joining our [Discord community](https://discord.gg/Ma4SnagqwE) for support and updates
-- Contributing on [GitHub](https://github.com/panteLx/easynews-plus-plus-addon)
+- Contributing on [GitHub](https://github.com/panteLx/easynews-plus-plus)
 
 ## 📄 License
 
