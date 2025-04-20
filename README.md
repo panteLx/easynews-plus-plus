@@ -26,6 +26,7 @@ Public instance: [https://easynews-cloudflare-worker.jqrw92fchz.workers.dev/conf
 - File size-based sorting when resolutions match
 - Better quality detection from file names with multiple resolution and format patterns
 - Subtitle fetching should be more reliable
+- Configurable strict title matching to filter out results that don't exactly match the movie or series title (default: off)
 
 ### Title Translation Feature
 
@@ -96,7 +97,9 @@ The addon can be deployed as a [Cloudflare worker](https://workers.cloudflare.co
 ```bash
 $ git clone https://github.com/pantelx/easynews-plus-plus.git && cd easynews-plus-plus
 $ npm i
-$ npm run deploy:cloudflare-worker
+$ npm run deploy:cf
+# You can also preview your changes first if enabled on the Cloudflare worker dashboard
+$ npm run preview:cf
 ```
 
 You will see the Cloudflare URL in the terminal.
@@ -129,7 +132,7 @@ Run the easynews addon in development mode:
 # addon
 $ npm run start:addon:dev
 # cloudflare worker deployment in development mode
-$ npm run start:cloudflare-worker:dev
+$ npm run start:cf:dev
 ```
 
 ### Release on Github
