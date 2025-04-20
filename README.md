@@ -9,7 +9,7 @@
 </div>
 
 > [!NOTE]  
-> Easynews++ is an open-source addon that enhances the Easynews experience with superior performance, advanced search capabilities, and intelligent stream selection. It features custom title support, multi-platform compatibility, and self-hosting options. Built upon the foundation of Easynews+, it implements a different authentication approach to ensure seamless operation across various platforms including Stremio, Omni, and Vidi.
+> Easynews++ is an open-source addon that enhances the Easynews experience with superior performance, advanced search capabilities, and intelligent stream selection. It features custom title support, multi-platform compatibility, and self-hosting options. Built upon the foundation of Easynews+, it implements a different authentication approach to ensure seamless operation across various platforms including Stremio, Omni, Vidi and Fusion.
 
 ## 🔗 Quick Links
 
@@ -59,7 +59,7 @@ The custom title functionality has been significantly enhanced to better handle 
 ### 🔄 Platform Compatibility
 
 - Utilizes a different authentication implementation that works seamlessly across multiple platforms
-- Specifically optimized for Omni and Vidi compatibility
+- Specifically optimized for Omni, Vidi and Fusion compatibility
 - No reliance on basic auth headers for media streaming
 
 ---
