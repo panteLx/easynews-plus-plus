@@ -17,7 +17,7 @@
 
 **Discord Server:** [Join our Discord](https://discord.gg/Ma4SnagqwE) for community discussions and support
 
-**Self-hosting:** [Check out the Self-Hosting Guide](#self-hosting-guide)
+**Self-hosting:** [Check out the Self-Hosting Guide](#%EF%B8%8F-self-hosting-guide)
 
 **Support the project:** [Buy Me A Coffee](https://buymeacoffee.com/pantel)
 
