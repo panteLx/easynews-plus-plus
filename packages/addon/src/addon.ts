@@ -4,6 +4,7 @@ import landingTemplate from 'stremio-addon-sdk/src/landingTemplate';
 import { catalog, manifest } from './manifest';
 import {
   buildSearchQuery,
+  capitalizeFirstLetter,
   createStreamPath,
   createStreamUrl,
   createThumbnailUrl,
@@ -12,12 +13,15 @@ import {
   getPostTitle,
   getQuality,
   getSize,
+  getVersion,
   isBadVideo,
+  loadCustomTitles,
+  logger,
+  LogLevel,
   logError,
   matchesTitle,
-  getAlternativeTitles,
   parseCustomTitles,
-  loadTitleTranslations,
+  getAlternativeTitles,
 } from './utils';
 import {
   EasynewsAPI,
@@ -35,7 +39,7 @@ import { Stream } from './types';
 import * as path from 'path';
 import * as fs from 'fs';
 
-// Erweiterte Konfigurationsschnittstelle
+// Extended configuration interface
 interface AddonConfig {
   username: string;
   password: string;
@@ -47,6 +51,7 @@ interface AddonConfig {
   sort2Direction?: string;
   sort3?: string;
   sort3Direction?: string;
+  logLevel?: string; // Add log level configuration option
   [key: string]: any;
 }
 
@@ -55,6 +60,11 @@ type ValidPosterShape = 'square' | 'regular' | 'landscape';
 
 const builder = new addonBuilder(manifest);
 const prefix = `${catalog.id}:`;
+
+// Log addon initialization
+logger.info(
+  `Addon initializing - version: ${getVersion()}, log level: ${logger.getLevelName()}`
+);
 
 // In-memory request cache to reduce API calls and improve response times
 const requestCache = new Map<string, { data: any; timestamp: number }>();
@@ -77,83 +87,80 @@ function setCache<T>(key: string, data: T): void {
   requestCache.set(key, { data, timestamp: Date.now() });
 }
 
-// Load custom title translations from file if available
+// Load custom titles from file if available
 // Try multiple possible locations for the file
 let translationsFromFile: Record<string, string[]> = {};
 let loadedPath: string | null = null;
 
-// Start with the built-in translations by calling loadTitleTranslations with a non-existent path
+// Start with the built-in translations by calling loadCustomTitles with a non-existent path
 // This will return the default built-in translations
-translationsFromFile = loadTitleTranslations('');
+translationsFromFile = loadCustomTitles('');
 
 try {
   const possiblePaths = [
     // In the same directory as the running code
-    path.join(__dirname, 'title-translations.json'),
+    path.join(__dirname, 'custom-titles.json'),
     // One level up (addon root directory)
-    path.join(__dirname, '..', 'title-translations.json'),
+    path.join(__dirname, '..', 'custom-titles.json'),
     // Two levels up (packages directory)
-    path.join(__dirname, '..', '..', 'title-translations.json'),
+    path.join(__dirname, '..', '..', 'custom-titles.json'),
     // Three levels up (project root)
-    path.join(__dirname, '..', '..', '..', 'title-translations.json'),
+    path.join(__dirname, '..', '..', '..', 'custom-titles.json'),
     // In current working directory
-    path.join(process.cwd(), 'title-translations.json'),
+    path.join(process.cwd(), 'custom-titles.json'),
     // In addon subdirectory of current working directory
-    path.join(process.cwd(), 'addon', 'title-translations.json'),
+    path.join(process.cwd(), 'addon', 'custom-titles.json'),
     // In dist subdirectory of current working directory
-    path.join(process.cwd(), 'dist', 'title-translations.json'),
+    path.join(process.cwd(), 'dist', 'custom-titles.json'),
   ];
 
   // Try each path until we find the file
   for (const filePath of possiblePaths) {
     try {
       if (fs.existsSync(filePath)) {
-        console.log(`Found title-translations.json at: ${filePath}`);
-        translationsFromFile = loadTitleTranslations(filePath);
+        logger.info(`Found custom-titles.json at: ${filePath}`);
+        translationsFromFile = loadCustomTitles(filePath);
         loadedPath = filePath;
 
-        // Log some details about the loaded translations
+        // Log some details about the loaded custom titles
         const numTranslations = Object.keys(translationsFromFile).length;
-        console.log(
-          `Successfully loaded ${numTranslations} title translations`
-        );
+        logger.info(`Successfully loaded ${numTranslations} custom titles`);
 
         if (numTranslations > 0) {
           // Log a few examples to verify they're loaded correctly
           const examples = Object.entries(translationsFromFile).slice(0, 3);
           for (const [original, translations] of examples) {
-            console.log(
-              `Example translation: "${original}" -> "${translations.join('", "')}"`
+            logger.info(
+              `Example custom title: "${original}" -> "${translations.join('", "')}"`
             );
           }
         } else {
-          console.log(
-            'No translations were loaded from the file. The file might be empty or have invalid format.'
+          logger.info(
+            'No custom titles were loaded from the file. The file might be empty or have invalid format.'
           );
         }
         break;
       }
     } catch (error) {
-      console.log(`Error checking path ${filePath}: ${error}`);
+      logger.info(`Error checking path ${filePath}: ${error}`);
     }
   }
 
   if (!loadedPath) {
-    console.log(
-      'Could not find title-translations.json file. Using built-in translations only. Built-in translations count:',
-      Object.keys(translationsFromFile).length
+    logger.info(
+      `Could not find custom-titles.json file. Using built-in custom titles only. Built-in custom titles count: ${Object.keys(translationsFromFile).length}`
     );
-    console.log('Some examples of built-in translations:');
+    logger.info('Some examples of built-in custom titles:');
     const examples = Object.entries(translationsFromFile).slice(0, 5);
     for (const [original, translations] of examples) {
-      console.log(`  "${original}" -> "${translations.join('", "')}"`);
+      logger.info(`  "${original}" -> "${translations.join('", "')}"`);
     }
   } else {
-    console.log('Using title translations from:', loadedPath);
+    logger.info(`Using custom titles from: ${loadedPath}`);
   }
 } catch (error) {
-  console.log('Error loading title translations file:', error);
-  console.log('Using built-in translations as fallback');
+  logger.error('Error loading custom titles file:', error);
+  logger.info('Using built-in custom titles as fallback');
 }
 
 builder.defineCatalogHandler(async ({ extra: { search } }) => {
@@ -184,7 +191,12 @@ builder.defineMetaHandler(
     type: ContentType;
     config: AddonConfig;
   }) => {
-    const { username, password } = config;
+    const { username, password, logLevel } = config;
+
+    // Configure logger based on config
+    if (logLevel) {
+      logger.setLevel(logLevel);
+    }
 
     if (!id.startsWith(catalog.id)) {
       return { meta: null as unknown as MetaDetail };
@@ -292,8 +304,14 @@ builder.defineStreamHandler(
       password,
       customTitles,
       strictTitleMatching,
+      logLevel,
       ...options
     } = config;
+
+    // Configure logger based on config
+    if (logLevel) {
+      logger.setLevel(logLevel);
+    }
 
     if (!id.startsWith('tt')) {
       return {
@@ -318,43 +336,42 @@ builder.defineStreamHandler(
       // Parse strictTitleMatching option (checkbox returns string 'on' or undefined)
       const useStrictMatching =
         strictTitleMatching === 'on' || strictTitleMatching === 'true';
-      console.log(
-        'Strict title matching enabled:',
-        useStrictMatching ? 'YES' : 'NO'
+      logger.info(
+        `Strict title matching: ${useStrictMatching ? 'enabled' : 'disabled'}`
       );
 
       // Combine config-provided custom titles with titles from file
-      let titleTranslations = { ...translationsFromFile };
+      let customTranslations = { ...translationsFromFile };
 
-      console.log(
-        `Using ${Object.keys(titleTranslations).length} title translations (${Object.keys(translationsFromFile).length} from built-in/file + additional from config)`
+      logger.info(
+        `Using ${Object.keys(customTranslations).length} custom titles (${Object.keys(translationsFromFile).length} from built-in/file + additional from config)`
       );
 
       // Add any custom titles from configuration
       if (customTitles) {
-        console.log('Additional custom titles provided in configuration');
+        logger.info(`Additional custom titles provided in configuration`);
         const customTitlesObj = parseCustomTitles(customTitles);
         const customCount = Object.keys(customTitlesObj).length;
-        console.log(`Parsed ${customCount} custom titles from configuration`);
+        logger.info(`Parsed ${customCount} custom titles from configuration`);
 
         if (customCount > 0) {
           // Merge translations, custom titles take precedence
-          titleTranslations = {
+          customTranslations = {
             ...translationsFromFile,
             ...customTitlesObj,
           };
-          console.log(
-            `Combined title translations count: ${Object.keys(titleTranslations).length}`
+          logger.info(
+            `Combined custom titles count: ${Object.keys(customTranslations).length}`
           );
         }
       }
 
       // sort options
       const sortOptions: Partial<SearchOptions> = {
-        query: '', // Wird später für jede Suche gesetzt
+        query: '', // Will be set for each search later
       };
 
-      // Sortieroptionen verarbeiten
+      // Process sort options
       const sort1 = options.sort1 as string | undefined;
       if (sort1) {
         const sortValue = fromHumanReadable(sort1);
@@ -369,25 +386,25 @@ builder.defineStreamHandler(
       }
 
       const meta = await publicMetaProvider(id, type);
-      console.log('Searching for:', meta.name);
+      logger.info(`Searching for: ${meta.name}`);
 
       // Check if we have a translation for this title directly
-      if (titleTranslations[meta.name]) {
-        console.log(
-          `Direct translation found for "${meta.name}": "${titleTranslations[meta.name].join('", "')}"`
+      if (customTranslations[meta.name]) {
+        logger.info(
+          `Direct custom title found for "${meta.name}": "${customTranslations[meta.name].join('", "')}"`
         );
       } else {
-        console.log(
-          `No direct translation found for "${meta.name}", checking partial matches`
+        logger.info(
+          `No direct custom title found for "${meta.name}", checking partial matches`
         );
 
         // Look for partial matches in title keys
-        for (const [key, values] of Object.entries(titleTranslations)) {
+        for (const [key, values] of Object.entries(customTranslations)) {
           if (
             meta.name.toLowerCase().includes(key.toLowerCase()) ||
             key.toLowerCase().includes(meta.name.toLowerCase())
           ) {
-            console.log(
+            logger.info(
               `Possible title match: "${meta.name}" ~ "${key}" -> "${values.join('", "')}"`
             );
           }
@@ -398,27 +415,27 @@ builder.defineStreamHandler(
 
       // Use alternativeNames from metadata if available, or generate them
       // Convert translations to JSON string for getAlternativeTitles
-      const titlesJson = JSON.stringify(titleTranslations);
+      const titlesJson = JSON.stringify(customTranslations);
 
-      console.log('Getting alternative titles for:', meta.name);
+      logger.info(`Getting alternative titles for: ${meta.name}`);
 
       // Initialize with the original title
       let allTitles = [meta.name];
 
-      // Add any direct translations found in titleTranslations
+      // Add any direct translations found in customTranslations
       if (
-        titleTranslations[meta.name] &&
-        titleTranslations[meta.name].length > 0
+        customTranslations[meta.name] &&
+        customTranslations[meta.name].length > 0
       ) {
-        console.log(
-          `Adding direct translations for "${meta.name}": "${titleTranslations[meta.name].join('", "')}"`
+        logger.info(
+          `Adding direct custom titles for "${meta.name}": "${customTranslations[meta.name].join('", "')}"`
         );
-        allTitles = [...allTitles, ...titleTranslations[meta.name]];
+        allTitles = [...allTitles, ...customTranslations[meta.name]];
       }
 
       // Add any alternative names from meta (if available)
       if (meta.alternativeNames && meta.alternativeNames.length > 0) {
-        console.log(
+        logger.info(
           `Adding ${meta.alternativeNames.length} alternative names from metadata`
         );
         // Filter out duplicates
@@ -435,13 +452,15 @@ builder.defineStreamHandler(
       ).filter((alt) => !allTitles.includes(alt) && alt !== meta.name);
 
       if (additionalTitles.length > 0) {
-        console.log(
+        logger.info(
           `Adding ${additionalTitles.length} additional titles from partial matches`
         );
         allTitles = [...allTitles, ...additionalTitles];
       }
 
-      console.log(`Will search for ${allTitles.length} titles:`, allTitles);
+      logger.info(
+        `Will search for ${allTitles.length} titles: ${allTitles.join(', ')}`
+      );
 
       // Store all search results here
       const allSearchResults: {
@@ -456,7 +475,7 @@ builder.defineStreamHandler(
 
         const titleMeta = { ...meta, name: titleVariant, year: undefined };
         const query = buildSearchQuery(type, titleMeta);
-        console.log(`Searching without year for: "${query}"`);
+        logger.info(`Searching without year for: "${query}"`);
 
         try {
           const res = await api.search({
@@ -466,7 +485,7 @@ builder.defineStreamHandler(
           });
 
           const resultCount = res?.data?.length || 0;
-          console.log(`Found ${resultCount} results for "${query}"`);
+          logger.info(`Found ${resultCount} results for "${query}"`);
 
           if (resultCount > 0) {
             allSearchResults.push({ query, result: res });
@@ -475,20 +494,20 @@ builder.defineStreamHandler(
             const examples = res.data.slice(0, 2);
             for (const file of examples) {
               const title = getPostTitle(file);
-              console.log(
-                `  Example result: "${title}" (${file['4'] || 'unknown size'})`
+              logger.info(
+                `Example result: "${title}" (${file['4'] || 'unknown size'})`
               );
             }
           }
         } catch (error) {
-          console.error(`Error searching for ${query}:`, error);
+          logger.error(`Error searching for "${query}":`, error);
           // Continue with other titles even if one fails
         }
       }
 
       // If we get no or few results, try with year included for more specificity
       if (allSearchResults.length === 0 && meta.year !== undefined) {
-        console.log(
+        logger.info(
           `No results found without year, trying with year: ${meta.year}`
         );
 
@@ -498,7 +517,7 @@ builder.defineStreamHandler(
 
           const titleMeta = { ...meta, name: titleVariant, year: meta.year };
           const query = buildSearchQuery(type, titleMeta);
-          console.log(`Searching with year for: "${query}"`);
+          logger.info(`Searching with year for: "${query}"`);
 
           try {
             const res = await api.search({
@@ -508,7 +527,7 @@ builder.defineStreamHandler(
             });
 
             const resultCount = res?.data?.length || 0;
-            console.log(`Found ${resultCount} results for "${query}"`);
+            logger.info(`Found ${resultCount} results for "${query}"`);
 
             if (resultCount > 0) {
               allSearchResults.push({ query, result: res });
@@ -517,13 +536,13 @@ builder.defineStreamHandler(
               const examples = res.data.slice(0, 2);
               for (const file of examples) {
                 const title = getPostTitle(file);
-                console.log(
-                  `  Example result: "${title}" (${file['4'] || 'unknown size'})`
+                logger.info(
+                  `Example result: "${title}" (${file['4'] || 'unknown size'})`
                 );
               }
             }
           } catch (error) {
-            console.error(`Error searching for ${query}:`, error);
+            logger.error(`Error searching for "${query}":`, error);
             // Continue with other titles even if one fails
           }
         }

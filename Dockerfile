@@ -5,8 +5,8 @@ WORKDIR /build
 # Copy LICENSE file.
 COPY LICENSE ./
 
-# Copy the title-translations.json file.
-COPY title-translations.json ./
+# Copy the custom-titles.json file.
+COPY custom-titles.json ./
 
 # Copy the relevant package.json and package-lock.json files.
 COPY package*.json ./

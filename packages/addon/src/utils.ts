@@ -4,6 +4,7 @@ import { ContentType } from 'stremio-addon-sdk';
 import { parse as parseTorrentTitle } from 'parse-torrent-title';
 import * as fs from 'fs';
 import * as path from 'path';
+import { readFileSync } from 'fs';
 
 export function isBadVideo(file: FileData) {
   const duration = file['14'] ?? '';
@@ -246,9 +247,9 @@ export function extractDigits(value: string) {
 }
 
 /**
- * Default title translations that will be available even when file loading fails (for Cloudflare Workers)
+ * Default custom titles that will be available even when file loading fails (for Cloudflare Workers)
  */
-let titleTranslations: Record<string, string[]> = {
+let customTranslations: Record<string, string[]> = {
   'Rain or Shine': ['Just between Lovers'],
   'Mufasa: The Lion King': ['Mufasa: Der Koenig der Loewen'],
   'The Lion King': ['Der König der Löwen', 'Der Koenig der Loewen'],
@@ -286,67 +287,60 @@ let titleTranslations: Record<string, string[]> = {
 };
 
 /**
- * Load additional title translations from a JSON file if available
- * @param filePath Path to the JSON file containing title translations
- * @returns Title translations from the file or the default translations if file not found
+ * Load additional custom titles from a JSON file if available
+ * @param filePath Path to the JSON file containing custom titles
+ * @returns Custom titles from the file or the default custom titles if file not found
  */
-export function loadTitleTranslations(
-  filePath: string
-): Record<string, string[]> {
-  // Check if we're in a Cloudflare Worker environment
-  if (
-    typeof process === 'undefined' ||
-    !process.env ||
-    typeof __dirname === 'undefined' ||
-    typeof fs === 'undefined'
-  ) {
-    console.log(
-      'Running in Cloudflare Worker environment, using built-in translations only'
+export function loadCustomTitles(filePath: string): Record<string, string[]> {
+  // First check if we're in a Cloudflare Worker environment (no filesystem)
+  if (typeof __dirname === 'undefined' || typeof fs === 'undefined') {
+    logger.info(
+      'Running in Cloudflare Worker environment, using built-in custom titles only'
     );
-    return titleTranslations; // Return the built-in translations
+    return customTranslations; // Return the built-in custom titles
   }
 
   try {
     if (fs.existsSync(filePath)) {
-      console.log(`Loading translations from file: ${filePath}`);
+      logger.info(`Loading custom titles from file: ${filePath}`);
       const fileContent = fs.readFileSync(filePath, 'utf-8');
-      console.log(`File content length: ${fileContent.length} bytes`);
+      logger.info(`File content size: ${fileContent.length} bytes`);
 
       // Try to parse the file content
       try {
-        const customTranslations = JSON.parse(fileContent);
-        console.log(
-          `Parsed ${Object.keys(customTranslations).length} custom translations from file`
+        const customTitles = JSON.parse(fileContent);
+        logger.info(
+          `Parsed ${Object.keys(customTitles).length} custom titles from file`
         );
 
-        // Log a sample of translations for debugging
-        const sampleKeys = Object.keys(customTranslations).slice(0, 3);
+        // Log a sample of custom titles for debugging
+        const sampleKeys = Object.keys(customTitles).slice(0, 3);
         for (const key of sampleKeys) {
-          console.log(
-            `Sample translation: "${key}" -> ${JSON.stringify(customTranslations[key])}`
+          logger.info(
+            `Sample custom title: "${key}" -> ${JSON.stringify(customTitles[key])}`
           );
         }
 
-        // Merge with built-in translations (file translations take precedence)
+        // Merge with built-in custom titles (file custom titles take precedence)
         return {
-          ...titleTranslations,
           ...customTranslations,
+          ...customTitles,
         };
       } catch (parseError) {
-        console.error(`Error parsing JSON in ${filePath}:`, parseError);
-        console.error(
+        logger.error(`Error parsing JSON in ${filePath}:`, parseError);
+        logger.error(
           `First 100 characters of file: ${fileContent.substring(0, 100)}...`
         );
       }
     } else {
-      console.log(`File does not exist: ${filePath}`);
+      logger.info(`File does not exist: ${filePath}`);
     }
   } catch (error) {
-    console.log(`Error loading translations from ${filePath}:`, error);
+    logger.info(`Error loading custom titles from ${filePath}:`, error);
   }
 
-  console.log('Using built-in translations as fallback');
-  return titleTranslations; // Return built-in translations as fallback
+  logger.info('Using built-in custom titles as fallback');
+  return customTranslations; // Return built-in custom titles as fallback
 }
 
 /**
@@ -392,7 +386,7 @@ export function parseCustomTitles(
 
       return result;
     } catch (objError) {
-      console.error('Error processing object custom titles:', objError);
+      logger.error('Error processing object custom titles:', objError);
     }
   }
 
@@ -471,28 +465,28 @@ export function parseCustomTitles(
       }
     }
   } catch (error) {
-    console.error('Error parsing custom titles:', error);
+    logger.error('Error parsing custom titles:', error);
   }
 
   return result;
 }
 
 /**
- * Gets combined title translations from custom string and existing translations
+ * Gets combined custom titles from custom string and existing custom titles
  * @param customTitlesStr String from the configuration
- * @param existingTranslations Existing translations to combine with
+ * @param existingCustomTitles Existing custom titles to combine with
  * @returns Combined record of original titles to arrays of alternative titles
  */
-export function getCombinedTitleTranslations(
+export function getCombinedCustomTitles(
   customTitlesStr: string,
-  existingTranslations: Record<string, string[]> = {}
+  existingCustomTitles: Record<string, string[]> = {}
 ): Record<string, string[]> {
   const customTitles = parseCustomTitles(customTitlesStr);
 
-  // Combine existing translations with custom ones
-  // Custom translations take precedence if there's a conflict
+  // Combine existing custom titles with custom ones
+  // Custom titles from config take precedence if there's a conflict
   return {
-    ...existingTranslations,
+    ...existingCustomTitles,
     ...customTitles,
   };
 }
@@ -573,11 +567,11 @@ export function getAlternativeTitles(
 
   // Log whether we found any matches
   if (foundMatch) {
-    console.log(
+    logger.info(
       `Found ${alternatives.length - 1} alternative titles for "${title}"`
     );
   } else {
-    console.log(`No alternative titles found for "${title}"`);
+    logger.info(`No alternative titles found for "${title}"`);
   }
 
   return alternatives;
@@ -609,12 +603,239 @@ export function buildSearchQuery(
   return query;
 }
 
+/**
+ * Get the addon version from package.json
+ * @returns Version string
+ */
+export function getVersion(): string {
+  try {
+    // Try to read the package.json file
+    let packageJson: { version: string };
+
+    // First try in the current directory
+    try {
+      packageJson = JSON.parse(
+        readFileSync(path.join(__dirname, '../package.json'), 'utf-8')
+      );
+      return packageJson.version;
+    } catch (error) {
+      // Then try from the current working directory
+      packageJson = JSON.parse(
+        readFileSync(path.join(process.cwd(), 'package.json'), 'utf-8')
+      );
+      return packageJson.version;
+    }
+  } catch (error) {
+    // Return a generic version string if the file can't be read
+    return 'unknown-version';
+  }
+}
+
+/**
+ * Log levels for configuration
+ */
+export enum LogLevel {
+  NONE = -1, // No logging at all
+  ERROR = 0, // Critical errors that prevent operation
+  WARN = 1, // Warnings about potential issues
+  INFO = 2, // General operational information
+  DEBUG = 3, // Detailed information for debugging
+  TRACE = 4, // Very detailed tracing information
+}
+
+/**
+ * Parse a string log level to enum value
+ * @param level The string log level to parse
+ * @returns The LogLevel enum value
+ */
+export function parseLogLevel(level: string | undefined): LogLevel {
+  if (!level) return LogLevel.INFO;
+
+  switch (level.toLowerCase()) {
+    case 'none':
+      return LogLevel.NONE;
+    case 'error':
+      return LogLevel.ERROR;
+    case 'warn':
+    case 'warning':
+      return LogLevel.WARN;
+    case 'info':
+      return LogLevel.INFO;
+    case 'debug':
+      return LogLevel.DEBUG;
+    case 'trace':
+      return LogLevel.TRACE;
+    default:
+      // Try to parse as number
+      const numLevel = parseInt(level, 10);
+      if (
+        !isNaN(numLevel) &&
+        numLevel >= LogLevel.NONE &&
+        numLevel <= LogLevel.TRACE
+      ) {
+        return numLevel;
+      }
+      return LogLevel.INFO;
+  }
+}
+
+/**
+ * Get initial log level from environment or default to INFO
+ * @returns The initial log level to use
+ */
+function getInitialLogLevel(): LogLevel {
+  if (typeof process !== 'undefined' && process.env) {
+    return parseLogLevel(process.env.EASYNEWS_LOG_LEVEL);
+  }
+  return LogLevel.INFO;
+}
+
+/**
+ * Format a timestamp for logging
+ * @returns Formatted timestamp [HH:MM:SS]
+ */
+function getTimestamp(): string {
+  const now = new Date();
+  return `[${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}]`;
+}
+
+/**
+ * Logger module for consistent logging across the addon
+ *
+ * Log levels can be set via:
+ * 1. Environment variable: EASYNEWS_LOG_LEVEL (none, error, warn, info, debug, trace)
+ * 2. AddonConfig.logLevel in the configuration
+ * 3. Programmatically via logger.setLevel()
+ */
+export const logger = {
+  /**
+   * Current log level
+   */
+  level: getInitialLogLevel(),
+
+  /**
+   * Get log level name from current level
+   * @returns The name of the current log level
+   */
+  getLevelName: (): string => {
+    switch (logger.level) {
+      case LogLevel.NONE:
+        return 'NONE';
+      case LogLevel.ERROR:
+        return 'ERROR';
+      case LogLevel.WARN:
+        return 'WARN';
+      case LogLevel.INFO:
+        return 'INFO';
+      case LogLevel.DEBUG:
+        return 'DEBUG';
+      case LogLevel.TRACE:
+        return 'TRACE';
+      default:
+        return `UNKNOWN(${logger.level})`;
+    }
+  },
+
+  /**
+   * Set the logging level
+   * @param level The log level to set
+   */
+  setLevel: (level: LogLevel | string) => {
+    if (typeof level === 'string') {
+      logger.level = parseLogLevel(level);
+    } else {
+      logger.level = level;
+    }
+
+    // Log the level change at the level that will be visible
+    if (logger.level >= LogLevel.DEBUG) {
+      console.debug(
+        `${logger.formatPrefix()} [DEBUG] Log level changed to: ${logger.getLevelName()}`
+      );
+    }
+  },
+
+  /**
+   * Format a log prefix with version and timestamp
+   */
+  formatPrefix: () => {
+    return `[Easynews++ v${getVersion()}]${logger.level >= LogLevel.DEBUG ? getTimestamp() : ''}`;
+  },
+
+  /**
+   * Log trace messages (most detailed level)
+   * @param message The message to log
+   * @param optionalParams Additional parameters to log
+   */
+  trace: (message: string, ...optionalParams: any[]) => {
+    if (logger.level >= LogLevel.TRACE) {
+      console.debug(
+        `${logger.formatPrefix()} [TRACE] ${message}`,
+        ...optionalParams
+      );
+    }
+  },
+
+  /**
+   * Log debug messages
+   * @param message The message to log
+   * @param optionalParams Additional parameters to log
+   */
+  debug: (message: string, ...optionalParams: any[]) => {
+    if (logger.level >= LogLevel.DEBUG) {
+      console.debug(
+        `${logger.formatPrefix()} [DEBUG] ${message}`,
+        ...optionalParams
+      );
+    }
+  },
+
+  /**
+   * Log informational messages
+   * @param message The message to log
+   * @param optionalParams Additional parameters to log
+   */
+  info: (message: string, ...optionalParams: any[]) => {
+    if (logger.level >= LogLevel.INFO) {
+      console.log(`${logger.formatPrefix()} ${message}`, ...optionalParams);
+    }
+  },
+
+  /**
+   * Log warning messages
+   * @param message The message to log
+   * @param optionalParams Additional parameters to log
+   */
+  warn: (message: string, ...optionalParams: any[]) => {
+    if (logger.level >= LogLevel.WARN) {
+      console.warn(
+        `${logger.formatPrefix()} [WARN] ${message}`,
+        ...optionalParams
+      );
+    }
+  },
+
+  /**
+   * Log error messages
+   * @param message The message to log
+   * @param optionalParams Additional parameters to log
+   */
+  error: (message: string, ...optionalParams: any[]) => {
+    if (logger.level >= LogLevel.ERROR) {
+      console.error(
+        `${logger.formatPrefix()} [ERROR] ${message}`,
+        ...optionalParams
+      );
+    }
+  },
+};
+
 export function logError(message: {
   message: string;
   error: unknown;
   context: unknown;
 }) {
-  console.error(message);
+  logger.error(`Error: ${message.message}`, message);
 }
 
 export function capitalizeFirstLetter(str: string): string {
