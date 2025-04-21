@@ -13,10 +13,7 @@
     "deploy:beamup": "beamup",
     "preview:cf": "npm run build && npm -w packages/cloudflare-worker run preview",
     "sync-versions": "node packages/scripts/sync-versions.js",
-    "release": "bash ./packages/scripts/release.sh",
-    "version:patch": "npm version patch --no-git-tag-version && npm run sync-versions && git add . && git commit -m 'chore: bump version' && git tag v$(node -p \"require('./package.json').version\") && git push && git push --tags",
-    "version:minor": "npm version minor --no-git-tag-version && npm run sync-versions && git add . && git commit -m 'chore: bump version' && git tag v$(node -p \"require('./package.json').version\") && git push && git push --tags",
-    "version:major": "npm version major --no-git-tag-version && npm run sync-versions && git add . && git commit -m 'chore: bump version' && git tag v$(node -p \"require('./package.json').version\") && git push && git push --tags"
+    "release": "bash ./packages/scripts/release.sh"
   },
   "keywords": [
     "stremio easynews addon",
