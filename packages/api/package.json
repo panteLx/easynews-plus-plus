@@ -1,5 +1,5 @@
 {
-  "name": "@easynews-plus-plus/api",
+  "name": "easynews-plus-plus-api",
   "version": "2.0.0",
   "main": "./dist/index.js",
   "scripts": {

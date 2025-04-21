@@ -26,7 +26,7 @@ import {
   EasynewsAPI,
   SearchOptions,
   EasynewsSearchResponse,
-} from '@easynews-plus-plus/api';
+} from 'easynews-plus-plus-api';
 import { publicMetaProvider } from './meta';
 import {
   fromHumanReadable,
