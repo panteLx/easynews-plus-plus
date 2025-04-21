@@ -1,4 +1,10 @@
 import { Manifest } from 'stremio-addon-sdk';
+import {
+  TranslationKeys,
+  getTranslations,
+  getUILanguage,
+  ISO_TO_LANGUAGE,
+} from './i18n';
 
 function landingTemplate(manifest: Manifest): string {
   const configurationFields = manifest.config || [];
@@ -6,13 +12,195 @@ function landingTemplate(manifest: Manifest): string {
     ? `background-image: url(${manifest.background}); background-size: cover; background-position: center;`
     : '';
 
+  // Find UI language field to determine which language to use
+  const uiLanguageField = configurationFields.find(
+    (field: any) => field.key === 'uiLanguage'
+  );
+  const defaultUILanguage = uiLanguageField?.default || 'eng';
+
+  // Get translations based on the default UI language
+  const translations = getTranslations(defaultUILanguage);
+
+  // For debugging
+  console.log(
+    `Using UI language: ${defaultUILanguage}, translations found: ${!!translations}`
+  );
+  console.log(
+    `Translations loaded:`,
+    JSON.stringify(translations).substring(0, 200) + '...'
+  );
+
+  // Add a timestamp parameter to prevent caching
+  const cacheBreaker = Date.now();
+
+  // Create a description text based on the language
+  let description = manifest.description || '';
+
+  // Replace the field titles with their translated versions if they exist
+  const translatedFields = configurationFields.map((field: any) => {
+    if (field.key === 'username' && translations.form.username) {
+      return { ...field, title: translations.form.username };
+    } else if (field.key === 'password' && translations.form.password) {
+      return { ...field, title: translations.form.password };
+    } else if (
+      field.key === 'strictTitleMatching' &&
+      translations.form.strictTitleMatching
+    ) {
+      return { ...field, title: translations.form.strictTitleMatching };
+    } else if (
+      field.key === 'preferredLanguage' &&
+      translations.form.preferredLanguage
+    ) {
+      // For language selection field, translate both title and options
+      const translatedOptions: Record<string, string> = {};
+      if (field.options) {
+        // Safely access options and translations
+        if (
+          field.options[''] !== undefined &&
+          translations.languages?.noPreference
+        ) {
+          translatedOptions[''] = translations.languages.noPreference;
+        }
+        if (
+          field.options['eng'] !== undefined &&
+          translations.languages?.english
+        ) {
+          translatedOptions['eng'] = translations.languages.english;
+        }
+        if (
+          field.options['ger'] !== undefined &&
+          translations.languages?.german
+        ) {
+          translatedOptions['ger'] = translations.languages.german;
+        }
+        if (
+          field.options['spa'] !== undefined &&
+          translations.languages?.spanish
+        ) {
+          translatedOptions['spa'] = translations.languages.spanish;
+        }
+        if (
+          field.options['fre'] !== undefined &&
+          translations.languages?.french
+        ) {
+          translatedOptions['fre'] = translations.languages.french;
+        }
+        if (
+          field.options['ita'] !== undefined &&
+          translations.languages?.italian
+        ) {
+          translatedOptions['ita'] = translations.languages.italian;
+        }
+        if (
+          field.options['jpn'] !== undefined &&
+          translations.languages?.japanese
+        ) {
+          translatedOptions['jpn'] = translations.languages.japanese;
+        }
+        if (
+          field.options['por'] !== undefined &&
+          translations.languages?.portuguese
+        ) {
+          translatedOptions['por'] = translations.languages.portuguese;
+        }
+        if (
+          field.options['rus'] !== undefined &&
+          translations.languages?.russian
+        ) {
+          translatedOptions['rus'] = translations.languages.russian;
+        }
+        if (
+          field.options['kor'] !== undefined &&
+          translations.languages?.korean
+        ) {
+          translatedOptions['kor'] = translations.languages.korean;
+        }
+        if (
+          field.options['chi'] !== undefined &&
+          translations.languages?.chinese
+        ) {
+          translatedOptions['chi'] = translations.languages.chinese;
+        }
+      }
+      return {
+        ...field,
+        title: translations.form.preferredLanguage,
+        options:
+          Object.keys(translatedOptions).length > 0
+            ? translatedOptions
+            : field.options,
+      };
+    } else if (
+      field.key === 'sortingPreference' &&
+      translations.form.sortingMethod
+    ) {
+      // For sorting preference field, translate both title and options
+      const translatedOptions: Record<string, string> = {};
+      if (field.options) {
+        if (
+          field.options['quality_first'] !== undefined &&
+          translations.sortingOptions?.qualityFirst
+        ) {
+          translatedOptions['quality_first'] =
+            translations.sortingOptions.qualityFirst;
+        }
+        if (
+          field.options['language_first'] !== undefined &&
+          translations.sortingOptions?.languageFirst
+        ) {
+          translatedOptions['language_first'] =
+            translations.sortingOptions.languageFirst;
+        }
+        if (
+          field.options['size_first'] !== undefined &&
+          translations.sortingOptions?.sizeFirst
+        ) {
+          translatedOptions['size_first'] =
+            translations.sortingOptions.sizeFirst;
+        }
+        if (
+          field.options['date_first'] !== undefined &&
+          translations.sortingOptions?.dateFirst
+        ) {
+          translatedOptions['date_first'] =
+            translations.sortingOptions.dateFirst;
+        }
+        if (
+          field.options['relevance_first'] !== undefined &&
+          translations.sortingOptions?.relevanceFirst
+        ) {
+          translatedOptions['relevance_first'] =
+            translations.sortingOptions.relevanceFirst;
+        }
+      }
+      return {
+        ...field,
+        title: translations.form.sortingMethod,
+        options:
+          Object.keys(translatedOptions).length > 0
+            ? translatedOptions
+            : field.options,
+      };
+    } else if (field.key === 'uiLanguage' && translations.form.uiLanguage) {
+      // For UI language selection field, just translate the title
+      return {
+        ...field,
+        title: translations.form.uiLanguage,
+      };
+    }
+    return field;
+  });
+
   return `
 <!DOCTYPE html>
-<html>
+<html lang="${ISO_TO_LANGUAGE[defaultUILanguage] || 'en'}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${manifest.name || manifest.id}</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>${manifest.name || manifest.id} - ${translations.configPage.title}</title>
   <style>
     * {
       box-sizing: border-box;
@@ -396,12 +584,12 @@ function landingTemplate(manifest: Manifest): string {
         ${manifest.logo ? `<img class="logo" src="${manifest.logo}" alt="${manifest.name || manifest.id} logo">` : ''}
         <div>
           <h1 class="title">${manifest.name || manifest.id}</h1>
-          <p class="description">${manifest.description || ''}</p>
+          <p class="description">${translations.configPage.description || translations.configPage.title}</p>
         </div>
       </div>
       
       <form id="configForm">
-        ${configurationFields
+        ${translatedFields
           .map((field: any) => {
             if (field.type === 'checkbox') {
               return `
@@ -442,20 +630,33 @@ function landingTemplate(manifest: Manifest): string {
         
         <div class="button-group">
           <div class="copy-button-wrapper">
-            <button type="button" id="copyButton" class="copy-button" href="#">Copy Configuration</button>
-            <div id="tooltip" class="tooltip">Copied!</div>
+            <button type="button" id="copyButton" class="copy-button" href="#">${translations.configPage.copyConfig}</button>
+            <div id="tooltip" class="tooltip">${translations.configPage.configCopied}</div>
           </div>
           <a id="installLink" href="#">
-            <button type="button">Add to Stremio</button>
+            <button type="button">${translations.configPage.addToStremio}</button>
           </a>
         </div>
       </form>
     </div>
     
-    <p class="version">Version: ${manifest.version}</p>
+    <p class="version">${translations.configPage.version}: ${manifest.version}</p>
   </div>
   
   <script>
+    // Store the current language for debugging
+    const currentLanguage = "${defaultUILanguage}";
+    console.log("Page loaded with language:", currentLanguage);
+    
+    // Store translations in JS for debugging
+    const pageTranslations = {
+      copyConfig: "${translations.configPage.copyConfig}",
+      addToStremio: "${translations.configPage.addToStremio}",
+      configCopied: "${translations.configPage.configCopied}",
+      version: "${translations.configPage.version}"
+    };
+    console.log("Translations loaded:", pageTranslations);
+    
     const configForm = document.getElementById('configForm');
     const installLink = document.getElementById('installLink');
     const copyButton = document.getElementById('copyButton');
@@ -481,11 +682,97 @@ function landingTemplate(manifest: Manifest): string {
       copyButton.href = 'https://' + window.location.host + '/' + encodeURIComponent(JSON.stringify(config)) + '/manifest.json';
     }
     
+    // Extract the language change handler to a named function
+    function handleLanguageChange() {
+      // Get the current form values
+      const formData = new FormData(configForm);
+      const config = {};
+      
+      for (const [key, value] of formData.entries()) {
+        config[key] = value;
+      }
+      
+      // Handle checkboxes
+      document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+        if (!formData.has(checkbox.name)) {
+          config[checkbox.name] = 'false';
+        }
+      });
+      
+      // Store the current form values
+      localStorage.setItem('formValues', JSON.stringify(config));
+      
+      // Reload with the new language parameter
+      const newLang = this.value;
+      console.log('Language change requested to:', newLang, 'from:', '${defaultUILanguage}');
+      
+      // Always use the full URL to ensure proper navigation
+      const baseUrl = window.location.pathname;
+      // Add cache breaker to force the browser to get a fresh page
+      const newUrl = baseUrl + '?lang=' + newLang + '&cache=' + new Date().getTime();
+      console.log('Navigating to:', newUrl);
+      
+      // Force navigation to the new URL
+      window.location.href = newUrl;
+    }
+    
     // Update when form changes
-    configForm.addEventListener('change', updateLink);
+    configForm.addEventListener('change', function(event) {
+      // Only update links when the language isn't changing
+      if (event.target.id !== 'uiLanguage') {
+        updateLink();
+      }
+    });
     
     // Initialize on load
-    document.addEventListener('DOMContentLoaded', updateLink);
+    document.addEventListener('DOMContentLoaded', function() {
+      // Log the current URL and form values for debugging
+      console.log('Current URL:', window.location.href);
+      console.log('Form has language selector:', !!document.getElementById('uiLanguage'));
+    
+      // Set up language selector
+      const uiLanguageSelect = document.getElementById('uiLanguage');
+      if (uiLanguageSelect) {
+        console.log('Language selector found with value:', uiLanguageSelect.value);
+        // Remove any existing event listeners
+        uiLanguageSelect.removeEventListener('change', handleLanguageChange);
+        // Add event listener
+        uiLanguageSelect.addEventListener('change', handleLanguageChange);
+      }
+      
+      // Update links initially
+      updateLink();
+      
+      // Restore form values if returning from a language change
+      const savedValues = localStorage.getItem('formValues');
+      if (savedValues) {
+        try {
+          const values = JSON.parse(savedValues);
+          console.log('Restoring saved values:', values);
+          
+          // Fill in the form
+          Object.entries(values).forEach(([key, value]) => {
+            const field = document.getElementById(key) || document.querySelector('input[name="' + key + '"]');
+            if (field) {
+              if (field.type === 'checkbox') {
+                field.checked = value === 'true';
+              } else {
+                field.value = value;
+              }
+            }
+          });
+          
+          // Clear the saved values
+          localStorage.removeItem('formValues');
+          
+          // Update links with restored values
+          updateLink();
+        } catch (e) {
+          console.error('Error restoring saved values:', e);
+          localStorage.removeItem('formValues');
+        }
+      }
+    });
     
     // "Save Configuration" Button functionality
     installLink.addEventListener('click', function(e) {
