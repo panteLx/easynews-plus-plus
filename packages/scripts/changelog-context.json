@@ -27,10 +27,9 @@
     "commitGroupsSort": "title",
     "commitsSort": ["scope", "subject"],
     "noteGroupsSort": "title",
-    "mainTemplate": "{{> header}}{{> commit-list}}{{> footer}}",
-    "commitPartial": "- **{{type}}{{#if scope}}({{scope}}){{/if}}:** {{subject}}{{#if hash}} ([{{shortHash}}]({{@root.repoUrl}}/commit/{{hash}})){{/if}}\n",
-    "headerPartial": "# {{version}}\n{{#if date}}({{date}})\n{{/if}}\n",
-    "footerPartial": "{{> footer-notes}}",
+    "mainTemplate": "# {{version}}\n{{#if date}}({{date}})\n{{/if}}\n\n{{#each commitGroups}}\n## {{title}}\n\n{{#each commits}}\n- **{{type}}{{#if scope}}({{scope}}){{/if}}:** {{subject}}{{#if hash}} ([{{shortHash}}]({{@root.repoUrl}}/commit/{{hash}})){{/if}}\n{{#if body}}\n\n{{body}}\n{{/if}}\n{{/each}}\n{{/each}}\n\n{{#if noteGroups}}\n{{#each noteGroups}}\n## {{title}}\n\n{{#each notes}}\n* {{text}}\n{{/each}}\n{{/each}}\n{{/if}}",
+    "headerPartial": "",
+    "footerPartial": "",
     "groupOrder": [
       "Features",
       "Bug Fixes",
