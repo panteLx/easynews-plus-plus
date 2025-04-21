@@ -19,8 +19,7 @@ const config = {
   releaseCommitMessageFormat: 'chore(release): {{currentTag}}',
   // Add custom template
   writerOpts: {
-    headerPartial:
-      '## <small>{{version}} {{#if date}}({{date}}){{/if}}</small>\n\n',
+    headerPartial: '## {{version}}{{#if date}} ({{date}}){{/if}}\n\n',
     transform: function (commit, context) {
       // Skip commits related to releases - several patterns to catch all variations
       if (

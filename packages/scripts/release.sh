@@ -90,10 +90,32 @@ fi
 
 # Check if there's already an entry for this version and remove it before regenerating
 echo "Checking for existing changelog entries for version $NEW_VERSION..."
+
+# Check all possible formats
+ENTRY_EXISTS=false
+if grep -q "^## $NEW_VERSION" CHANGELOG.md; then
+    echo "Found existing entry for version $NEW_VERSION in format 1, removing it before regenerating..."
+    # Delete the section for this version
+    sed -i "/^## $NEW_VERSION/,/^## /d" CHANGELOG.md
+    ENTRY_EXISTS=true
+fi
+
 if grep -q "## <small>$NEW_VERSION" CHANGELOG.md; then
-    echo "Found existing entry for version $NEW_VERSION, removing it before regenerating..."
+    echo "Found existing entry for version $NEW_VERSION in format 2, removing it before regenerating..."
     # Delete the section for this version
     sed -i "/## <small>$NEW_VERSION/,/## <small>/d" CHANGELOG.md
+    ENTRY_EXISTS=true
+fi
+
+if grep -q "^# $NEW_VERSION" CHANGELOG.md; then
+    echo "Found existing entry for version $NEW_VERSION in format 3, removing it before regenerating..."
+    # Delete the section for this version
+    sed -i "/^# $NEW_VERSION/,/^# /d" CHANGELOG.md
+    ENTRY_EXISTS=true
+fi
+
+if [ "$ENTRY_EXISTS" = false ]; then
+    echo "No existing entries found for version $NEW_VERSION."
 fi
 
 # Generate changelog
@@ -126,19 +148,28 @@ fi
 
 # Extract the changelog content for the latest release
 echo "Extracting changelog content for version $NEW_VERSION..."
-# Extract content between the version heading and the next version heading
-CHANGELOG=$(sed -n "/## <small>$NEW_VERSION/,/## <small>/p" CHANGELOG.md | sed '1p;/## <small>/d')
+
+# Try different formats for the changelog version headers, starting with the most recent format
+# Format 1: ## 1.5.0
+CHANGELOG=$(sed -n "/^## $NEW_VERSION/,/^## /p" CHANGELOG.md | sed '1p;/^## /d')
+
+# If that fails, try Format 2: ## <small>1.5.0</small>
+if [ -z "$CHANGELOG" ]; then
+    echo "Trying format 2..."
+    CHANGELOG=$(sed -n "/## <small>$NEW_VERSION/,/## <small>/p" CHANGELOG.md | sed '1p;/## <small>/d')
+fi
+
+# If that fails, try Format 3: # 1.5.0 (old format)
+if [ -z "$CHANGELOG" ]; then
+    echo "Trying format 3..."
+    CHANGELOG=$(sed -n "/^# $NEW_VERSION/,/^# /p" CHANGELOG.md | sed '1p;/^# /d')
+fi
 
 if [ -z "$CHANGELOG" ]; then
     echo "Error: Could not extract changelog for version $NEW_VERSION."
-    echo "Trying alternative format..."
-    # Try alternative format (for backwards compatibility)
-    CHANGELOG=$(sed -n "/^# $NEW_VERSION/,/^# /p" CHANGELOG.md | sed '1p;/^# /d')
-    
-    if [ -z "$CHANGELOG" ]; then
-        echo "Error: Could not extract changelog in any known format for version $NEW_VERSION."
-        exit 1
-    fi
+    echo "Debug: Current CHANGELOG.md format (first 20 lines):"
+    head -n 20 CHANGELOG.md
+    exit 1
 fi
 
 # Create the release on GitHub
