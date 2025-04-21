@@ -75,9 +75,10 @@ echo "Syncing version to all packages..."
 node packages/scripts/sync-versions.js
 git add packages/*/package.json
 
-# Check if CHANGELOG.md exists, create it if it doesn't
+# Check if CHANGELOG.md exists
 if [ ! -f CHANGELOG.md ]; then
-    echo "# Changelog\n\n" > CHANGELOG.md
+    echo "Error: CHANGELOG.md does not exist. Please create it and add the changelog content."
+    exit 1
 fi
 
 # Check if conventional-changelog is installed, if not install it
