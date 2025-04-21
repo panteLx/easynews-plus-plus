@@ -44,6 +44,7 @@ interface AddonConfig {
   password: string;
   customTitles?: string;
   strictTitleMatching?: string;
+  preferredLanguage?: string;
   sort1?: string;
   sort1Direction?: string;
   sort2?: string;
@@ -210,6 +211,9 @@ builder.defineMetaHandler(
   }) => {
     const { username, password, logLevel } = config;
 
+    // For language filtering in the catalog
+    const preferredLang = config.preferredLanguage || '';
+
     // Configure logger based on config
     if (logLevel) {
       logger.setLevel(logLevel);
@@ -271,6 +275,8 @@ builder.defineMetaHandler(
               size: getSize(file),
               url: `${createStreamUrl(res, username, password)}/${createStreamPath(file)}`,
               videoSize: file.rawSize,
+              file,
+              preferredLang: '',
             }),
           ],
         });
@@ -321,6 +327,7 @@ builder.defineStreamHandler(
       password,
       customTitles,
       strictTitleMatching,
+      preferredLanguage,
       logLevel,
       ...options
     } = config;
@@ -355,6 +362,12 @@ builder.defineStreamHandler(
         strictTitleMatching === 'on' || strictTitleMatching === 'true';
       logger.info(
         `Strict title matching: ${useStrictMatching ? 'enabled' : 'disabled'}`
+      );
+
+      // Get preferred language from configuration
+      const preferredLang = preferredLanguage || '';
+      logger.info(
+        `Preferred language: ${preferredLang ? preferredLang : 'No preference'}`
       );
 
       // Combine config-provided custom titles with titles from file
@@ -645,6 +658,8 @@ builder.defineStreamHandler(
               title,
               url: `${createStreamUrl(res, username, password)}/${createStreamPath(file)}`,
               videoSize: file.rawSize,
+              file,
+              preferredLang,
             })
           );
         }
@@ -652,6 +667,22 @@ builder.defineStreamHandler(
 
       // Sort streams - prioritize higher quality videos
       streams.sort((a, b) => {
+        // Check if we have a language preference set
+        if (preferredLang) {
+          // Extract stream data from _temp property we'll add to the streams
+          const aFile = (a as any)._temp?.file;
+          const bFile = (b as any)._temp?.file;
+
+          if (aFile && bFile) {
+            const aHasPreferredLang = aFile.alangs?.includes(preferredLang);
+            const bHasPreferredLang = bFile.alangs?.includes(preferredLang);
+
+            // If only one stream has the preferred language, prioritize it
+            if (aHasPreferredLang && !bHasPreferredLang) return -1;
+            if (!aHasPreferredLang && bHasPreferredLang) return 1;
+          }
+        }
+
         // Extract description lines which contain size information
         const aDesc = a.description?.split('\n') || [];
         const bDesc = b.description?.split('\n') || [];
@@ -741,6 +772,8 @@ function mapStream({
   fileExtension,
   videoSize,
   url,
+  file,
+  preferredLang,
 }: {
   title: string;
   url: string;
@@ -751,22 +784,34 @@ function mapStream({
   duration: string | undefined;
   size: string | undefined;
   fullResolution: string | undefined;
+  file: any;
+  preferredLang: string;
 }): Stream {
   const quality = getQuality(title, fullResolution);
 
-  return {
+  // Show language information in the description if available
+  const languageInfo = file.alangs?.length
+    ? `🌐 ${file.alangs.join(', ')}${preferredLang && file.alangs.includes(preferredLang) ? ' ⭐' : ''}`
+    : '🌐 Unknown';
+
+  const stream: Stream & { _temp?: any } = {
     name: `Easynews++${quality ? `\n${quality}` : ''}`,
     description: [
       `${title}${fileExtension}`,
       `🕛 ${duration ?? 'unknown duration'}`,
       `📦 ${size ?? 'unknown size'}`,
+      languageInfo,
     ].join('\n'),
     url: url,
     behaviorHints: {
       notWebReady: true,
       filename: `${title}${fileExtension}`,
     },
+    // Add temporary property with file data for sorting
+    _temp: { file },
   };
+
+  return stream;
 }
 
 function getCacheOptions(itemsLength: number): Partial<Cache> {

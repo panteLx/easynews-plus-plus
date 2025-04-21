@@ -18,6 +18,21 @@ export const catalog: ManifestCatalog = {
 const sortOptions = humanReadableSortOptions as any;
 const directionOptions = humanReadableDirections as any;
 
+// Language options for the preferred language selector
+const languageOptions = {
+  '': 'No preference',
+  eng: 'English',
+  ger: 'German (Deutsch)',
+  spa: 'Spanish (Español)',
+  fre: 'French (Français)',
+  ita: 'Italian (Italiano)',
+  jpn: 'Japanese (日本語)',
+  por: 'Portuguese (Português)',
+  rus: 'Russian (Русский)',
+  kor: 'Korean (한국어)',
+  chi: 'Chinese (中文)',
+};
+
 export const manifest: Manifest = {
   id: 'community.easynews-plus-plus',
   version,
@@ -42,6 +57,13 @@ export const manifest: Manifest = {
       key: 'strictTitleMatching',
       type: 'checkbox',
       default: 'false',
+    },
+    {
+      title: 'Preferred Audio Language',
+      key: 'preferredLanguage',
+      type: 'select',
+      options: languageOptions,
+      default: '',
     },
     {
       title: 'Sort 1st',
