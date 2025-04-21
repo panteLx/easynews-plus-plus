@@ -111,7 +111,8 @@ fi
 
 # Extract the changelog content for the latest release
 echo "Extracting changelog content for version $NEW_VERSION..."
-CHANGELOG=$(awk '/^# / {if (count++ == 1) exit} {print}' CHANGELOG.md | tail -n +2)
+# Extract content between the first heading and the second heading (or end of file)
+CHANGELOG=$(sed -n "/^# $NEW_VERSION/,/^# /p" CHANGELOG.md | sed '1p;/^# /d')
 
 if [ -z "$CHANGELOG" ]; then
     echo "Error: Could not extract changelog for version $NEW_VERSION."
