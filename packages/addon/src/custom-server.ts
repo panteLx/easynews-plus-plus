@@ -1,12 +1,11 @@
-import express from 'express';
-import * as path from 'path';
+import express, { Request, Response, NextFunction } from 'express';
 import { AddonInterface } from 'stremio-addon-sdk';
-import { Request, Response, NextFunction } from 'express';
-
 // Import getRouter manually since TypeScript definitions are incomplete
 // @ts-ignore
 import getRouter from 'stremio-addon-sdk/src/getRouter';
+import * as path from 'path';
 import customTemplate from './custom-template';
+import { getUILanguage } from './i18n';
 
 type ServerOptions = {
   port?: number;
@@ -14,6 +13,27 @@ type ServerOptions = {
   cacheMaxAge?: number;
   static?: string;
 };
+
+// Helper function to create a deep clone of the manifest with a specified language
+function createManifestWithLanguage(
+  addonInterface: AddonInterface,
+  lang: string
+) {
+  const manifest = JSON.parse(JSON.stringify(addonInterface.manifest)); // Deep clone
+
+  // Find and update the uiLanguage field
+  if (manifest.config) {
+    const uiLangFieldIndex = manifest.config.findIndex(
+      (field: any) => field.key === 'uiLanguage'
+    );
+    if (uiLangFieldIndex >= 0 && lang) {
+      console.log(`Setting language in manifest to: ${lang}`);
+      manifest.config[uiLangFieldIndex].default = lang;
+    }
+  }
+
+  return manifest;
+}
 
 export function serveHTTP(
   addonInterface: AddonInterface,
@@ -38,23 +58,52 @@ export function serveHTTP(
     });
   }
 
-  // The important part: Use our custom template
-  const landingHTML = customTemplate(addonInterface.manifest);
+  // The important part: Use our custom template with internationalization
   const hasConfig = !!(addonInterface.manifest.config || []).length;
 
   // Landing page
-  app.get('/', (_: Request, res: Response) => {
+  app.get('/', (req: Request, res: Response) => {
     if (hasConfig) {
-      res.redirect('/configure');
+      // Pass any language parameter to the configure route
+      const lang = (req.query.lang as string) || '';
+      const redirectUrl = lang ? `/configure?lang=${lang}` : '/configure';
+      res.redirect(redirectUrl);
     } else {
       res.setHeader('content-type', 'text/html');
+      // Generate the landing HTML with the default language
+      const landingHTML = customTemplate(addonInterface.manifest);
       res.end(landingHTML);
     }
   });
 
   if (hasConfig)
-    app.get('/configure', (_: Request, res: Response) => {
+    app.get('/configure', (req: Request, res: Response) => {
+      // Set no-cache headers
+      res.setHeader(
+        'Cache-Control',
+        'no-store, no-cache, must-revalidate, proxy-revalidate'
+      );
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
       res.setHeader('content-type', 'text/html');
+
+      // Get language from query parameter
+      const lang = (req.query.lang as string) || '';
+      console.log(`Express server: Received request with lang=${lang}`);
+
+      // Generate HTML with the selected language
+      let tempManifest;
+
+      // If a language is specified, create a specialized manifest for that language
+      if (lang) {
+        tempManifest = createManifestWithLanguage(addonInterface, lang);
+      } else {
+        // Otherwise, use the default manifest
+        tempManifest = addonInterface.manifest;
+      }
+
+      // Generate HTML with the updated language
+      const landingHTML = customTemplate(tempManifest);
       res.end(landingHTML);
     });
 
