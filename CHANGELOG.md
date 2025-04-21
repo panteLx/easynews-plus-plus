@@ -1,3 +1,9 @@
+## [2.0.1](https://github.com/panteLx/easynews-plus-plus/compare/v2.0.0...v2.0.1) (2025-04-21)
+
+### Bug Fixes
+
+* package names and versions to remove scope prefixes ([f04d2b7](https://github.com/panteLx/easynews-plus-plus/commit/f04d2b7b56032ed923949ff27d2db3105287db6f))
+* streamline addon start command in package.json ([6c75eea](https://github.com/panteLx/easynews-plus-plus/commit/6c75eeafebff3e9fbda6831162f16a5b4fbd9e13))
 ## [2.0.0](https://github.com/panteLx/easynews-plus-plus/compare/v1.5.1...v2.0.0) (2025-04-21)
 
 ### Features

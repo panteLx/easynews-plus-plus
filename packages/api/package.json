@@ -1,6 +1,6 @@
 {
   "name": "easynews-plus-plus-api",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "main": "./dist/index.js",
   "scripts": {
     "test": "vitest run --passWithNoTests",
