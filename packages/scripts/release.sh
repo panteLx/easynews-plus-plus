@@ -36,9 +36,9 @@ else
     LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
 
     # Check for different types of commits since the latest tag
-    if git log "$LATEST_TAG"..HEAD --oneline | grep -q "feat|perf"; then
+    if git log "$LATEST_TAG"..HEAD --pretty=format:%s | grep -E "^(feat|perf)(\(.+\))?:" > /dev/null; then
         RELEASE_TYPE="minor"
-    elif git log "$LATEST_TAG"..HEAD --oneline | grep -q "fix|docs|style|test|chore|refactor"; then
+    elif git log "$LATEST_TAG"..HEAD --pretty=format:%s | grep -E "^(fix|docs|style|test|chore|refactor)(\(.+\))?:" > /dev/null; then
         RELEASE_TYPE="patch"
     else
         echo "No conventional commit types found since the latest release. No new release will be created."
