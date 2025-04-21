@@ -292,16 +292,21 @@ let customTranslations: Record<string, string[]> = {
  * @returns Custom titles from the file or the default custom titles if file not found
  */
 export function loadCustomTitles(filePath: string): Record<string, string[]> {
-  // First check if we're in a Cloudflare Worker environment (no filesystem)
-  if (typeof __dirname === 'undefined' || typeof fs === 'undefined') {
-    logger.info(
-      'Running in Cloudflare Worker environment, using built-in custom titles only'
-    );
-    return customTranslations; // Return the built-in custom titles
-  }
-
+  // Check if we're in an environment without filesystem access (like Cloudflare Workers)
   try {
-    if (fs.existsSync(filePath)) {
+    if (
+      typeof process === 'undefined' ||
+      typeof fs === 'undefined' ||
+      typeof __dirname === 'undefined' ||
+      !fs.existsSync
+    ) {
+      logger.info(
+        'Running in environment without filesystem access, using built-in custom titles only'
+      );
+      return customTranslations; // Return the built-in custom titles
+    }
+
+    if (filePath && fs.existsSync(filePath)) {
       logger.info(`Loading custom titles from file: ${filePath}`);
       const fileContent = fs.readFileSync(filePath, 'utf-8');
       logger.info(`File content size: ${fileContent.length} bytes`);
@@ -332,11 +337,11 @@ export function loadCustomTitles(filePath: string): Record<string, string[]> {
           `First 100 characters of file: ${fileContent.substring(0, 100)}...`
         );
       }
-    } else {
+    } else if (filePath) {
       logger.info(`File does not exist: ${filePath}`);
     }
   } catch (error) {
-    logger.info(`Error loading custom titles from ${filePath}:`, error);
+    logger.info(`Error loading custom titles: ${error}`);
   }
 
   logger.info('Using built-in custom titles as fallback');
@@ -609,24 +614,40 @@ export function buildSearchQuery(
  */
 export function getVersion(): string {
   try {
-    // Try to read the package.json file
-    let packageJson: { version: string };
+    // Check if we're in a Node.js environment
+    if (
+      typeof process !== 'undefined' &&
+      typeof fs !== 'undefined' &&
+      fs.readFileSync
+    ) {
+      let packageJson: { version: string };
 
-    // First try in the current directory
-    try {
-      packageJson = JSON.parse(
-        readFileSync(path.join(__dirname, '../package.json'), 'utf-8')
-      );
-      return packageJson.version;
-    } catch (error) {
-      // Then try from the current working directory
-      packageJson = JSON.parse(
-        readFileSync(path.join(process.cwd(), 'package.json'), 'utf-8')
-      );
-      return packageJson.version;
+      // Try to read from current working directory
+      try {
+        packageJson = JSON.parse(
+          fs.readFileSync(path.join(process.cwd(), 'package.json'), 'utf-8')
+        );
+        return packageJson.version;
+      } catch (error) {
+        // Fallback to parent directory for monorepo setups
+        try {
+          packageJson = JSON.parse(
+            fs.readFileSync(
+              path.join(process.cwd(), '..', 'package.json'),
+              'utf-8'
+            )
+          );
+          return packageJson.version;
+        } catch (parentError) {
+          // Continue to fallback
+        }
+      }
     }
+
+    // In Cloudflare Worker or similar environments, or if file read fails
+    return 'unknown-version';
   } catch (error) {
-    // Return a generic version string if the file can't be read
+    // Return a generic version string if any error occurs
     return 'unknown-version';
   }
 }

@@ -1,6 +1,5 @@
 import { Cache, ContentType, MetaDetail, MetaVideo } from 'stremio-addon-sdk';
 import addonBuilder from 'stremio-addon-sdk/src/builder';
-import landingTemplate from 'stremio-addon-sdk/src/landingTemplate';
 import { catalog, manifest } from './manifest';
 import {
   buildSearchQuery,
@@ -87,7 +86,6 @@ function setCache<T>(key: string, data: T): void {
   requestCache.set(key, { data, timestamp: Date.now() });
 }
 
-// Load custom titles from file if available
 // Try multiple possible locations for the file
 let translationsFromFile: Record<string, string[]> = {};
 let loadedPath: string | null = null;
@@ -97,66 +95,79 @@ let loadedPath: string | null = null;
 translationsFromFile = loadCustomTitles('');
 
 try {
-  const possiblePaths = [
-    // In the same directory as the running code
-    path.join(__dirname, 'custom-titles.json'),
-    // One level up (addon root directory)
-    path.join(__dirname, '..', 'custom-titles.json'),
-    // Two levels up (packages directory)
-    path.join(__dirname, '..', '..', 'custom-titles.json'),
-    // Three levels up (project root)
-    path.join(__dirname, '..', '..', '..', 'custom-titles.json'),
-    // In current working directory
-    path.join(process.cwd(), 'custom-titles.json'),
-    // In addon subdirectory of current working directory
-    path.join(process.cwd(), 'addon', 'custom-titles.json'),
-    // In dist subdirectory of current working directory
-    path.join(process.cwd(), 'dist', 'custom-titles.json'),
-  ];
+  // Check if we're in a Cloudflare Worker environment
+  if (
+    typeof process === 'undefined' ||
+    typeof fs === 'undefined' ||
+    typeof __dirname === 'undefined' ||
+    !fs.existsSync
+  ) {
+    logger.info(
+      'Running in Cloudflare Worker environment, using built-in custom titles only'
+    );
+  } else {
+    // Only try filesystem paths if we're in a Node.js environment
+    const possiblePaths = [
+      // In the same directory as the running code
+      path.join(__dirname, 'custom-titles.json'),
+      // One level up (addon root directory)
+      path.join(__dirname, '..', 'custom-titles.json'),
+      // Two levels up (packages directory)
+      path.join(__dirname, '..', '..', 'custom-titles.json'),
+      // Three levels up (project root)
+      path.join(__dirname, '..', '..', '..', 'custom-titles.json'),
+      // In current working directory
+      path.join(process.cwd(), 'custom-titles.json'),
+      // In addon subdirectory of current working directory
+      path.join(process.cwd(), 'addon', 'custom-titles.json'),
+      // In dist subdirectory of current working directory
+      path.join(process.cwd(), 'dist', 'custom-titles.json'),
+    ];
 
-  // Try each path until we find the file
-  for (const filePath of possiblePaths) {
-    try {
-      if (fs.existsSync(filePath)) {
-        logger.info(`Found custom-titles.json at: ${filePath}`);
-        translationsFromFile = loadCustomTitles(filePath);
-        loadedPath = filePath;
+    // Try each path until we find the file
+    for (const filePath of possiblePaths) {
+      try {
+        if (fs.existsSync(filePath)) {
+          logger.info(`Found custom-titles.json at: ${filePath}`);
+          translationsFromFile = loadCustomTitles(filePath);
+          loadedPath = filePath;
 
-        // Log some details about the loaded custom titles
-        const numTranslations = Object.keys(translationsFromFile).length;
-        logger.info(`Successfully loaded ${numTranslations} custom titles`);
+          // Log some details about the loaded custom titles
+          const numTranslations = Object.keys(translationsFromFile).length;
+          logger.info(`Successfully loaded ${numTranslations} custom titles`);
 
-        if (numTranslations > 0) {
-          // Log a few examples to verify they're loaded correctly
-          const examples = Object.entries(translationsFromFile).slice(0, 3);
-          for (const [original, translations] of examples) {
+          if (numTranslations > 0) {
+            // Log a few examples to verify they're loaded correctly
+            const examples = Object.entries(translationsFromFile).slice(0, 3);
+            for (const [original, translations] of examples) {
+              logger.info(
+                `Example custom title: "${original}" -> "${translations.join('", "')}"`
+              );
+            }
+          } else {
             logger.info(
-              `Example custom title: "${original}" -> "${translations.join('", "')}"`
+              'No custom titles were loaded from the file. The file might be empty or have invalid format.'
             );
           }
-        } else {
-          logger.info(
-            'No custom titles were loaded from the file. The file might be empty or have invalid format.'
-          );
+          break;
         }
-        break;
+      } catch (error) {
+        logger.info(`Error checking path ${filePath}: ${error}`);
       }
-    } catch (error) {
-      logger.info(`Error checking path ${filePath}: ${error}`);
     }
-  }
 
-  if (!loadedPath) {
-    logger.info(
-      `Could not find custom-titles.json file. Using built-in custom titles only. Built-in custom titles count: ${Object.keys(translationsFromFile).length}`
-    );
-    logger.info('Some examples of built-in custom titles:');
-    const examples = Object.entries(translationsFromFile).slice(0, 5);
-    for (const [original, translations] of examples) {
-      logger.info(`  "${original}" -> "${translations.join('", "')}"`);
+    if (!loadedPath) {
+      logger.info(
+        `Could not find custom-titles.json file. Using built-in custom titles only. Built-in custom titles count: ${Object.keys(translationsFromFile).length}`
+      );
+      logger.info('Some examples of built-in custom titles:');
+      const examples = Object.entries(translationsFromFile).slice(0, 5);
+      for (const [original, translations] of examples) {
+        logger.info(`  "${original}" -> "${translations.join('", "')}"`);
+      }
+    } else {
+      logger.info(`Using custom titles from: ${loadedPath}`);
     }
-  } else {
-    logger.info(`Using custom titles from: ${loadedPath}`);
   }
 } catch (error) {
   logger.error('Error loading custom titles file:', error);
@@ -759,4 +770,3 @@ function getCacheOptions(itemsLength: number): Partial<Cache> {
 }
 
 export const addonInterface = builder.getInterface();
-export const landingHTML = landingTemplate(addonInterface.manifest);
