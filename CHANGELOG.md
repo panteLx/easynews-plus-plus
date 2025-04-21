@@ -1,3 +1,10 @@
+## [2.0.0](https://github.com/panteLx/easynews-plus-plus/compare/v1.5.1...v2.0.0) (2025-04-21)
+
+### Features
+
+* add preferred language option to addon configuration ([d0f77a5](https://github.com/panteLx/easynews-plus-plus/commit/d0f77a5af5a940dacb5ea1cef5239e79e89b9ed6))
+* implement internationalization support for the addon ([5e45012](https://github.com/panteLx/easynews-plus-plus/commit/5e450122cedec97130a63d79fb791cfe5070f3d9))
+* implement sorting preference configuration for streams ([67a40ff](https://github.com/panteLx/easynews-plus-plus/commit/67a40ffb436db6eccb9a8a2a6d119bc5d9ae9f62))
 ## [1.5.1](https://github.com/panteLx/easynews-plus-plus/compare/v1.5.0...v1.5.1) (2025-04-21)
 
 ### Bug Fixes

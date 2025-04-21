@@ -1,6 +1,6 @@
 {
   "name": "@easynews-plus-plus/core",
-  "version": "1.5.1",
+  "version": "2.0.0",
   "main": "dist/server.js",
   "scripts": {
     "test": "npm run build && npm run test --workspaces",

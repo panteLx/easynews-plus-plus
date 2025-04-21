@@ -1,6 +1,6 @@
 {
   "name": "@easynews-plus-plus/cloudflare-worker",
-  "version": "1.5.1",
+  "version": "2.0.0",
   "scripts": {
     "test": "vitest run --passWithNoTests",
     "dev": "wrangler dev src/index.ts",
