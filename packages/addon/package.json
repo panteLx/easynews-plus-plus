@@ -1,6 +1,6 @@
 {
   "name": "@easynews-plus-plus/addon",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "main": "dist/index.js",
   "scripts": {
     "test": "vitest run --passWithNoTests",
