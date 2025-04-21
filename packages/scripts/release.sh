@@ -90,7 +90,7 @@ fi
 
 # Generate changelog
 echo "Generating changelog..."
-conventional-changelog -p conventionalcommits -i CHANGELOG.md -s -r 2 --commit-path . --context-path ./packages/scripts/changelog-context.json --template ./packages/scripts/changelog-template.hbs
+conventional-changelog -p conventionalcommits -i CHANGELOG.md -s -r 2 --commit-path . --config ./packages/scripts/changelog-context.json
 git add CHANGELOG.md
 
 # Commit the changes with the new version

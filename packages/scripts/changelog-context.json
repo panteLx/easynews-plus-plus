@@ -1,6 +1,8 @@
 {
   "options": {
-    "preset": "conventionalcommits",
+    "preset": {
+      "name": "conventionalcommits"
+    },
     "groupBy": false,
     "commitGroupsSort": "title",
     "commitsSort": ["scope", "subject"],
@@ -19,5 +21,25 @@
     "displayTypes": true,
     "displayScopes": true,
     "displayIssues": true
+  },
+  "writerOpts": {
+    "groupBy": "type",
+    "commitGroupsSort": "title",
+    "commitsSort": ["scope", "subject"],
+    "noteGroupsSort": "title",
+    "mainTemplate": "{{> header}}{{> commit-list}}{{> footer}}",
+    "commitPartial": "- **{{type}}{{#if scope}}({{scope}}){{/if}}:** {{subject}}{{#if hash}} ([{{shortHash}}]({{@root.repoUrl}}/commit/{{hash}})){{/if}}\n",
+    "headerPartial": "# {{version}}\n{{#if date}}({{date}})\n{{/if}}\n",
+    "footerPartial": "{{> footer-notes}}",
+    "groupOrder": [
+      "Features",
+      "Bug Fixes",
+      "Performance Improvements",
+      "Code Refactoring",
+      "Documentation",
+      "Styles",
+      "Tests",
+      "Chores"
+    ]
   }
 }
