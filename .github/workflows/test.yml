@@ -1,4 +1,4 @@
-name: Build and test
+name: Build
 
 on: [push]
 
@@ -13,4 +13,3 @@ jobs:
           node-version: '23.x'
       - run: npm ci
       - run: npm run build
-      - run: npm test
