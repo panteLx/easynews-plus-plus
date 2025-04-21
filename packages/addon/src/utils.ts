@@ -614,42 +614,49 @@ export function buildSearchQuery(
  */
 export function getVersion(): string {
   try {
-    // Check if we're in a Node.js environment
-    if (
-      typeof process !== 'undefined' &&
-      typeof fs !== 'undefined' &&
-      fs.readFileSync
-    ) {
-      let packageJson: { version: string };
-
-      // Try to read from current working directory
-      try {
-        packageJson = JSON.parse(
-          fs.readFileSync(path.join(process.cwd(), 'package.json'), 'utf-8')
-        );
-        return packageJson.version;
-      } catch (error) {
-        // Fallback to parent directory for monorepo setups
-        try {
-          packageJson = JSON.parse(
-            fs.readFileSync(
-              path.join(process.cwd(), '..', 'package.json'),
-              'utf-8'
-            )
-          );
-          return packageJson.version;
-        } catch (parentError) {
-          // Continue to fallback
-        }
-      }
-    }
-
-    // In Cloudflare Worker or similar environments, or if file read fails
-    return 'unknown-version';
+    const version = require('../package.json').version;
+    return version;
   } catch (error) {
-    // Return a generic version string if any error occurs
     return 'unknown-version';
   }
+  // try {
+  //   // Check if we're in a Node.js environment
+  //   if (
+  //     typeof process !== 'undefined' &&
+  //     typeof fs !== 'undefined' &&
+  //     fs.readFileSync
+  //   ) {
+  //     let packageJson: { version: string };
+
+  //     // Try to read from current working directory
+  //     try {
+  //       packageJson = JSON.parse(
+  //         fs.readFileSync(path.join(process.cwd(), 'package.json'), 'utf-8')
+  //       );
+  //       return packageJson.version;
+  //     } catch (error) {
+  //       // Fallback to parent directory for monorepo setups
+  //       try {
+  //         packageJson = JSON.parse(
+  //           fs.readFileSync(
+  //             path.join(process.cwd(), '..', 'package.json'),
+  //             'utf-8'
+  //           )
+  //         );
+  //         return packageJson.version;
+  //       } catch (parentError) {
+  //         // Continue to fallback
+  //       }
+  //     }
+  //   }
+
+  //   // In Cloudflare Worker or similar environments, or if file read fails
+  //   // Use a valid semver string instead of "unknown-version"
+  //   return 'unknown-version';
+  // } catch (error) {
+  //   // Return a valid semver version string if any error occurs
+  //   return 'unknown-version';
+  // }
 }
 
 /**
