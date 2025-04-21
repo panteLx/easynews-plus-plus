@@ -1,13 +1,11 @@
-#!/bin/bash
-
 # Check if the script is being run from the root of the project
-if [ ! -f package.json ]; then
+if [ ! -f .version ] || [ ! -f frontend/package.json ] || [ ! -f CHANGELOG.md ]; then
     echo "Error: This script must be run from the root of the project."
     exit 1
 fi
 
-# Read the current version from package.json
-VERSION=$(jq -r '.version' package.json)
+# Read the current version from .version
+VERSION=$(cat .version)
 
 # Function to increment the version
 increment_version() {
@@ -33,15 +31,15 @@ if [ "$1" == "major" ]; then
     RELEASE_TYPE="major"
 else
     # Get the latest tag
-    LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+    LATEST_TAG=$(git describe --tags --abbrev=0)
 
-    # Check for different types of commits since the latest tag
-    if git log "$LATEST_TAG"..HEAD --pretty=format:%s | grep -E "^(feat|perf)(\(.+\))?:" > /dev/null; then
+    # Check for "feat" or "fix" in the commit messages since the latest tag
+    if git log "$LATEST_TAG"..HEAD --oneline | grep -q "feat"; then
         RELEASE_TYPE="minor"
-    elif git log "$LATEST_TAG"..HEAD --pretty=format:%s | grep -E "^(fix|docs|style|test|chore|refactor)(\(.+\))?:" > /dev/null; then
+    elif git log "$LATEST_TAG"..HEAD --oneline | grep -q "fix"; then
         RELEASE_TYPE="patch"
     else
-        echo "No conventional commit types found since the latest release. No new release will be created."
+        echo "No 'fix' or 'feat' commits found since the latest release. No new release will be created."
         exit 0
     fi
 fi
@@ -68,12 +66,22 @@ if [[ "$CONFIRM" != "y" ]]; then
     exit 1
 fi
 
-# Update version in package.json
-jq --arg new_version "$NEW_VERSION" '.version = $new_version' package.json > package_tmp.json && mv package_tmp.json package.json
-git add package.json
+# Update the .version file with the new version
+echo $NEW_VERSION >.version
+git add .version
 
-# Sync version to all workspace packages
-echo "Syncing version $NEW_VERSION to all workspace packages..."
+# Update version in frontend/package.json
+jq --arg new_version "$NEW_VERSION" '.version = $new_version' frontend/package.json >frontend/package_tmp.json && mv frontend/package_tmp.json frontend/package.json
+git add frontend/package.json
+
+# Update version in root package.json if it exists
+if [ -f package.json ]; then
+    jq --arg new_version "$NEW_VERSION" '.version = $new_version' package.json >package_tmp.json && mv package_tmp.json package.json
+    git add package.json
+fi
+
+# Run the sync-versions script to update all package versions
+echo "Syncing version to all packages..."
 node packages/scripts/sync-versions.js
 git add packages/*/package.json
 
@@ -83,55 +91,13 @@ if ! command -v conventional-changelog &>/dev/null; then
     npm install -g conventional-changelog-cli
 fi
 
-# Create CHANGELOG.md if it doesn't exist
-if [ ! -f CHANGELOG.md ]; then
-    touch CHANGELOG.md
-fi
-
-# Check if there's already an entry for this version and remove it before regenerating
-echo "Checking for existing changelog entries for version $NEW_VERSION..."
-
-# Check all possible formats
-ENTRY_EXISTS=false
-if grep -q "^## $NEW_VERSION" CHANGELOG.md; then
-    echo "Found existing entry for version $NEW_VERSION in format 1, removing it before regenerating..."
-    # Delete the section for this version
-    sed -i "/^## $NEW_VERSION/,/^## /d" CHANGELOG.md
-    ENTRY_EXISTS=true
-fi
-
-if grep -q "## <small>$NEW_VERSION" CHANGELOG.md; then
-    echo "Found existing entry for version $NEW_VERSION in format 2, removing it before regenerating..."
-    # Delete the section for this version
-    sed -i "/## <small>$NEW_VERSION/,/## <small>/d" CHANGELOG.md
-    ENTRY_EXISTS=true
-fi
-
-if grep -q "^# $NEW_VERSION" CHANGELOG.md; then
-    echo "Found existing entry for version $NEW_VERSION in format 3, removing it before regenerating..."
-    # Delete the section for this version
-    sed -i "/^# $NEW_VERSION/,/^# /d" CHANGELOG.md
-    ENTRY_EXISTS=true
-fi
-
-if [ "$ENTRY_EXISTS" = false ]; then
-    echo "No existing entries found for version $NEW_VERSION."
-fi
-
 # Generate changelog
 echo "Generating changelog..."
-conventional-changelog -c ./packages/scripts/conventional-changelog-config.js -i CHANGELOG.md -s -r 2 --commit-path .
-
-# Remove release commits from the changelog
-echo "Cleaning up release commits from changelog..."
-sed -i '/.*release.*/d' CHANGELOG.md
-# Remove any empty sections that might remain after removing release commits
-sed -i '/^## .*/{N;/\n\n## /d;}' CHANGELOG.md
-
+conventional-changelog -p conventionalcommits -i CHANGELOG.md -s
 git add CHANGELOG.md
 
 # Commit the changes with the new version
-git commit -m "chore(release): $NEW_VERSION"
+git commit -m "release: $NEW_VERSION"
 
 # Create a Git tag with the new version
 git tag "v$NEW_VERSION"
@@ -148,27 +114,10 @@ fi
 
 # Extract the changelog content for the latest release
 echo "Extracting changelog content for version $NEW_VERSION..."
-
-# Try different formats for the changelog version headers, starting with the most recent format
-# Format 1: ## 1.5.0
-CHANGELOG=$(sed -n "/^## $NEW_VERSION/,/^## /p" CHANGELOG.md | sed '1p;/^## /d')
-
-# If that fails, try Format 2: ## <small>1.5.0</small>
-if [ -z "$CHANGELOG" ]; then
-    echo "Trying format 2..."
-    CHANGELOG=$(sed -n "/## <small>$NEW_VERSION/,/## <small>/p" CHANGELOG.md | sed '1p;/## <small>/d')
-fi
-
-# If that fails, try Format 3: # 1.5.0 (old format)
-if [ -z "$CHANGELOG" ]; then
-    echo "Trying format 3..."
-    CHANGELOG=$(sed -n "/^# $NEW_VERSION/,/^# /p" CHANGELOG.md | sed '1p;/^# /d')
-fi
+CHANGELOG=$(awk '/^## / {if (NR > 1) exit} NR > 1 {print}' CHANGELOG.md | awk 'NR > 2 || NF {print}')
 
 if [ -z "$CHANGELOG" ]; then
     echo "Error: Could not extract changelog for version $NEW_VERSION."
-    echo "Debug: Current CHANGELOG.md format (first 20 lines):"
-    head -n 20 CHANGELOG.md
     exit 1
 fi
 
