@@ -37,32 +37,42 @@
 ### 🔍 Enhanced Search & Streaming
 
 - Sophisticated title matching with percentage-based similarity for multi-word titles
+- Custom title support for enhanced content discovery
 - Comprehensive support for various naming conventions and special characters
 - Advanced content filtering (removes samples, broken files, etc.)
 - Multiple fallback search strategies for challenging content
 - Smart quality prioritization (4K/UHD → 1080p → 720p)
 - File size-based sorting within the same resolution
+- Language filtering with preferred audio language prioritization
 - Improved quality detection from complex file names
 - Enhanced subtitle fetching reliability
 - Configurable strict title matching (disabled by default)
 
 ### 🌐 Custom Title Management
 
-The custom title functionality has been significantly enhanced to better handle alternative titles and translations. The addon now intelligently combines:
-
-- Original titles
-- Custom titles from the custom-titles.json file
-- Alternative titles from metadata
-- Additional titles from partial matches
+- Intelligent handling of alternative titles and custom titles
+- Support for original titles, custom titles and metadata alternatives
+- Partial matching for related title variants
+- Custom title addition via custom-titles.json file (self-hosted version)
 
 > [!NOTE]  
-> This enhancement is currently exclusive to the self-hosted version. To add additional custom titles to the public version, please create a new issue with the custom titles you want to get supported.
+> To add custom titles to the public instance, please create a new issue with your suggestions.
+
+### 🌍 Language Filtering
+
+- Preferred audio language selection from multiple supported options
+- Automatic prioritization of content in your preferred language
+- Clear language labeling in stream descriptions
+- Visual indicators for preferred language content (⭐)
+
+> [!NOTE]  
+> If you would like additional languages added to the public instance, please create a new issue with your request.
 
 ### 🔄 Platform Compatibility
 
-- Utilizes a different authentication implementation that works seamlessly across multiple platforms
-- Specifically optimized for Omni, Vidi and Fusion compatibility
-- No reliance on basic auth headers for media streaming
+- Seamless operation across multiple streaming platforms
+- Optimized for Stremio, Omni, Vidi and Fusion compatibility
+- Authentication implementation that works without basic auth headers for media streaming
 
 ---
 
@@ -170,6 +180,40 @@ $ npm run release
 
 Easynews is a premium Usenet provider offering a web-based Usenet browser. It enables users to search, preview, and download files from Usenet newsgroups without requiring a newsreader. Known for its user-friendly interface and fast download speeds, Easynews serves as an alternative to debrid services (Real-Debrid, Premiumize, AllDebrid, etc.). An active Easynews subscription is required to use this addon.
 
+### How does the caching system work?
+
+The addon implements a multi-level caching strategy to improve performance:
+
+1. In-memory request caching reduces repeated API calls
+2. Configurable Time-To-Live (TTL) ensures data freshness
+3. Results are cached based on search parameters and user settings
+4. Cached results are automatically invalidated after the TTL expires
+
+This significantly reduces API usage and improves response times for frequently accessed content.
+
+### How does title matching work?
+
+The title matching system uses several advanced techniques:
+
+1. Percentage-based similarity for multi-word titles
+2. Support for various naming conventions (e.g., "The Movie" vs "Movie, The")
+3. Special character handling (spaces, punctuation, accents)
+4. Configurable strict matching option for exact results
+
+When strict matching is enabled, only exact title matches are returned. When disabled (default), the addon uses smart matching to find related content.
+
+### How does the custom title system work?
+
+The custom title system helps find content with alternative titles or translations:
+
+1. Original titles are combined with custom translations
+2. Additional titles from metadata are incorporated
+3. Partial matching enables finding related content
+4. Self-hosted users can add custom titles via custom-titles.json
+
+> [!NOTE]  
+> To add custom titles to the public instance, please create a new issue with your suggestions.
+
 ### Why can't I find specific content?
 
 First, verify the content exists on [Easynews web search](https://members.easynews.com/). If unavailable or returning poor quality results (duration < 5 minutes, marked as spam, no video), the addon won't find it either.
@@ -188,14 +232,52 @@ Examples of challenging cases:
 
 For these cases, consider self-hosting and adding custom titles or using the public instance and create a new issue with the custom titles you want to get supported.
 
+### How does the quality prioritization work?
+
+The addon automatically prioritizes streams based on several factors:
+
+1. Resolution quality (4K/UHD → 1080p → 720p → 480p)
+2. File size within the same resolution (larger files typically offer better quality)
+3. Comparison of GB vs MB files (GB files are prioritized)
+4. Numerical size comparison within the same unit (e.g., 2GB over 1GB)
+
+This system ensures you get the highest quality content available without manual filtering.
+
 ### Why is there a 50-stream limit?
 
 The addon limits results to the top 50 highest quality streams to:
 
-- Prevent media player overload
-- Optimize performance
-- Ensure quality-focused results (prioritizing 4K/UHD → 1080p → 720p)
-- Sort by file size within the same resolution
+1. Prevent media player overload
+2. Optimize performance and response times
+3. Focus on quality over quantity
+4. Streamline the user experience
+
+After quality sorting, the top 50 streams will represent the best available options, making additional results unnecessary.
+
+### How does the language filter work?
+
+The language filter allows you to prioritize content in your preferred audio language:
+
+1. Select your preferred language in the addon configuration
+2. Streams containing your preferred language audio will be shown first
+3. Other language streams will be displayed below
+4. All streams display their audio language information in the description
+5. Your preferred language will be marked with a star (⭐)
+
+This makes it easier to find content in languages you understand without removing other options.
+
+If you need additional languages added to the public instance, please [create a new issue](https://github.com/pantelx/easynews-plus-plus/issues/new) with your request.
+
+### How is platform compatibility ensured?
+
+The addon achieves universal compatibility through:
+
+1. Authentication implementation that works across all platforms
+2. Direct media streaming without reliance on basic auth headers
+3. Optimized response formats compatible with Stremio, Omni, Vidi and Fusion
+4. Consistent stream URL structure that works uniformly across devices
+
+This approach eliminates the platform-specific issues commonly found in other addons.
 
 ## 💖 Support the Project
 
