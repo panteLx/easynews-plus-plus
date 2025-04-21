@@ -1,3 +1,20 @@
+## <small>1.5.3 (2025-04-21)</small>
+
+* docs: add changelog link to README for better visibility ([b06c84e](https://github.com/panteLx/easynews-plus-plus/commit/b06c84e))
+
+
+
+## <small>1.5.2 (2025-04-21)</small>
+
+* release: 1.5.2 ([13cfe16](https://github.com/panteLx/easynews-plus-plus/commit/13cfe16))
+* chore: enhance changelog configuration and extraction logic ([5ad1906](https://github.com/panteLx/easynews-plus-plus/commit/5ad1906))
+* chore: remove changelog context configuration and update release script ([bde2f1d](https://github.com/panteLx/easynews-plus-plus/commit/bde2f1d))
+* chore: update changelog context and template handling in release script ([d3a178d](https://github.com/panteLx/easynews-plus-plus/commit/d3a178d))
+* chore: update changelog formatting and improve changelog extraction in release script ([e54afa5](https://github.com/panteLx/easynews-plus-plus/commit/e54afa5))
+* chore: update changelog template structure for improved formatting ([1f426f2](https://github.com/panteLx/easynews-plus-plus/commit/1f426f2))
+
+
+
 ## <small>1.5.2 (2025-04-21)</small>
 
 * chore: enhance changelog configuration and extraction logic ([5ad1906](https://github.com/panteLx/easynews-plus-plus/commit/5ad1906))
