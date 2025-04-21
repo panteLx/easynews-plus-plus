@@ -174,6 +174,12 @@ try {
   logger.info('Using built-in custom titles as fallback');
 }
 
+// Import custom template for landing page
+import customTemplate from './custom-template';
+
+// Export landing HTML for Cloudflare Worker
+export const landingHTML = customTemplate(manifest);
+
 builder.defineCatalogHandler(async ({ extra: { search } }) => {
   return {
     metas: [
