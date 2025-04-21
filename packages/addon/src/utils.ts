@@ -249,7 +249,7 @@ export function extractDigits(value: string) {
 /**
  * Default custom titles that will be available even when file loading fails (for Cloudflare Workers)
  */
-let customTranslations: Record<string, string[]> = {
+let customTitles: Record<string, string[]> = {
   'Rain or Shine': ['Just between Lovers'],
   'Mufasa: The Lion King': ['Mufasa: Der Koenig der Loewen'],
   'The Lion King': ['Der König der Löwen', 'Der Koenig der Loewen'],
@@ -303,7 +303,7 @@ export function loadCustomTitles(filePath: string): Record<string, string[]> {
       logger.info(
         'Running in environment without filesystem access, using built-in custom titles only'
       );
-      return customTranslations; // Return the built-in custom titles
+      return customTitles; // Return the built-in custom titles
     }
 
     if (filePath && fs.existsSync(filePath)) {
@@ -313,23 +313,23 @@ export function loadCustomTitles(filePath: string): Record<string, string[]> {
 
       // Try to parse the file content
       try {
-        const customTitles = JSON.parse(fileContent);
+        const titlesFromFile = JSON.parse(fileContent);
         logger.info(
-          `Parsed ${Object.keys(customTitles).length} custom titles from file`
+          `Parsed ${Object.keys(titlesFromFile).length} custom titles from file`
         );
 
         // Log a sample of custom titles for debugging
-        const sampleKeys = Object.keys(customTitles).slice(0, 3);
+        const sampleKeys = Object.keys(titlesFromFile).slice(0, 3);
         for (const key of sampleKeys) {
           logger.info(
-            `Sample custom title: "${key}" -> ${JSON.stringify(customTitles[key])}`
+            `Sample custom title: "${key}" -> ${JSON.stringify(titlesFromFile[key])}`
           );
         }
 
         // Merge with built-in custom titles (file custom titles take precedence)
         return {
-          ...customTranslations,
           ...customTitles,
+          ...titlesFromFile,
         };
       } catch (parseError) {
         logger.error(`Error parsing JSON in ${filePath}:`, parseError);
@@ -345,11 +345,11 @@ export function loadCustomTitles(filePath: string): Record<string, string[]> {
   }
 
   logger.info('Using built-in custom titles as fallback');
-  return customTranslations; // Return built-in custom titles as fallback
+  return customTitles; // Return built-in custom titles as fallback
 }
 
 /**
- * Parses custom title translations from a configuration string
+ * Parses custom title from a configuration string
  * @param customTitlesStr String from the configuration (JSON format preferred)
  * @returns Record of original titles to arrays of alternative titles
  */
@@ -497,19 +497,19 @@ export function getCombinedCustomTitles(
 }
 
 /**
- * Gets potential alternative titles in other languages based on the original title
+ * Gets potential alternative titles based on the original title
  * @param title The original title
- * @param customTitlesStr Optional string with custom title translations from configuration
+ * @param customTitlesStr Optional string with custom title from configuration
  * @returns Array of potential alternative titles including the original one
  */
 export function getAlternativeTitles(
   title: string,
   customTitlesStr?: string
 ): string[] {
-  // Use custom translations or empty object if not provided
+  // Use custom titles or empty object if not provided
   const combined = customTitlesStr ? parseCustomTitles(customTitlesStr) : {};
 
-  // If no translations available, just return the original title
+  // If no custom titles available, just return the original title
   if (Object.keys(combined).length === 0) {
     return [title];
   }
@@ -533,34 +533,34 @@ export function getAlternativeTitles(
   let foundMatch = false;
 
   // Check for sub-string matches
-  for (const [englishTitle, translations] of Object.entries(combined)) {
+  for (const [englishTitle, customTitles] of Object.entries(combined)) {
     // Skip checking very short titles (3 characters or less) to avoid false matches
     if (englishTitle.length <= 3) continue;
 
     if (title.toLowerCase().includes(englishTitle.toLowerCase())) {
       foundMatch = true;
-      // Title contains a known English title, add the translated equivalents
-      for (const translation of translations) {
-        const translatedTitle = title.replace(
+      // Title contains a known English title, add the custom equivalents
+      for (const customTitle of customTitles) {
+        const customTitleReplaced = title.replace(
           new RegExp(englishTitle, 'i'),
-          translation
+          customTitle
         );
-        if (!alternatives.includes(translatedTitle)) {
-          alternatives.push(translatedTitle);
+        if (!alternatives.includes(customTitleReplaced)) {
+          alternatives.push(customTitleReplaced);
         }
       }
     }
 
-    // Also check if the title might be a translated title we know
-    for (const translatedTitle of translations) {
+    // Also check if the title might be a custom title we know
+    for (const customTitle of customTitles) {
       // Skip checking very short titles to avoid false matches
-      if (translatedTitle.length <= 3) continue;
+      if (customTitle.length <= 3) continue;
 
-      if (title.toLowerCase().includes(translatedTitle.toLowerCase())) {
+      if (title.toLowerCase().includes(customTitle.toLowerCase())) {
         foundMatch = true;
-        // Title contains a known translated title, add the English equivalent
+        // Title contains a known custom title, add the English equivalent
         const englishTitle1 = title.replace(
-          new RegExp(translatedTitle, 'i'),
+          new RegExp(customTitle, 'i'),
           englishTitle
         );
         if (!alternatives.includes(englishTitle1)) {

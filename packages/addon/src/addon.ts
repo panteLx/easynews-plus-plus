@@ -83,12 +83,12 @@ function setCache<T>(key: string, data: T): void {
 }
 
 // Try multiple possible locations for the file
-let translationsFromFile: Record<string, string[]> = {};
+let titlesFromFile: Record<string, string[]> = {};
 let loadedPath: string | null = null;
 
-// Start with the built-in translations by calling loadCustomTitles with a non-existent path
-// This will return the default built-in translations
-translationsFromFile = loadCustomTitles('');
+// Start with the built-in custom titles by calling loadCustomTitles with a non-existent path
+// This will return the default built-in custom titles
+titlesFromFile = loadCustomTitles('');
 
 try {
   // Check if we're in a Cloudflare Worker environment
@@ -125,19 +125,19 @@ try {
       try {
         if (fs.existsSync(filePath)) {
           logger.info(`Found custom-titles.json at: ${filePath}`);
-          translationsFromFile = loadCustomTitles(filePath);
+          titlesFromFile = loadCustomTitles(filePath);
           loadedPath = filePath;
 
           // Log some details about the loaded custom titles
-          const numTranslations = Object.keys(translationsFromFile).length;
-          logger.info(`Successfully loaded ${numTranslations} custom titles`);
+          const numCustomTitles = Object.keys(titlesFromFile).length;
+          logger.info(`Successfully loaded ${numCustomTitles} custom titles`);
 
-          if (numTranslations > 0) {
+          if (numCustomTitles > 0) {
             // Log a few examples to verify they're loaded correctly
-            const examples = Object.entries(translationsFromFile).slice(0, 3);
-            for (const [original, translations] of examples) {
+            const examples = Object.entries(titlesFromFile).slice(0, 3);
+            for (const [original, customTitles] of examples) {
               logger.info(
-                `Example custom title: "${original}" -> "${translations.join('", "')}"`
+                `Example custom title: "${original}" -> "${customTitles.join('", "')}"`
               );
             }
           } else {
@@ -154,12 +154,12 @@ try {
 
     if (!loadedPath) {
       logger.info(
-        `Could not find custom-titles.json file. Using built-in custom titles only. Built-in custom titles count: ${Object.keys(translationsFromFile).length}`
+        `Could not find custom-titles.json file. Using built-in custom titles only. Built-in custom titles count: ${Object.keys(titlesFromFile).length}`
       );
       logger.info('Some examples of built-in custom titles:');
-      const examples = Object.entries(translationsFromFile).slice(0, 5);
-      for (const [original, translations] of examples) {
-        logger.info(`  "${original}" -> "${translations.join('", "')}"`);
+      const examples = Object.entries(titlesFromFile).slice(0, 5);
+      for (const [original, customTitles] of examples) {
+        logger.info(`  "${original}" -> "${customTitles.join('", "')}"`);
       }
     } else {
       logger.info(`Using custom titles from: ${loadedPath}`);
@@ -368,10 +368,10 @@ builder.defineStreamHandler(
       );
 
       // Combine config-provided custom titles with titles from file
-      let customTranslations = { ...translationsFromFile };
+      let customTitles = { ...titlesFromFile };
 
       logger.info(
-        `Using ${Object.keys(customTranslations).length} custom titles (${Object.keys(translationsFromFile).length} from built-in/file + additional from config)`
+        `Using ${Object.keys(customTitles).length} custom titles (${Object.keys(titlesFromFile).length} from built-in/file + additional from config)`
       );
 
       // Add any custom titles from configuration
@@ -382,13 +382,13 @@ builder.defineStreamHandler(
         logger.info(`Parsed ${customCount} custom titles from configuration`);
 
         if (customCount > 0) {
-          // Merge translations, custom titles take precedence
-          customTranslations = {
-            ...translationsFromFile,
+          // Merge custom titles take precedence
+          customTitles = {
+            ...titlesFromFile,
             ...customTitlesObj,
           };
           logger.info(
-            `Combined custom titles count: ${Object.keys(customTranslations).length}`
+            `Combined custom titles count: ${Object.keys(customTitles).length}`
           );
         }
       }
@@ -450,10 +450,10 @@ builder.defineStreamHandler(
       const meta = await publicMetaProvider(id, type);
       logger.info(`Searching for: ${meta.name}`);
 
-      // Check if we have a translation for this title directly
-      if (customTranslations[meta.name]) {
+      // Check if we have a custom title for this title directly
+      if (customTitles[meta.name]) {
         logger.info(
-          `Direct custom title found for "${meta.name}": "${customTranslations[meta.name].join('", "')}"`
+          `Direct custom title found for "${meta.name}": "${customTitles[meta.name].join('", "')}"`
         );
       } else {
         logger.info(
@@ -461,7 +461,7 @@ builder.defineStreamHandler(
         );
 
         // Look for partial matches in title keys
-        for (const [key, values] of Object.entries(customTranslations)) {
+        for (const [key, values] of Object.entries(customTitles)) {
           if (
             meta.name.toLowerCase().includes(key.toLowerCase()) ||
             key.toLowerCase().includes(meta.name.toLowerCase())
@@ -476,23 +476,20 @@ builder.defineStreamHandler(
       const api = new EasynewsAPI({ username, password });
 
       // Use alternativeNames from metadata if available, or generate them
-      // Convert translations to JSON string for getAlternativeTitles
-      const titlesJson = JSON.stringify(customTranslations);
+      // Convert custom titles to JSON string for getAlternativeTitles
+      const titlesJson = JSON.stringify(customTitles);
 
       logger.info(`Getting alternative titles for: ${meta.name}`);
 
       // Initialize with the original title
       let allTitles = [meta.name];
 
-      // Add any direct translations found in customTranslations
-      if (
-        customTranslations[meta.name] &&
-        customTranslations[meta.name].length > 0
-      ) {
+      // Add any direct custom titles found in customTitles
+      if (customTitles[meta.name] && customTitles[meta.name].length > 0) {
         logger.info(
-          `Adding direct custom titles for "${meta.name}": "${customTranslations[meta.name].join('", "')}"`
+          `Adding direct custom titles for "${meta.name}": "${customTitles[meta.name].join('", "')}"`
         );
-        allTitles = [...allTitles, ...customTranslations[meta.name]];
+        allTitles = [...allTitles, ...customTitles[meta.name]];
       }
 
       // Add any alternative names from meta (if available)
