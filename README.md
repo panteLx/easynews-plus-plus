@@ -68,6 +68,23 @@
 > [!NOTE]  
 > If you would like additional languages added to the public instance, please create a new issue with your request.
 
+### 🌐 Multi-Language UI Support
+
+- Full UI translation support for 10 languages:
+  - English (default)
+  - German (Deutsch)
+  - Spanish (Español)
+  - French (Français)
+  - Italian (Italiano)
+  - Japanese (日本語)
+  - Portuguese (Português)
+  - Russian (Русский)
+  - Korean (한국어)
+  - Chinese (中文)
+- Seamless language switching without losing configuration
+- Translated form fields, options, and descriptions
+- Consistent UI experience across all supported languages
+
 ### 🔄 Platform Compatibility
 
 - Seamless operation across multiple streaming platforms
