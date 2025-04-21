@@ -35,13 +35,13 @@ else
     # Get the latest tag
     LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
 
-    # Check for "feat" or "fix" in the commit messages since the latest tag
-    if git log "$LATEST_TAG"..HEAD --oneline | grep -q "feat"; then
+    # Check for different types of commits since the latest tag
+    if git log "$LATEST_TAG"..HEAD --oneline | grep -q "feat|perf"; then
         RELEASE_TYPE="minor"
-    elif git log "$LATEST_TAG"..HEAD --oneline | grep -q "fix"; then
+    elif git log "$LATEST_TAG"..HEAD --oneline | grep -q "fix|docs|style|test|chore|refactor"; then
         RELEASE_TYPE="patch"
     else
-        echo "No 'fix' or 'feat' commits found since the latest release. No new release will be created."
+        echo "No conventional commit types found since the latest release. No new release will be created."
         exit 0
     fi
 fi
@@ -90,7 +90,7 @@ fi
 
 # Generate changelog
 echo "Generating changelog..."
-conventional-changelog -p conventionalcommits -i CHANGELOG.md -s
+conventional-changelog -p conventionalcommits -i CHANGELOG.md -s -r 2 --commit-path . --context-path ./packages/scripts/changelog-context.json --template ./packages/scripts/changelog-template.hbs
 git add CHANGELOG.md
 
 # Commit the changes with the new version
@@ -111,7 +111,7 @@ fi
 
 # Extract the changelog content for the latest release
 echo "Extracting changelog content for version $NEW_VERSION..."
-CHANGELOG=$(awk '/^## / {if (NR > 1) exit} NR > 1 {print}' CHANGELOG.md | awk 'NR > 2 || NF {print}')
+CHANGELOG=$(awk '/^# / {if (count++ == 1) exit} {print}' CHANGELOG.md | tail -n +2)
 
 if [ -z "$CHANGELOG" ]; then
     echo "Error: Could not extract changelog for version $NEW_VERSION."

@@ -1,0 +1,23 @@
+{
+  "options": {
+    "preset": "conventionalcommits",
+    "groupBy": false,
+    "commitGroupsSort": "title",
+    "commitsSort": ["scope", "subject"],
+    "noteGroupsSort": "title",
+    "issuePrefixes": ["#"],
+    "types": [
+      { "type": "feat", "section": "Features" },
+      { "type": "fix", "section": "Bug Fixes" },
+      { "type": "perf", "section": "Performance Improvements" },
+      { "type": "refactor", "section": "Code Refactoring" },
+      { "type": "docs", "section": "Documentation" },
+      { "type": "style", "section": "Styles" },
+      { "type": "test", "section": "Tests" },
+      { "type": "chore", "section": "Chores" }
+    ],
+    "displayTypes": true,
+    "displayScopes": true,
+    "displayIssues": true
+  }
+}
