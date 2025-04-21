@@ -151,13 +151,14 @@ $ npm run start:cf:dev
 
 ### 📝 Release Process
 
-Create a new version:
+Create a new version tag and release:
 
 ```bash
-$ npm run version:<patch|minor|major>
+$ npm run release
 ```
 
-Create a corresponding release on GitHub with release notes.
+> [!NOTE]  
+> This will only create a new version tag and release on GitHub if the script found fix or feat commits since the latest tag.
 
 ---
 
