@@ -17,6 +17,11 @@ const config = {
   compareUrlFormat:
     '{{host}}/{{owner}}/{{repository}}/compare/{{previousTag}}...{{currentTag}}',
   releaseCommitMessageFormat: 'chore(release): {{currentTag}}',
+  // Add custom template
+  writerOpts: {
+    headerPartial:
+      '## <small>{{version}} {{#if date}}({{date}}){{/if}}</small>\n\n',
+  },
 };
 
 // We export a function that returns the configuration

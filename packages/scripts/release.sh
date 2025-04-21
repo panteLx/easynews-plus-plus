@@ -111,12 +111,19 @@ fi
 
 # Extract the changelog content for the latest release
 echo "Extracting changelog content for version $NEW_VERSION..."
-# Extract content between the first heading and the second heading (or end of file)
-CHANGELOG=$(sed -n "/^# $NEW_VERSION/,/^# /p" CHANGELOG.md | sed '1p;/^# /d')
+# Extract content between the version heading and the next version heading
+CHANGELOG=$(sed -n "/## <small>$NEW_VERSION/,/## <small>/p" CHANGELOG.md | sed '1p;/## <small>/d')
 
 if [ -z "$CHANGELOG" ]; then
     echo "Error: Could not extract changelog for version $NEW_VERSION."
-    exit 1
+    echo "Trying alternative format..."
+    # Try alternative format (for backwards compatibility)
+    CHANGELOG=$(sed -n "/^# $NEW_VERSION/,/^# /p" CHANGELOG.md | sed '1p;/^# /d')
+    
+    if [ -z "$CHANGELOG" ]; then
+        echo "Error: Could not extract changelog in any known format for version $NEW_VERSION."
+        exit 1
+    fi
 fi
 
 # Create the release on GitHub
