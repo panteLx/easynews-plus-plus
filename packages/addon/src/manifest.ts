@@ -31,7 +31,16 @@ const languageOptions = {
   rus: 'Russian (Русский)',
   kor: 'Korean (한국어)',
   chi: 'Chinese (中文)',
-};
+} as any;
+
+// Sorting preference options
+const sortingOptions = {
+  quality_first: 'Quality (4K → 1080p → 720p)',
+  language_first: 'Preferred Language, then Quality',
+  size_first: 'File Size (largest first)',
+  date_first: 'Date Added (newest first)',
+  relevance_first: 'Relevance (best matches first)',
+} as any;
 
 export const manifest: Manifest = {
   id: 'community.easynews-plus-plus',
@@ -66,46 +75,11 @@ export const manifest: Manifest = {
       default: '',
     },
     {
-      title: 'Sort 1st',
-      key: 'sort1',
+      title: 'Sorting Method',
+      key: 'sortingPreference',
       type: 'select',
-      options: sortOptions,
-      default: toHumanReadable('Size'),
-    },
-    {
-      title: 'Sort 1st direction',
-      key: 'sort1Direction',
-      type: 'select',
-      options: directionOptions,
-      default: 'Descending' satisfies DirectionKey,
-    },
-    {
-      title: 'Sort 2nd',
-      key: 'sort2',
-      type: 'select',
-      options: sortOptions,
-      default: toHumanReadable('Relevance'),
-    },
-    {
-      title: 'Sort 2nd direction',
-      key: 'sort2Direction',
-      type: 'select',
-      options: directionOptions,
-      default: 'Descending' satisfies DirectionKey,
-    },
-    {
-      title: 'Sort 3rd',
-      key: 'sort3',
-      type: 'select',
-      options: sortOptions,
-      default: toHumanReadable('DateTime'),
-    },
-    {
-      title: 'Sort 3rd direction',
-      key: 'sort3Direction',
-      type: 'select',
-      options: directionOptions,
-      default: 'Descending' satisfies DirectionKey,
+      options: sortingOptions,
+      default: 'quality_first',
     },
   ],
 };
