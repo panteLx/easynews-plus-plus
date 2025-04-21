@@ -1,3 +1,8 @@
+## [1.5.1](https://github.com/panteLx/easynews-plus-plus/compare/v1.5.0...v1.5.1) (2025-04-21)
+
+### Bug Fixes
+
+* update LICENSE file with GitHub link for copyright ([9b3f3d5](https://github.com/panteLx/easynews-plus-plus/commit/9b3f3d5d396f695d6fbc3c607a7d2e6618f2174c))
 ## [1.5.0](https://github.com/panteLx/easynews-plus-plus/compare/v1.4.0...v1.5.0) (2025-04-21)
 
 ### Features
