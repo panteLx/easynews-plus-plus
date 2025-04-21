@@ -99,6 +99,13 @@ fi
 # Generate changelog
 echo "Generating changelog..."
 conventional-changelog -c ./packages/scripts/conventional-changelog-config.js -i CHANGELOG.md -s -r 2 --commit-path .
+
+# Remove release commits from the changelog
+echo "Cleaning up release commits from changelog..."
+sed -i '/.*release.*/d' CHANGELOG.md
+# Remove any empty sections that might remain after removing release commits
+sed -i '/^## .*/{N;/\n\n## /d;}' CHANGELOG.md
+
 git add CHANGELOG.md
 
 # Commit the changes with the new version

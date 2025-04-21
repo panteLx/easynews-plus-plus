@@ -22,11 +22,15 @@ const config = {
     headerPartial:
       '## <small>{{version}} {{#if date}}({{date}}){{/if}}</small>\n\n',
     transform: function (commit, context) {
-      // Skip release commits
+      // Skip commits related to releases - several patterns to catch all variations
       if (
         commit.subject &&
-        (commit.subject.startsWith('release:') ||
-          (commit.type === 'chore' && commit.subject.startsWith('release')))
+        // Old pattern - direct "release:" prefix
+        (commit.subject.match(/^release:/i) ||
+          // New pattern - in the scope or combined
+          commit.subject.match(/^release/) ||
+          // Any commit with "release" in the subject (case insensitive)
+          commit.subject.toLowerCase().includes('release'))
       ) {
         return false;
       }
