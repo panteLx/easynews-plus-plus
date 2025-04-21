@@ -88,13 +88,21 @@ if [ ! -f CHANGELOG.md ]; then
     touch CHANGELOG.md
 fi
 
+# Check if there's already an entry for this version and remove it before regenerating
+echo "Checking for existing changelog entries for version $NEW_VERSION..."
+if grep -q "## <small>$NEW_VERSION" CHANGELOG.md; then
+    echo "Found existing entry for version $NEW_VERSION, removing it before regenerating..."
+    # Delete the section for this version
+    sed -i "/## <small>$NEW_VERSION/,/## <small>/d" CHANGELOG.md
+fi
+
 # Generate changelog
 echo "Generating changelog..."
 conventional-changelog -c ./packages/scripts/conventional-changelog-config.js -i CHANGELOG.md -s -r 2 --commit-path .
 git add CHANGELOG.md
 
 # Commit the changes with the new version
-git commit -m "release: $NEW_VERSION"
+git commit -m "chore(release): $NEW_VERSION"
 
 # Create a Git tag with the new version
 git tag "v$NEW_VERSION"

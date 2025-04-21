@@ -21,6 +21,18 @@ const config = {
   writerOpts: {
     headerPartial:
       '## <small>{{version}} {{#if date}}({{date}}){{/if}}</small>\n\n',
+    transform: function (commit, context) {
+      // Skip release commits
+      if (
+        commit.subject &&
+        (commit.subject.startsWith('release:') ||
+          (commit.type === 'chore' && commit.subject.startsWith('release')))
+      ) {
+        return false;
+      }
+
+      return commit;
+    },
   },
 };
 
