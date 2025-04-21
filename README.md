@@ -91,6 +91,37 @@
 - Optimized for Stremio, Omni, Vidi and Fusion compatibility
 - Authentication implementation that works without basic auth headers for media streaming
 
+#### ✅ **Fully Supported & Tested:**
+
+- tvOS (Omni & Vidi)
+- iOS (Fusion)
+- Stremio
+  - Windows 4.x
+  - Linux
+  - Web (Browser)
+
+#### ⚠️ **Should Work (Untested):**
+
+- Stremio:
+  - macOS
+  - Android TV
+  - Steam Deck
+  - Raspberry Pi
+  - Sony TV
+  - Philips TV
+
+#### ❌ **Currently Not Supported:**
+
+- Stremio:
+  - Windows 5.x (confirmed not working)
+  - webOS (confirmed not working)
+  - iOS
+  - Android Mobile (confirmed not working)
+  - Samsung TV
+
+> [!NOTE]  
+> We are actively working on expanding platform support. If you encounter any issues with a specific platform, please report them in our [Discord community](https://discord.gg/Ma4SnagqwE) or create a new issue on GitHub.
+
 ---
 
 ## 🛠️ Self-Hosting Guide
