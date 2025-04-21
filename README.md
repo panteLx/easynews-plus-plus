@@ -243,6 +243,18 @@ The addon automatically prioritizes streams based on several factors:
 
 This system ensures you get the highest quality content available without manual filtering.
 
+### What sorting options are available?
+
+The addon offers multiple sorting methods that can be selected in the configuration:
+
+1. **Quality First** (default): Prioritizes by resolution quality, then preferred language, then file size.
+2. **Language First**: Prioritizes content with your preferred language, then sorts by quality and size.
+3. **Size First**: Sorts primarily by file size (largest first), then quality, then language.
+4. **Date First**: Prioritizes newest content first, with secondary sorting by quality and language.
+5. **Relevance First**: Sorts by API relevance score, which typically finds the best matches to your search terms.
+
+You can select your preferred sorting method in the addon configuration page. For optimal language prioritization, the "Language First" option works best when you've also set your preferred language.
+
 ### Why is there a 50-stream limit?
 
 The addon limits results to the top 50 highest quality streams to:
@@ -263,6 +275,8 @@ The language filter allows you to prioritize content in your preferred audio lan
 3. Other language streams will be displayed below
 4. All streams display their audio language information in the description
 5. Your preferred language will be marked with a star (⭐)
+
+For maximum language prioritization effect, use the "Language First" sorting option in combination with your preferred language setting. This ensures content in your preferred language always appears at the top of results, regardless of quality or size.
 
 This makes it easier to find content in languages you understand without removing other options.
 
