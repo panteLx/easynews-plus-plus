@@ -1,12 +1,12 @@
 {
-  "name": "@easynews-plus-plus/core",
+  "name": "easynews-plus-plus-core",
   "version": "2.0.0",
   "main": "dist/server.js",
   "scripts": {
     "test": "npm run build && npm run test --workspaces",
     "format": "prettier --write .",
     "build": "npm -w packages/api run build && npm -w packages/addon run build",
-    "start:addon": "npm run build && npm -w packages/addon start",
+    "start:addon": "npm -w packages/addon start",
     "start:addon:dev": "npm run build && npm -w packages/addon run start:dev",
     "start:cf:dev": "npm run build && npm -w packages/cloudflare-worker run dev",
     "deploy:cf": "npm run build && npm -w packages/cloudflare-worker run deploy",

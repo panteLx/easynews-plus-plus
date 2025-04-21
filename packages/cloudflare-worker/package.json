@@ -1,5 +1,5 @@
 {
-  "name": "@easynews-plus-plus/cloudflare-worker",
+  "name": "easynews-plus-plus-cloudflare-worker",
   "version": "2.0.0",
   "scripts": {
     "test": "vitest run --passWithNoTests",
@@ -9,7 +9,7 @@
     "build": "exit 0"
   },
   "dependencies": {
-    "@easynews-plus-plus/addon": "^1.1.0",
+    "easynews-plus-plus-addon": "^2.0.0",
     "hono": "^4.5.3",
     "hono-stremio": "^0.1.1"
   },

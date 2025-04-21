@@ -1,5 +1,5 @@
 {
-  "name": "@easynews-plus-plus/addon",
+  "name": "easynews-plus-plus-addon",
   "version": "2.0.0",
   "main": "dist/index.js",
   "scripts": {
@@ -15,7 +15,7 @@
     "@types/stremio-addon-sdk": "^1.6.11"
   },
   "dependencies": {
-    "@easynews-plus-plus/api": "^1.1.0",
+    "easynews-plus-plus-api": "^2.0.0",
     "parse-torrent-title": "^1.4.0",
     "stremio-addon-sdk": "^1.6.10"
   }
