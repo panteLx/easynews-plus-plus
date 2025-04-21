@@ -1,11 +1,11 @@
 # Check if the script is being run from the root of the project
-if [ ! -f .version ] || [ ! -f frontend/package.json ] || [ ! -f CHANGELOG.md ]; then
+if [ ! -f package.json ] || [ ! -d packages ]; then
     echo "Error: This script must be run from the root of the project."
     exit 1
 fi
 
-# Read the current version from .version
-VERSION=$(cat .version)
+# Read the current version from package.json
+VERSION=$(node -e "console.log(require('./package.json').version)")
 
 # Function to increment the version
 increment_version() {
@@ -31,7 +31,7 @@ if [ "$1" == "major" ]; then
     RELEASE_TYPE="major"
 else
     # Get the latest tag
-    LATEST_TAG=$(git describe --tags --abbrev=0)
+    LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
 
     # Check for "feat" or "fix" in the commit messages since the latest tag
     if git log "$LATEST_TAG"..HEAD --oneline | grep -q "feat"; then
@@ -66,24 +66,19 @@ if [[ "$CONFIRM" != "y" ]]; then
     exit 1
 fi
 
-# Update the .version file with the new version
-echo $NEW_VERSION >.version
-git add .version
-
-# Update version in frontend/package.json
-jq --arg new_version "$NEW_VERSION" '.version = $new_version' frontend/package.json >frontend/package_tmp.json && mv frontend/package_tmp.json frontend/package.json
-git add frontend/package.json
-
-# Update version in root package.json if it exists
-if [ -f package.json ]; then
-    jq --arg new_version "$NEW_VERSION" '.version = $new_version' package.json >package_tmp.json && mv package_tmp.json package.json
-    git add package.json
-fi
+# Update version in root package.json
+jq --arg new_version "$NEW_VERSION" '.version = $new_version' package.json >package_tmp.json && mv package_tmp.json package.json
+git add package.json
 
 # Run the sync-versions script to update all package versions
 echo "Syncing version to all packages..."
 node packages/scripts/sync-versions.js
 git add packages/*/package.json
+
+# Check if CHANGELOG.md exists, create it if it doesn't
+if [ ! -f CHANGELOG.md ]; then
+    echo "# Changelog\n\n" > CHANGELOG.md
+fi
 
 # Check if conventional-changelog is installed, if not install it
 if ! command -v conventional-changelog &>/dev/null; then
@@ -117,8 +112,8 @@ echo "Extracting changelog content for version $NEW_VERSION..."
 CHANGELOG=$(awk '/^## / {if (NR > 1) exit} NR > 1 {print}' CHANGELOG.md | awk 'NR > 2 || NF {print}')
 
 if [ -z "$CHANGELOG" ]; then
-    echo "Error: Could not extract changelog for version $NEW_VERSION."
-    exit 1
+    echo "Warning: Could not extract changelog for version $NEW_VERSION."
+    CHANGELOG="Release version $NEW_VERSION"
 fi
 
 # Create the release on GitHub
