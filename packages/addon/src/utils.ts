@@ -284,6 +284,7 @@ let customTitles: Record<string, string[]> = {
   'House of the Dragon': ['House of the Dragon', 'Haus des Drachen'],
   'The Mandalorian': ['The Mandalorian', 'Der Mandalorianer'],
   Wednesday: ['Wednesday', 'Addams Family: Wednesday'],
+  'Help! My House Is Haunted': ['Help My House Is Haunted'],
 };
 
 /**
