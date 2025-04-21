@@ -1,6 +1,6 @@
 {
   "name": "@easynews-plus-plus/core",
-  "version": "1.4.1",
+  "version": "1.4.0",
   "main": "dist/server.js",
   "scripts": {
     "test": "npm run build && npm run test --workspaces",
@@ -12,9 +12,11 @@
     "deploy:cf": "npm run build && npm -w packages/cloudflare-worker run deploy",
     "deploy:beamup": "beamup",
     "preview:cf": "npm run build && npm -w packages/cloudflare-worker run preview",
-    "version:patch": "npm version patch --no-git-tag-version && npm version patch --workspaces --no-git-tag-version && git add . && git commit -m 'chore: bump version' && git tag v$(node -p \"require('./package.json').version\") && git push && git push --tags",
-    "version:minor": "npm version minor --no-git-tag-version && npm version minor --workspaces --no-git-tag-version && git add . && git commit -m 'chore: bump version' && git tag v$(node -p \"require('./package.json').version\") && git push && git push --tags",
-    "version:major": "npm version major --no-git-tag-version && npm version major --workspaces --no-git-tag-version && git add . && git commit -m 'chore: bump version' && git tag v$(node -p \"require('./package.json').version\") && git push && git push --tags"
+    "sync-versions": "node packages/scripts/sync-versions.js",
+    "release": "bash ./packages/scripts/release.sh",
+    "version:patch": "npm version patch --no-git-tag-version && npm run sync-versions && git add . && git commit -m 'chore: bump version' && git tag v$(node -p \"require('./package.json').version\") && git push && git push --tags",
+    "version:minor": "npm version minor --no-git-tag-version && npm run sync-versions && git add . && git commit -m 'chore: bump version' && git tag v$(node -p \"require('./package.json').version\") && git push && git push --tags",
+    "version:major": "npm version major --no-git-tag-version && npm run sync-versions && git add . && git commit -m 'chore: bump version' && git tag v$(node -p \"require('./package.json').version\") && git push && git push --tags"
   },
   "keywords": [
     "stremio easynews addon",
@@ -38,6 +40,7 @@
     "prettier": "^3.3.2",
     "tsx": "^4.16.2",
     "typescript": "^5.8.3",
-    "vitest": "^2.1.5"
+    "vitest": "^2.1.5",
+    "conventional-changelog": "^3.1.24"
   }
 }
