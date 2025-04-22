@@ -195,11 +195,12 @@ function landingTemplate(manifest: Manifest): string {
 <!DOCTYPE html>
 <html lang="${ISO_TO_LANGUAGE[defaultUILanguage] || 'en'}">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
+  <link rel="icon" type="image/png" href="${manifest.logo}">
   <title>${manifest.name || manifest.id} - ${translations.configPage.title}</title>
   <style>
     * {
@@ -566,12 +567,40 @@ function landingTemplate(manifest: Manifest): string {
       
       .button-group {
         flex-direction: column;
+        gap: 0.75rem;
+        width: 100%;
+      }
+      
+      .button-group button {
+        width: 100%;
+        margin: 0;
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
       }
       
       .copy-button {
         margin-right: 0;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0;
         width: 100%;
+      }
+      
+      .form-group {
+        margin-bottom: 1.25rem;
+      }
+      
+      input[type="text"],
+      input[type="password"],
+      select {
+        padding: 0.875rem;
+        font-size: 1rem;
+      }
+      
+      .checkbox-wrapper {
+        padding: 1rem;
+      }
+      
+      .checkbox-title {
+        font-size: 1rem;
       }
     }
   </style>
