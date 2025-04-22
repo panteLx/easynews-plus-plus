@@ -717,14 +717,12 @@ function landingTemplate(manifest: Manifest): string {
       const formData = new FormData(configForm);
       const config = {};
       
-      for (const [key, value] of formData.entries()) {
-        config[key] = value;
-      }
-      
-      // Handle checkboxes
-      document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-        if (!formData.has(checkbox.name)) {
-          config[checkbox.name] = 'false';
+      // Handle all form fields including checkboxes
+      document.querySelectorAll('input, select').forEach(field => {
+        if (field.type === 'checkbox') {
+          config[field.name] = field.checked ? 'true' : 'false';
+        } else {
+          config[field.name] = field.value;
         }
       });
       
