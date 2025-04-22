@@ -73,6 +73,11 @@ export const manifest: Manifest = {
   background: 'https://i.imgur.com/QPPXf5T.jpeg',
   logo: 'https://pbs.twimg.com/profile_images/479627852757733376/8v9zH7Yo_400x400.jpeg',
   behaviorHints: { configurable: true, configurationRequired: true },
+  stremioAddonsConfig: {
+    issuer: 'https://stremio-addons.net',
+    signature:
+      'eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..51PLy1tUzMKnIWRNR4A7LA.t7KcM925cLQphqv-9WHr59YPtO-snyEl5wBeYvWYs9JlW3tFZ8P_WeGwzVBhVVELh5b3976B8CbnwXVFamteW3suTTf9FnBUMY29NUvn20qQX70EshoCaFh3dy9uowcB.bYVYPWa02j8x1RNx7UG59A',
+  },
   config: [
     { title: englishTranslations.form.username, key: 'username', type: 'text' },
     {
