@@ -177,7 +177,7 @@ $ npm run start
 Access the addon at `http://localhost:1337/`. Customize the port using the `PORT` environment variable:
 
 ```bash
-$ PORT=8080 npm run start:addon
+$ PORT=8080 npm run start
 ```
 
 ### ☁️ Cloud Deployment
