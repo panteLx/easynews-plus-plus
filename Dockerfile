@@ -43,4 +43,4 @@ COPY --from=builder /build/node_modules ./node_modules
 
 EXPOSE 1337
 
-ENTRYPOINT ["npm", "run", "start:addon"]
+ENTRYPOINT ["npm", "run", "start"]
