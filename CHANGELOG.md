@@ -1,3 +1,16 @@
+## [2.1.0](https://github.com/panteLx/easynews-plus-plus/compare/v2.0.1...v2.1.0) (2025-04-22)
+
+### Features
+
+* add Dutch and Romanian language support ([382c608](https://github.com/panteLx/easynews-plus-plus/commit/382c6085efc4fa3d86cf133e3aa21ba2364d9139))
+* add GitHub Actions workflow for Docker image publishing ([541da8d](https://github.com/panteLx/easynews-plus-plus/commit/541da8da5243298c2cd7138f0a98a00218db88c4))
+* add npm publish script and enhance release process ([c8847ad](https://github.com/panteLx/easynews-plus-plus/commit/c8847ad5eef9f0a57ae21194a774eff43f5a9111))
+
+### Bug Fixes
+
+* form data handling in landing template on language change ([43bfa03](https://github.com/panteLx/easynews-plus-plus/commit/43bfa03337e3ee350c86cd44fd1ec3ba6c867086))
+* package dependencies to use local file paths ([ddfa532](https://github.com/panteLx/easynews-plus-plus/commit/ddfa53233e3d688c54ef77d62aec604bd3be519b))
+* package versions and descriptions to 1.0.0 ([4577e0b](https://github.com/panteLx/easynews-plus-plus/commit/4577e0bb6e0f70995ed92cbbf940c561396ac927))
 ## [2.0.1](https://github.com/panteLx/easynews-plus-plus/compare/v2.0.0...v2.0.1) (2025-04-21)
 
 ### Bug Fixes
