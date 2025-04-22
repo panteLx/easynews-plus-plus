@@ -1,7 +1,7 @@
 import { Manifest, ManifestCatalog, ContentType } from 'stremio-addon-sdk';
 import { translations, DEFAULT_LANGUAGE } from './i18n';
 
-const { version, description } = require('../package.json');
+import { version, description } from '../../../package.json';
 
 // Prepare catalog structure
 export const catalog: ManifestCatalog = {

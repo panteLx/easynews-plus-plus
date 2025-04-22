@@ -1,10 +1,10 @@
 {
   "name": "easynews-plus-plus-api",
-  "version": "2.0.1",
+  "version": "1.0.0",
   "main": "./dist/index.js",
   "scripts": {
     "test": "vitest run --passWithNoTests",
     "build": "tsc"
   },
-  "description": "Easynews API library"
+  "description": "API package for Easynews++"
 }

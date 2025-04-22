@@ -1,6 +1,7 @@
 {
   "name": "easynews-plus-plus-cloudflare-worker",
-  "version": "2.0.1",
+  "version": "1.0.0",
+  "description": "Cloudflare Worker package for Easynews++",
   "scripts": {
     "test": "vitest run --passWithNoTests",
     "dev": "wrangler dev src/index.ts",
@@ -9,7 +10,7 @@
     "build": "exit 0"
   },
   "dependencies": {
-    "easynews-plus-plus-addon": "^2.0.0",
+    "easynews-plus-plus-addon": "file:../addon",
     "hono": "^4.5.3",
     "hono-stremio": "^0.1.1"
   },
