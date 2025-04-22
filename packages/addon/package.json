@@ -15,7 +15,7 @@
     "@types/stremio-addon-sdk": "^1.6.11"
   },
   "dependencies": {
-    "easynews-plus-plus-api": "workspace:*",
+    "easynews-plus-plus-api": "file:../api",
     "parse-torrent-title": "^1.4.0",
     "stremio-addon-sdk": "^1.6.10"
   }

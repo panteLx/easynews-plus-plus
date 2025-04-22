@@ -10,7 +10,7 @@
     "build": "exit 0"
   },
   "dependencies": {
-    "easynews-plus-plus-addon": "workspace:*",
+    "easynews-plus-plus-addon": "file:../addon",
     "hono": "^4.5.3",
     "hono-stremio": "^0.1.1"
   },
