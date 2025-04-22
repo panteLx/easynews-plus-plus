@@ -99,6 +99,7 @@
 - iOS (Fusion)
 - Stremio
   - Windows 4.x
+  - Windows 5.x (beta)
   - Linux
   - Web (Browser)
 
@@ -115,7 +116,6 @@
 #### ❌ **Currently Not Supported:**
 
 - Stremio:
-  - Windows 5.x (confirmed not working)
   - webOS (confirmed not working)
   - iOS
   - Android Mobile (confirmed not working)
