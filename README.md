@@ -143,7 +143,17 @@ $ docker build -t easynews-plus-plus .
 $ docker run -p 8080:1337 easynews-plus-plus
 ```
 
+Alternatively, you can use the pre-built Docker image from GitHub Container Registry:
+
+```bash
+$ docker pull ghcr.io/pantelx/easynews-plus-plus:latest
+$ docker run -p 8080:1337 ghcr.io/pantelx/easynews-plus-plus:latest
+```
+
 Verify the installation by visiting `http://localhost:8080/` in your browser.
+
+> [!NOTE]  
+> The Docker image is automatically built and published to GitHub Container Registry (ghcr.io) for each push to the main branch and for each new version tag. You can find all available tags on the [GitHub Packages page](https://github.com/pantelx/easynews-plus-plus/pkgs/container/easynews-plus-plus).
 
 ### 📦 Source Installation
 
@@ -161,7 +171,7 @@ $ npm -v
 $ git clone https://github.com/pantelx/easynews-plus-plus.git && cd easynews-plus-plus
 $ npm i
 # Start in production mode
-$ npm run start:addon
+$ npm run start
 ```
 
 Access the addon at `http://localhost:1337/`. Customize the port using the `PORT` environment variable:
@@ -206,9 +216,9 @@ Development modes:
 
 ```bash
 # Addon development
-$ npm run start:addon:dev
+$ npm run dev
 # Cloudflare worker development
-$ npm run start:cf:dev
+$ npm run dev:cf
 ```
 
 ### 📝 Release Process
