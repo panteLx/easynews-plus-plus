@@ -229,7 +229,7 @@ export const translations: Translations = {
       chinese: 'Chinesisch (中文)',
       dutch: 'Niederländisch (Nederlands)',
       romanian: 'Rumänisch (Română)',
-      bulgarian: 'Bulgarische (Български)',
+      bulgarian: 'Bulgarisch (Български)',
     },
     sortingOptions: {
       qualityFirst: 'Qualität (4K → 1080p → 720p)',
