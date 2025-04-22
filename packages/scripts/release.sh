@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Check if the script is being run from the root of the project
 if [ ! -f package.json ] || [ ! -d packages ]; then
     echo "Error: This script must be run from the root of the project."
@@ -59,6 +61,9 @@ else
     exit 1
 fi
 
+# Ask if the user wants to publish to npm
+read -p "Do you also want to publish to npm after release? (y/n) " PUBLISH_NPM
+
 # Confirm release creation
 read -p "This will create a new $RELEASE_TYPE release with version $NEW_VERSION. Do you want to proceed? (y/n) " CONFIRM
 if [[ "$CONFIRM" != "y" ]]; then
@@ -70,10 +75,7 @@ fi
 jq --arg new_version "$NEW_VERSION" '.version = $new_version' package.json >package_tmp.json && mv package_tmp.json package.json
 git add package.json
 
-# Run the sync-versions script to update all package versions
-echo "Syncing version to all packages..."
-node packages/scripts/sync-versions.js
-git add packages/*/package.json
+echo "Updating root package.json version..."
 
 # Check if CHANGELOG.md exists
 if [ ! -f CHANGELOG.md ]; then
@@ -126,6 +128,12 @@ if [ $? -eq 0 ]; then
 else
     echo "Error: Failed to create GitHub release."
     exit 1
+fi
+
+# Publish to npm if requested
+if [[ "$PUBLISH_NPM" == "y" ]]; then
+    echo "Publishing to npm..."
+    npm run publish:npm
 fi
 
 echo "Release process complete. New version: $NEW_VERSION"
