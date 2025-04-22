@@ -13,15 +13,15 @@
 
 ## 🔗 Quick Links
 
-**Public instance:** [https://easynews-cloudflare-worker.jqrw92fchz.workers.dev/configure](https://easynews-cloudflare-worker.jqrw92fchz.workers.dev/configure) or [https://en.pantelx.com](https://en.pantelx.com)
+**Public Instance:** [https://easynews-cloudflare-worker.jqrw92fchz.workers.dev/configure](https://easynews-cloudflare-worker.jqrw92fchz.workers.dev/configure) or [https://en.pantelx.com](https://en.pantelx.com)
 
 **Discord Server:** [Join our Discord](https://discord.gg/Ma4SnagqwE) for community discussions and support
 
-**Self-hosting:** [Check out the Self-Hosting Guide](#%EF%B8%8F-self-hosting-guide)
+**Self-Hosting:** [Check out the Self-Hosting Guide](#%EF%B8%8F-self-hosting-guide)
 
 **Changelog:** [View all changes](./CHANGELOG.md)
 
-**Support the project:** [Buy Me A Coffee](https://buymeacoffee.com/pantel)
+**Support the Project:** [Buy Me A Coffee](https://buymeacoffee.com/pantel)
 
 ---
 
@@ -70,7 +70,7 @@
 
 ### 🌐 Multi-Language UI Support
 
-- Full UI translation support for 12 languages:
+- Full UI translation support for 13 languages:
   - English (default)
   - German (Deutsch)
   - Spanish (Español)
@@ -83,6 +83,7 @@
   - Chinese (中文)
   - Dutch (Nederlands)
   - Romanian (Română)
+  - Bulgarian (Български)
 - Seamless language switching without losing configuration
 - Translated form fields, options, and descriptions
 - Consistent UI experience across all supported languages
