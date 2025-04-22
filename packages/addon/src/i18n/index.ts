@@ -166,7 +166,7 @@ export const translations: Translations = {
       username: 'Username',
       password: 'Password',
       strictTitleMatching:
-        'Strict Title Matching (to filter out results that don\'t exactly match the movie or series title)',
+        "Strict Title Matching (to filter out results that don't exactly match the movie or series title)",
       preferredLanguage: 'Preferred Audio Language',
       sortingMethod: 'Sorting Method',
       uiLanguage: 'UI Language',
@@ -292,16 +292,16 @@ export const translations: Translations = {
       configCopied: 'Copié !',
       version: 'Version',
       description:
-        'Easynews++ est un addon open-source qui améliore l\'expérience Easynews avec des performances supérieures, des capacités de recherche avancées et une sélection intelligente des flux. Il propose le support de titres personnalisés, la compatibilité multi-plateformes et des options d\'auto-hébergement. Rejoignez notre communauté sur Discord (discord.gg/Ma4SnagqwE) ou contribuez sur GitHub (github.com/panteLx/easynews-plus-plus)',
+        "Easynews++ est un addon open-source qui améliore l'expérience Easynews avec des performances supérieures, des capacités de recherche avancées et une sélection intelligente des flux. Il propose le support de titres personnalisés, la compatibilité multi-plateformes et des options d'auto-hébergement. Rejoignez notre communauté sur Discord (discord.gg/Ma4SnagqwE) ou contribuez sur GitHub (github.com/panteLx/easynews-plus-plus)",
     },
     form: {
-      username: 'Nom d\'utilisateur',
+      username: "Nom d'utilisateur",
       password: 'Mot de passe',
       strictTitleMatching:
         'Correspondance stricte des titres (pour filtrer les résultats qui ne correspondent pas exactement au titre du film ou de la série)',
       preferredLanguage: 'Langue audio préférée',
       sortingMethod: 'Méthode de tri',
-      uiLanguage: 'Langue de l\'interface',
+      uiLanguage: "Langue de l'interface",
     },
     languages: {
       noPreference: 'Sans préférence',
@@ -322,9 +322,9 @@ export const translations: Translations = {
     sortingOptions: {
       qualityFirst: 'Qualité (4K → 1080p → 720p)',
       languageFirst: 'Langue préférée, puis qualité',
-      sizeFirst: 'Taille du fichier (plus grand d\'abord)',
-      dateFirst: 'Date d\'ajout (plus récent d\'abord)',
-      relevanceFirst: 'Pertinence (meilleures correspondances d\'abord)',
+      sizeFirst: "Taille du fichier (plus grand d'abord)",
+      dateFirst: "Date d'ajout (plus récent d'abord)",
+      relevanceFirst: "Pertinence (meilleures correspondances d'abord)",
     },
   },
   // Italian
@@ -336,7 +336,7 @@ export const translations: Translations = {
       configCopied: 'Copiato!',
       version: 'Versione',
       description:
-        'Easynews++ è un addon open-source che migliora l\'esperienza di Easynews con prestazioni superiori, funzionalità di ricerca avanzate e selezione intelligente dei flussi. Include supporto per titoli personalizzati, compatibilità multi-piattaforma e opzioni di self-hosting. Unisciti alla nostra comunità su Discord (discord.gg/Ma4SnagqwE) o contribuisci su GitHub (github.com/panteLx/easynews-plus-plus)',
+        "Easynews++ è un addon open-source che migliora l'esperienza di Easynews con prestazioni superiori, funzionalità di ricerca avanzate e selezione intelligente dei flussi. Include supporto per titoli personalizzati, compatibilità multi-piattaforma e opzioni di self-hosting. Unisciti alla nostra comunità su Discord (discord.gg/Ma4SnagqwE) o contribuisci su GitHub (github.com/panteLx/easynews-plus-plus)",
     },
     form: {
       username: 'Nome utente',
@@ -345,7 +345,7 @@ export const translations: Translations = {
         'Corrispondenza esatta dei titoli (per filtrare i risultati che non corrispondono esattamente al titolo del film o della serie)',
       preferredLanguage: 'Lingua audio preferita',
       sortingMethod: 'Metodo di ordinamento',
-      uiLanguage: 'Lingua dell\'interfaccia utente',
+      uiLanguage: "Lingua dell'interfaccia utente",
     },
     languages: {
       noPreference: 'Nessuna preferenza',
