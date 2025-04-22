@@ -1,0 +1,17 @@
+# Source files
+packages/
+src/
+.github/
+.vscode/
+
+# Config files
+.prettierrc
+tsconfig*.json
+Dockerfile
+.gitignore
+
+# Development files
+node_modules/
+package-lock.json
+.git/
+tsconfig.tsbuildinfo 

@@ -1,5 +1,5 @@
 {
-  "name": "easynews-plus-plus-core",
+  "name": "easynews-plus-plus",
   "version": "2.0.1",
   "main": "dist/server.js",
   "scripts": {
@@ -12,8 +12,8 @@
     "deploy:cf": "npm run build && npm -w packages/cloudflare-worker run deploy",
     "deploy:beamup": "beamup",
     "preview:cf": "npm run build && npm -w packages/cloudflare-worker run preview",
-    "sync-versions": "node packages/scripts/sync-versions.js",
-    "release": "bash ./packages/scripts/release.sh"
+    "release": "bash ./packages/scripts/release.sh",
+    "publish:npm": "bash ./packages/scripts/npm-publish.sh"
   },
   "keywords": [
     "stremio easynews addon",
@@ -38,5 +38,22 @@
     "tsx": "^4.16.2",
     "typescript": "^5.8.3",
     "vitest": "^2.1.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/panteLx/easynews-plus-plus.git"
+  },
+  "homepage": "https://github.com/panteLx/easynews-plus-plus",
+  "bugs": {
+    "url": "https://github.com/panteLx/easynews-plus-plus/issues"
+  },
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "publishConfig": {
+    "access": "public"
   }
 }
