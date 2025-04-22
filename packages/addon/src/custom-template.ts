@@ -133,6 +133,12 @@ function landingTemplate(manifest: Manifest): string {
         ) {
           translatedOptions['rum'] = translations.languages.romanian;
         }
+        if (
+          field.options['bul'] !== undefined &&
+          translations.languages?.bulgarian
+        ) {
+          translatedOptions['bul'] = translations.languages.bulgarian;
+        }
       }
       return {
         ...field,

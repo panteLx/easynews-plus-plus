@@ -29,6 +29,7 @@ const languageOptions = {
   chi: englishTranslations.languages.chinese,
   dut: englishTranslations.languages.dutch,
   rum: englishTranslations.languages.romanian,
+  bul: englishTranslations.languages.bulgarian,
 } as any;
 
 // Sorting preference options
@@ -54,6 +55,7 @@ const uiLanguageOptions = {
   chi: '中文 (Chinese)',
   dut: 'Nederlands (Dutch)',
   rum: 'Română (Romanian)',
+  bul: 'Български (Bulgarian)',
 };
 
 export const manifest: Manifest = {
