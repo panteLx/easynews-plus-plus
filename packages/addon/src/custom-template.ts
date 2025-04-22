@@ -195,11 +195,12 @@ function landingTemplate(manifest: Manifest): string {
 <!DOCTYPE html>
 <html lang="${ISO_TO_LANGUAGE[defaultUILanguage] || 'en'}">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
+  <link rel="icon" type="image/png" href="${manifest.logo}">
   <title>${manifest.name || manifest.id} - ${translations.configPage.title}</title>
   <style>
     * {
@@ -474,7 +475,7 @@ function landingTemplate(manifest: Manifest): string {
       color: hsl(240 5% 55%);
       text-align: center;
       font-size: 0.85rem;
-      margin-top: 2rem;
+      margin-top: 1rem;
     }
     
     .copy-button {
@@ -566,13 +567,69 @@ function landingTemplate(manifest: Manifest): string {
       
       .button-group {
         flex-direction: column;
+        gap: 0.75rem;
+        width: 100%;
+      }
+      
+      .button-group button {
+        width: 100%;
+        margin: 0;
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
       }
       
       .copy-button {
         margin-right: 0;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0;
         width: 100%;
       }
+      
+      .form-group {
+        margin-bottom: 1.25rem;
+      }
+      
+      input[type="text"],
+      input[type="password"],
+      select {
+        padding: 0.875rem;
+        font-size: 1rem;
+      }
+      
+      .checkbox-wrapper {
+        padding: 1rem;
+      }
+      
+      .checkbox-title {
+        font-size: 1rem;
+      }
+    }
+
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .social-link {
+      color: hsl(240 5% 55%);
+      transition: color 0.2s;
+    }
+
+    .social-link:hover {
+      color: var(--primary);
+    }
+
+    .social-link svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .border {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1rem;
+      max-width: 20%;
+      margin: 0 auto;
     }
   </style>
 </head>
@@ -640,7 +697,30 @@ function landingTemplate(manifest: Manifest): string {
       </form>
     </div>
     
+    <div class="social-links">
+      <a href="https://github.com/panteLx/easynews-plus-plus" target="_blank" rel="noopener noreferrer" class="social-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+        </svg>
+      </a>
+      <a href="https://discord.gg/Ma4SnagqwE" target="_blank" rel="noopener noreferrer" class="social-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+      </a>
+      <a href="https://buymeacoffee.com/pantel" target="_blank" rel="noopener noreferrer" class="social-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+          <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+          <line x1="6" y1="1" x2="6" y2="4"></line>
+          <line x1="10" y1="1" x2="10" y2="4"></line>
+          <line x1="14" y1="1" x2="14" y2="4"></line>
+        </svg>
+      </a>
+    </div>
+    <div class="border"></div>
     <p class="version">${translations.configPage.version}: ${manifest.version}</p>
+
   </div>
   
   <script>
@@ -688,14 +768,12 @@ function landingTemplate(manifest: Manifest): string {
       const formData = new FormData(configForm);
       const config = {};
       
-      for (const [key, value] of formData.entries()) {
-        config[key] = value;
-      }
-      
-      // Handle checkboxes
-      document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-        if (!formData.has(checkbox.name)) {
-          config[checkbox.name] = 'false';
+      // Handle all form fields including checkboxes
+      document.querySelectorAll('input, select').forEach(field => {
+        if (field.type === 'checkbox') {
+          config[field.name] = field.checked ? 'true' : 'false';
+        } else {
+          config[field.name] = field.value;
         }
       });
       
