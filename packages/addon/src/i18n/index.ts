@@ -15,7 +15,8 @@ export type Language =
   | 'ko'
   | 'zh'
   | 'nl'
-  | 'ro';
+  | 'ro'
+  | 'bg';
 
 // Key-value structure for translations
 export type TranslationKeys = {
@@ -52,6 +53,7 @@ export type TranslationKeys = {
     chinese: string;
     dutch: string;
     romanian: string;
+    bulgarian: string;
   };
   // Sorting options
   sortingOptions: {
@@ -83,6 +85,7 @@ export const ISO_TO_LANGUAGE: Record<string, Language> = {
   chi: 'zh',
   dut: 'nl',
   rum: 'ro',
+  bul: 'bg',
   // Default to English if not found
   '': 'en',
 };
@@ -101,6 +104,7 @@ export const LANGUAGE_TO_ISO: Record<Language, string> = {
   zh: 'chi',
   nl: 'dut',
   ro: 'rum',
+  bg: 'bul',
 };
 
 // All supported languages with their display names
@@ -117,6 +121,7 @@ export const SUPPORTED_LANGUAGES: Record<Language, string> = {
   zh: '中文 (Chinese)',
   nl: 'Nederlands (Dutch)',
   ro: 'Română (Romanian)',
+  bg: 'Български (Bulgarian)',
 };
 
 /**
@@ -161,7 +166,7 @@ export const translations: Translations = {
       username: 'Username',
       password: 'Password',
       strictTitleMatching:
-        "Strict Title Matching (to filter out results that don't exactly match the movie or series title)",
+        'Strict Title Matching (to filter out results that don\'t exactly match the movie or series title)',
       preferredLanguage: 'Preferred Audio Language',
       sortingMethod: 'Sorting Method',
       uiLanguage: 'UI Language',
@@ -180,6 +185,7 @@ export const translations: Translations = {
       chinese: 'Chinese (中文)',
       dutch: 'Dutch (Nederlands)',
       romanian: 'Romanian (Română)',
+      bulgarian: 'Bulgarian (Български)',
     },
     sortingOptions: {
       qualityFirst: 'Quality (4K → 1080p → 720p)',
@@ -223,6 +229,7 @@ export const translations: Translations = {
       chinese: 'Chinesisch (中文)',
       dutch: 'Niederländisch (Nederlands)',
       romanian: 'Rumänisch (Română)',
+      bulgarian: 'Bulgarische (Български)',
     },
     sortingOptions: {
       qualityFirst: 'Qualität (4K → 1080p → 720p)',
@@ -266,6 +273,7 @@ export const translations: Translations = {
       chinese: 'Chino (中文)',
       dutch: 'Holandés (Nederlands)',
       romanian: 'Rumano (Română)',
+      bulgarian: 'Búlgara (Български)',
     },
     sortingOptions: {
       qualityFirst: 'Calidad (4K → 1080p → 720p)',
@@ -284,16 +292,16 @@ export const translations: Translations = {
       configCopied: 'Copié !',
       version: 'Version',
       description:
-        "Easynews++ est un addon open-source qui améliore l'expérience Easynews avec des performances supérieures, des capacités de recherche avancées et une sélection intelligente des flux. Il propose le support de titres personnalisés, la compatibilité multi-plateformes et des options d'auto-hébergement. Rejoignez notre communauté sur Discord (discord.gg/Ma4SnagqwE) ou contribuez sur GitHub (github.com/panteLx/easynews-plus-plus)",
+        'Easynews++ est un addon open-source qui améliore l\'expérience Easynews avec des performances supérieures, des capacités de recherche avancées et une sélection intelligente des flux. Il propose le support de titres personnalisés, la compatibilité multi-plateformes et des options d\'auto-hébergement. Rejoignez notre communauté sur Discord (discord.gg/Ma4SnagqwE) ou contribuez sur GitHub (github.com/panteLx/easynews-plus-plus)',
     },
     form: {
-      username: "Nom d'utilisateur",
+      username: 'Nom d\'utilisateur',
       password: 'Mot de passe',
       strictTitleMatching:
         'Correspondance stricte des titres (pour filtrer les résultats qui ne correspondent pas exactement au titre du film ou de la série)',
       preferredLanguage: 'Langue audio préférée',
       sortingMethod: 'Méthode de tri',
-      uiLanguage: "Langue de l'interface",
+      uiLanguage: 'Langue de l\'interface',
     },
     languages: {
       noPreference: 'Sans préférence',
@@ -309,13 +317,14 @@ export const translations: Translations = {
       chinese: 'Chinois (中文)',
       dutch: 'Néerlandais (Nederlands)',
       romanian: 'Roumain (Română)',
+      bulgarian: 'Bulgare (Български)',
     },
     sortingOptions: {
       qualityFirst: 'Qualité (4K → 1080p → 720p)',
       languageFirst: 'Langue préférée, puis qualité',
-      sizeFirst: "Taille du fichier (plus grand d'abord)",
-      dateFirst: "Date d'ajout (plus récent d'abord)",
-      relevanceFirst: "Pertinence (meilleures correspondances d'abord)",
+      sizeFirst: 'Taille du fichier (plus grand d\'abord)',
+      dateFirst: 'Date d\'ajout (plus récent d\'abord)',
+      relevanceFirst: 'Pertinence (meilleures correspondances d\'abord)',
     },
   },
   // Italian
@@ -327,7 +336,7 @@ export const translations: Translations = {
       configCopied: 'Copiato!',
       version: 'Versione',
       description:
-        "Easynews++ è un addon open-source che migliora l'esperienza di Easynews con prestazioni superiori, funzionalità di ricerca avanzate e selezione intelligente dei flussi. Include supporto per titoli personalizzati, compatibilità multi-piattaforma e opzioni di self-hosting. Unisciti alla nostra comunità su Discord (discord.gg/Ma4SnagqwE) o contribuisci su GitHub (github.com/panteLx/easynews-plus-plus)",
+        'Easynews++ è un addon open-source che migliora l\'esperienza di Easynews con prestazioni superiori, funzionalità di ricerca avanzate e selezione intelligente dei flussi. Include supporto per titoli personalizzati, compatibilità multi-piattaforma e opzioni di self-hosting. Unisciti alla nostra comunità su Discord (discord.gg/Ma4SnagqwE) o contribuisci su GitHub (github.com/panteLx/easynews-plus-plus)',
     },
     form: {
       username: 'Nome utente',
@@ -336,7 +345,7 @@ export const translations: Translations = {
         'Corrispondenza esatta dei titoli (per filtrare i risultati che non corrispondono esattamente al titolo del film o della serie)',
       preferredLanguage: 'Lingua audio preferita',
       sortingMethod: 'Metodo di ordinamento',
-      uiLanguage: "Lingua dell'interfaccia utente",
+      uiLanguage: 'Lingua dell\'interfaccia utente',
     },
     languages: {
       noPreference: 'Nessuna preferenza',
@@ -352,6 +361,7 @@ export const translations: Translations = {
       chinese: 'Cinese (中文)',
       dutch: 'Olandese (Nederlands)',
       romanian: 'Rumeno (Română)',
+      bulgarian: 'Bulgara (Български)',
     },
     sortingOptions: {
       qualityFirst: 'Qualità (4K → 1080p → 720p)',
@@ -395,6 +405,7 @@ export const translations: Translations = {
       chinese: '中国語 (中文)',
       dutch: 'オランダ語 (Nederlands)',
       romanian: 'ルーマニア語 (Română)',
+      bulgarian: 'ブルガリア語 (Български)',
     },
     sortingOptions: {
       qualityFirst: '画質優先 (4K → 1080p → 720p)',
@@ -438,6 +449,7 @@ export const translations: Translations = {
       chinese: 'Chinês (中文)',
       dutch: 'Holandês (Nederlands)',
       romanian: 'Romeno (Română)',
+      bulgarian: 'Búlgara (Български)',
     },
     sortingOptions: {
       qualityFirst: 'Qualidade (4K → 1080p → 720p)',
@@ -481,6 +493,7 @@ export const translations: Translations = {
       chinese: 'Китайский (中文)',
       dutch: 'Нидерландский (Nederlands)',
       romanian: 'Румынский (Română)',
+      bulgarian: 'Болгарский (Български)',
     },
     sortingOptions: {
       qualityFirst: 'Качество (4K → 1080p → 720p)',
@@ -524,6 +537,7 @@ export const translations: Translations = {
       chinese: '중국어 (中文)',
       dutch: '네덜란드어 (Nederlands)',
       romanian: '루마니아어 (Română)',
+      bulgarian: '불가리아어 (Български)',
     },
     sortingOptions: {
       qualityFirst: '화질 (4K → 1080p → 720p)',
@@ -567,6 +581,7 @@ export const translations: Translations = {
       chinese: '中文 (Chinese)',
       dutch: '荷兰语 (Nederlands)',
       romanian: '罗马尼亚语 (Română)',
+      bulgarian: '保加利亚语 (Български)',
     },
     sortingOptions: {
       qualityFirst: '质量 (4K → 1080p → 720p)',
@@ -610,6 +625,7 @@ export const translations: Translations = {
       chinese: 'Chinees (中文)',
       dutch: 'Nederlands (Dutch)',
       romanian: 'Roemeens (Română)',
+      bulgarian: 'Bulgaars (Български)',
     },
     sortingOptions: {
       qualityFirst: 'Kwaliteit (4K → 1080p → 720p)',
@@ -653,6 +669,7 @@ export const translations: Translations = {
       chinese: 'Chineză (中文)',
       dutch: 'Olandeză (Nederlands)',
       romanian: 'Română (Romanian)',
+      bulgarian: 'Bulgară (Български)',
     },
     sortingOptions: {
       qualityFirst: 'Calitate (4K → 1080p → 720p)',
@@ -660,6 +677,50 @@ export const translations: Translations = {
       sizeFirst: 'Mărimea fișierului (cele mai mari înainte)',
       dateFirst: 'Data adăugării (cele mai recente înainte)',
       relevanceFirst: 'Relevantă (cele mai bune potriviri înainte)',
+    }
+  },
+  // Bulgarian
+  bg: {
+    configPage: {
+      title: 'Конфигурация',
+      copyConfig: 'Копирай конфигурацията',
+      addToStremio: 'Добави в Stremio',
+      configCopied: 'Конфигурацията е копирана!',
+      version: 'Версия',
+      description:
+        'Easynews++ е добавка с отворен код, която подобрява работата с Easynews с по-добра производителност, разширени възможности за търсене и интелигентен избор на поток. Той включва поддръжка на персонализирани заглавия, мултиплатформена съвместимост и опции за самостоятелно хостване. Присъединете се към нашата общност в Discord (discord.gg/Ma4SnagqwE) или допринасяйте в GitHub (github.com/panteLx/easynews-plus-plus)',
+    },
+    form: {
+      username: 'Потребителско име',
+      password: 'Парола',
+      strictTitleMatching:
+        'Строго съответствие на заглавието (за филтриране на резултати, които не съвпадат точно със заглавието на филма или сериала)',
+      preferredLanguage: 'Предпочитан аудио език',
+      sortingMethod: 'Метод на сортиране',
+      uiLanguage: 'Език на потребителския интерфейс',
+    },
+    languages: {
+      noPreference: 'Без предпочитания',
+      english: 'Английски език (English)',
+      german: 'Немски (Deutsch)',
+      spanish: 'Испански (Español)',
+      french: 'Френски (Français)',
+      italian: 'Италиански (Italiano)',
+      japanese: 'Японски (日本語)',
+      portuguese: 'Португалски (Português)',
+      russian: 'Руски (Русский)',
+      korean: 'Корейски (한국어)',
+      chinese: 'Китайски (中文)',
+      dutch: 'Нидерландски (Nederlands)',
+      romanian: 'Румънски (Română)',
+      bulgarian: 'Български',
+    },
+    sortingOptions: {
+      qualityFirst: 'Качество (4K → 1080p → 720p)',
+      languageFirst: 'Предпочитан език, след това качество',
+      sizeFirst: 'Размер на файла (първо най-големият)',
+      dateFirst: 'Дата на добавяне (най-новата първа)',
+      relevanceFirst: 'Релевантност (първо най-добрите съвпадения)',
     },
   },
 };
