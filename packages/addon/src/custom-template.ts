@@ -121,6 +121,18 @@ function landingTemplate(manifest: Manifest): string {
         ) {
           translatedOptions['chi'] = translations.languages.chinese;
         }
+        if (
+          field.options['dut'] !== undefined &&
+          translations.languages?.dutch
+        ) {
+          translatedOptions['dut'] = translations.languages.dutch;
+        }
+        if (
+          field.options['rum'] !== undefined &&
+          translations.languages?.romanian
+        ) {
+          translatedOptions['rum'] = translations.languages.romanian;
+        }
       }
       return {
         ...field,

@@ -27,6 +27,8 @@ const languageOptions = {
   rus: englishTranslations.languages.russian,
   kor: englishTranslations.languages.korean,
   chi: englishTranslations.languages.chinese,
+  dut: englishTranslations.languages.dutch,
+  rum: englishTranslations.languages.romanian,
 } as any;
 
 // Sorting preference options
@@ -50,6 +52,8 @@ const uiLanguageOptions = {
   rus: 'Русский (Russian)',
   kor: '한국어 (Korean)',
   chi: '中文 (Chinese)',
+  dut: 'Nederlands (Dutch)',
+  rum: 'Română (Romanian)',
 };
 
 export const manifest: Manifest = {
