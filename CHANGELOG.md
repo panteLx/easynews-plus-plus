@@ -1,3 +1,13 @@
+## [2.1.1](https://github.com/panteLx/easynews-plus-plus/compare/v2.1.0...v2.1.1) (2025-04-22)
+
+### Bug Fixes
+
+* clean up Docker image tagging in workflow ([9a00232](https://github.com/panteLx/easynews-plus-plus/commit/9a0023292e2b684feede139c69e5cd0f92f62b3a))
+* update Dockerfile entrypoint and README instructions ([2a109b1](https://github.com/panteLx/easynews-plus-plus/commit/2a109b1584f7b5b48787ddf3c8c37add0765f157))
+
+### Reverts
+
+* Revert "release: 2.1.0" ([1da955b](https://github.com/panteLx/easynews-plus-plus/commit/1da955b9b7107f04a0efe7f7f3974ed6f2a929be))
 ## [2.1.0](https://github.com/panteLx/easynews-plus-plus/compare/v2.0.1...v2.1.0) (2025-04-22)
 
 ### Features
