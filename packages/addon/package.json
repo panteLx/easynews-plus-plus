@@ -1,6 +1,6 @@
 {
   "name": "easynews-plus-plus-addon",
-  "version": "2.0.1",
+  "version": "1.0.0",
   "main": "dist/index.js",
   "scripts": {
     "test": "vitest run --passWithNoTests",
@@ -10,12 +10,12 @@
     "start": "node dist/server.js",
     "start:dev": "cross-env NODE_ENV=dev tsx watch src/server.ts"
   },
-  "description": "Easynews++ is an open-source addon that enhances the Easynews experience with superior performance, advanced search capabilities, and intelligent stream selection. It features custom title support, multi-platform compatibility, and self-hosting options. Join our community on Discord (discord.gg/Ma4SnagqwE) or contribute on GitHub (github.com/panteLx/easynews-plus-plus).",
+  "description": "Addon package for Easynews++",
   "devDependencies": {
     "@types/stremio-addon-sdk": "^1.6.11"
   },
   "dependencies": {
-    "easynews-plus-plus-api": "^2.0.0",
+    "easynews-plus-plus-api": "workspace:*",
     "parse-torrent-title": "^1.4.0",
     "stremio-addon-sdk": "^1.6.10"
   }

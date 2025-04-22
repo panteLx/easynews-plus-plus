@@ -615,7 +615,7 @@ export function buildSearchQuery(
  */
 export function getVersion(): string {
   try {
-    const version = require('../package.json').version;
+    const version = require('../../../package.json').version;
     return version;
   } catch (error) {
     return 'unknown-version';
