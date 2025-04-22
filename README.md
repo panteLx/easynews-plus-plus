@@ -70,7 +70,7 @@
 
 ### 🌐 Multi-Language UI Support
 
-- Full UI translation support for 10 languages:
+- Full UI translation support for 12 languages:
   - English (default)
   - German (Deutsch)
   - Spanish (Español)
@@ -81,6 +81,8 @@
   - Russian (Русский)
   - Korean (한국어)
   - Chinese (中文)
+  - Dutch (Nederlands)
+  - Romanian (Română)
 - Seamless language switching without losing configuration
 - Translated form fields, options, and descriptions
 - Consistent UI experience across all supported languages
