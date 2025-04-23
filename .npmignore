@@ -1,17 +1,37 @@
 # Source files
-packages/
 src/
+packages/
 .github/
 .vscode/
+reddit/
 
 # Config files
 .prettierrc
 tsconfig*.json
 Dockerfile
 .gitignore
+.npmignore
 
 # Development files
 node_modules/
 package-lock.json
+yarn.lock
 .git/
-tsconfig.tsbuildinfo 
+*.tsbuildinfo
+
+# Testing
+coverage/
+__tests__/
+*.test.ts
+*.spec.ts
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# Environment files
+.env*
+.env
+.env.local
+.env.*.local 
