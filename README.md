@@ -53,7 +53,7 @@
 - Intelligent handling of alternative titles and custom titles
 - Support for original titles, custom titles and metadata alternatives
 - Partial matching for related title variants
-- Custom title addition via custom-titles.json file (self-hosted version)
+- Custom title addition via custom-titles.json file
 
 > [!NOTE]  
 > To add custom titles to the public instance, please create a new issue with your suggestions.
