@@ -6,6 +6,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { readFileSync } from 'fs';
 
+// Import the custom titles JSON directly
+import customTitlesJson from '../../../custom-titles.json';
+
 export function isBadVideo(file: FileData) {
   const duration = file['14'] ?? '';
 
@@ -247,67 +250,16 @@ export function extractDigits(value: string) {
 }
 
 /**
- * Default custom titles that will be available even when file loading fails (for Cloudflare Workers)
- */
-let customTitles: Record<string, string[]> = {
-  'Rain or Shine': ['Just between Lovers'],
-  'Mufasa: The Lion King': ['Mufasa: Der Koenig der Loewen'],
-  'The Lion King': ['Der König der Löwen', 'Der Koenig der Loewen'],
-  'Avengers: Endgame': ['Avengers: Endspiel'],
-  'Avengers: Infinity War': ['Avengers: Infinity Krieg'],
-  'Star Wars': ['Krieg der Sterne'],
-  'The Godfather': ['Der Pate'],
-  'The Dark Knight': ['Der dunkle Ritter'],
-  'Pulp Fiction': ['Pulp Fiction'],
-  'Fight Club': ['Fight Club', 'Kampfklub'],
-  'Forrest Gump': ['Forrest Gump'],
-  Inception: ['Inception', 'Anfang'],
-  'The Matrix': ['Die Matrix', 'Matrix'],
-  'The Lord of the Rings': ['Der Herr der Ringe'],
-  'The Shawshank Redemption': ['Die Verurteilten'],
-  "Schindler's List": ['Schindlers Liste'],
-  'Pirates of the Caribbean': ['Fluch der Karibik'],
-  'The Hunger Games': ['Die Tribute von Panem'],
-  'Fast and Furious': ['Fast & Furious', 'The Fast and the Furious'],
-  'The Avengers': ["Marvel's The Avengers", 'Die Rächer'],
-  'Finding Nemo': ['Findet Nemo'],
-  'Inside Out': ['Alles steht Kopf'],
-  Frozen: ['Die Eiskönigin'],
-  Moana: ['Vaiana'],
-  'Wreck-It Ralph': ['Ralph reichts'],
-  'The Super Mario Bros. Movie': ['Der Super Mario Bros. Film'],
-  'The Little Mermaid': ['Arielle, die Meerjungfrau'],
-  'Fast X': ['Fast & Furious 10', 'Fast X'],
-  'Avatar: The Way of Water': ['Avatar: Der Weg des Wassers'],
-  'Walking Dead': ['The Walking Dead'],
-  'Money Heist': ['Haus des Geldes', 'La Casa de Papel'],
-  'House of the Dragon': ['House of the Dragon', 'Haus des Drachen'],
-  'The Mandalorian': ['The Mandalorian', 'Der Mandalorianer'],
-  Wednesday: ['Wednesday', 'Addams Family: Wednesday'],
-  'Help! My House Is Haunted': ['Help My House Is Haunted'],
-};
-
-/**
- * Load additional custom titles from a JSON file if available
  * @param filePath Path to the JSON file containing custom titles
- * @returns Custom titles from the file or the default custom titles if file not found
+ * @returns Custom titles from the file or the imported custom titles if file not found
  */
 export function loadCustomTitles(filePath: string): Record<string, string[]> {
-  // Check if we're in an environment without filesystem access (like Cloudflare Workers)
   try {
-    if (
-      typeof process === 'undefined' ||
-      typeof fs === 'undefined' ||
-      typeof __dirname === 'undefined' ||
-      !fs.existsSync
-    ) {
-      logger.info(
-        'Running in environment without filesystem access, using built-in custom titles only'
-      );
-      return customTitles; // Return the built-in custom titles
-    }
+    // Always have imported JSON available
+    logger.info('Using imported custom-titles.json as base');
 
-    if (filePath && fs.existsSync(filePath)) {
+    // If we have a valid file path and filesystem access, try to read the file
+    if (filePath && fs.existsSync && fs.existsSync(filePath)) {
       logger.info(`Loading custom titles from file: ${filePath}`);
       const fileContent = fs.readFileSync(filePath, 'utf-8');
       logger.info(`File content size: ${fileContent.length} bytes`);
@@ -329,7 +281,7 @@ export function loadCustomTitles(filePath: string): Record<string, string[]> {
 
         // Merge with built-in custom titles (file custom titles take precedence)
         return {
-          ...customTitles,
+          ...customTitlesJson,
           ...titlesFromFile,
         };
       } catch (parseError) {
@@ -339,176 +291,30 @@ export function loadCustomTitles(filePath: string): Record<string, string[]> {
         );
       }
     } else if (filePath) {
-      logger.info(`File does not exist: ${filePath}`);
+      logger.info(
+        `File does not exist or filesystem access unavailable: ${filePath}`
+      );
     }
   } catch (error) {
     logger.info(`Error loading custom titles: ${error}`);
   }
 
-  logger.info('Using built-in custom titles as fallback');
-  return customTitles; // Return built-in custom titles as fallback
-}
-
-/**
- * Parses custom title from a configuration string
- * @param customTitlesStr String from the configuration (JSON format preferred)
- * @returns Record of original titles to arrays of alternative titles
- */
-export function parseCustomTitles(
-  customTitlesStr: string | any
-): Record<string, string[]> {
-  // Handle empty/null input
-  if (!customTitlesStr) {
-    return {};
-  }
-
-  // If already an object, process it directly
-  if (typeof customTitlesStr === 'object' && !Array.isArray(customTitlesStr)) {
-    const result: Record<string, string[]> = {};
-
-    try {
-      // Validate the object structure
-      for (const [key, value] of Object.entries(customTitlesStr)) {
-        if (typeof key === 'string') {
-          let valueArray: string[] = [];
-
-          // Handle string value
-          if (typeof value === 'string') {
-            valueArray = [value.trim()];
-          }
-          // Handle array value
-          else if (Array.isArray(value)) {
-            valueArray = (value as any[])
-              .filter((item) => typeof item === 'string')
-              .map((item) => item.trim())
-              .filter((item) => item !== '');
-          }
-
-          if (valueArray.length > 0) {
-            result[key.trim()] = valueArray;
-          }
-        }
-      }
-
-      return result;
-    } catch (objError) {
-      logger.error('Error processing object custom titles:', objError);
-    }
-  }
-
-  // Convert to string if needed
-  if (typeof customTitlesStr !== 'string') {
-    try {
-      customTitlesStr = String(customTitlesStr);
-    } catch (strError) {
-      return {};
-    }
-  }
-
-  // Trim input
-  const trimmedInput = customTitlesStr.trim();
-
-  if (trimmedInput === '') {
-    return {};
-  }
-
-  const result: Record<string, string[]> = {};
-  try {
-    // Try to parse as JSON first (preferred)
-    if (trimmedInput.startsWith('{') && trimmedInput.endsWith('}')) {
-      try {
-        const parsed = JSON.parse(trimmedInput);
-
-        // Validate the parsed object and its structure
-        for (const [key, value] of Object.entries(parsed)) {
-          if (typeof key === 'string') {
-            let valueArray: string[] = [];
-
-            // Handle string value
-            if (typeof value === 'string') {
-              valueArray = [value.trim()];
-            }
-            // Handle array value
-            else if (Array.isArray(value)) {
-              valueArray = (value as any[])
-                .filter((item) => typeof item === 'string')
-                .map((item) => item.trim())
-                .filter((item) => item !== '');
-            }
-
-            if (valueArray.length > 0) {
-              result[key.trim()] = valueArray;
-            }
-          }
-        }
-
-        return result;
-      } catch (jsonError) {
-        // Fall through to legacy string parsing
-      }
-    }
-
-    // Legacy string format parsing (backward compatibility)
-    // Format: "Original Title:Alternative Title 1,Alternative Title 2;Another Original:Alternative"
-    const pairs = trimmedInput.split(';');
-
-    for (const pair of pairs) {
-      // Each pair should be in format "Original:Alternative1,Alternative2"
-      const [original, alternativesStr] = pair.split(':');
-
-      if (!original || !alternativesStr) {
-        continue;
-      }
-
-      const originalTitle = original.trim();
-      const alternatives = alternativesStr
-        .split(',')
-        .map((alt: string) => alt.trim())
-        .filter((alt: string) => alt !== '');
-
-      if (originalTitle && alternatives.length > 0) {
-        result[originalTitle] = alternatives;
-      }
-    }
-  } catch (error) {
-    logger.error('Error parsing custom titles:', error);
-  }
-
-  return result;
-}
-
-/**
- * Gets combined custom titles from custom string and existing custom titles
- * @param customTitlesStr String from the configuration
- * @param existingCustomTitles Existing custom titles to combine with
- * @returns Combined record of original titles to arrays of alternative titles
- */
-export function getCombinedCustomTitles(
-  customTitlesStr: string,
-  existingCustomTitles: Record<string, string[]> = {}
-): Record<string, string[]> {
-  const customTitles = parseCustomTitles(customTitlesStr);
-
-  // Combine existing custom titles with custom ones
-  // Custom titles from config take precedence if there's a conflict
-  return {
-    ...existingCustomTitles,
-    ...customTitles,
-  };
+  logger.info('Using imported custom-titles.json');
+  return customTitlesJson;
 }
 
 /**
  * Gets potential alternative titles based on the original title
  * @param title The original title
- * @param customTitlesStr Optional string with custom title from configuration
+ * @param customTitlesInput Optional custom titles object
  * @returns Array of potential alternative titles including the original one
  */
 export function getAlternativeTitles(
   title: string,
-  customTitlesStr?: string
+  customTitlesInput?: Record<string, string[]>
 ): string[] {
-  // Use custom titles or empty object if not provided
-  const combined = customTitlesStr ? parseCustomTitles(customTitlesStr) : {};
+  // Use provided custom titles or empty object if not provided
+  const combined = customTitlesInput || {};
 
   // If no custom titles available, just return the original title
   if (Object.keys(combined).length === 0) {
@@ -620,44 +426,6 @@ export function getVersion(): string {
   } catch (error) {
     return 'unknown-version';
   }
-  // try {
-  //   // Check if we're in a Node.js environment
-  //   if (
-  //     typeof process !== 'undefined' &&
-  //     typeof fs !== 'undefined' &&
-  //     fs.readFileSync
-  //   ) {
-  //     let packageJson: { version: string };
-
-  //     // Try to read from current working directory
-  //     try {
-  //       packageJson = JSON.parse(
-  //         fs.readFileSync(path.join(process.cwd(), 'package.json'), 'utf-8')
-  //       );
-  //       return packageJson.version;
-  //     } catch (error) {
-  //       // Fallback to parent directory for monorepo setups
-  //       try {
-  //         packageJson = JSON.parse(
-  //           fs.readFileSync(
-  //             path.join(process.cwd(), '..', 'package.json'),
-  //             'utf-8'
-  //           )
-  //         );
-  //         return packageJson.version;
-  //       } catch (parentError) {
-  //         // Continue to fallback
-  //       }
-  //     }
-  //   }
-
-  //   // In Cloudflare Worker or similar environments, or if file read fails
-  //   // Use a valid semver string instead of "unknown-version"
-  //   return 'unknown-version';
-  // } catch (error) {
-  //   // Return a valid semver version string if any error occurs
-  //   return 'unknown-version';
-  // }
 }
 
 /**
