@@ -103,12 +103,14 @@
   - Windows 5.x (beta)
   - Linux
   - Web (Browser)
+  - Android Mobile (beta)
 
 #### ⚠️ **Should Work (Untested):**
 
 - Stremio:
   - macOS
   - Android TV
+  - Android Mobile (stable)
   - Steam Deck
   - Raspberry Pi
   - Sony TV
@@ -119,7 +121,6 @@
 - Stremio:
   - webOS (confirmed not working)
   - iOS
-  - Android Mobile (confirmed not working)
   - Samsung TV
 
 > [!NOTE]  
