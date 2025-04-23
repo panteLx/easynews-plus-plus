@@ -311,10 +311,10 @@ export function loadCustomTitles(filePath: string): Record<string, string[]> {
  */
 export function getAlternativeTitles(
   title: string,
-  customTitlesInput?: Record<string, string[]>
+  customTitlesInput: Record<string, string[]> = customTitlesJson
 ): string[] {
-  // Use provided custom titles or empty object if not provided
-  const combined = customTitlesInput || {};
+  // Use the provided (or default) object
+  const combined = customTitlesInput;
 
   // If no custom titles available, just return the original title
   if (Object.keys(combined).length === 0) {
