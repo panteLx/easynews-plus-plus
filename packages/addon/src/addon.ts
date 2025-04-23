@@ -19,7 +19,6 @@ import {
   LogLevel,
   logError,
   matchesTitle,
-  parseCustomTitles,
   getAlternativeTitles,
 } from './utils';
 import {
@@ -37,12 +36,12 @@ import {
 import { Stream } from './types';
 import * as path from 'path';
 import * as fs from 'fs';
+import customTitlesJson from '../../../custom-titles.json';
 
 // Extended configuration interface
 interface AddonConfig {
   username: string;
   password: string;
-  customTitles?: string;
   strictTitleMatching?: string;
   preferredLanguage?: string;
   sortingPreference?: string;
@@ -82,92 +81,37 @@ function setCache<T>(key: string, data: T): void {
   requestCache.set(key, { data, timestamp: Date.now() });
 }
 
-// Try multiple possible locations for the file
+// Load custom titles
 let titlesFromFile: Record<string, string[]> = {};
-let loadedPath: string | null = null;
-
-// Start with the built-in custom titles by calling loadCustomTitles with a non-existent path
-// This will return the default built-in custom titles
-titlesFromFile = loadCustomTitles('');
+let loadedPath = '';
 
 try {
-  // Check if we're in a Cloudflare Worker environment
-  if (
-    typeof process === 'undefined' ||
-    typeof fs === 'undefined' ||
-    typeof __dirname === 'undefined' ||
-    !fs.existsSync
-  ) {
-    logger.info(
-      'Running in Cloudflare Worker environment, using built-in custom titles only'
-    );
-  } else {
-    // Only try filesystem paths if we're in a Node.js environment
-    const possiblePaths = [
-      // In the same directory as the running code
-      path.join(__dirname, 'custom-titles.json'),
-      // One level up (addon root directory)
-      path.join(__dirname, '..', 'custom-titles.json'),
-      // Two levels up (packages directory)
-      path.join(__dirname, '..', '..', 'custom-titles.json'),
-      // Three levels up (project root)
-      path.join(__dirname, '..', '..', '..', 'custom-titles.json'),
-      // In current working directory
-      path.join(process.cwd(), 'custom-titles.json'),
-      // In addon subdirectory of current working directory
-      path.join(process.cwd(), 'addon', 'custom-titles.json'),
-      // In dist subdirectory of current working directory
-      path.join(process.cwd(), 'dist', 'custom-titles.json'),
-    ];
+  // Always use the imported JSON by default
+  logger.info('Loading custom titles from imported custom-titles.json');
+  titlesFromFile = customTitlesJson;
+  loadedPath = 'imported';
 
-    // Try each path until we find the file
-    for (const filePath of possiblePaths) {
-      try {
-        if (fs.existsSync(filePath)) {
-          logger.info(`Found custom-titles.json at: ${filePath}`);
-          titlesFromFile = loadCustomTitles(filePath);
-          loadedPath = filePath;
+  // Log some details about the loaded custom titles
+  const numCustomTitles = Object.keys(titlesFromFile).length;
+  logger.info(`Successfully loaded ${numCustomTitles} custom titles`);
 
-          // Log some details about the loaded custom titles
-          const numCustomTitles = Object.keys(titlesFromFile).length;
-          logger.info(`Successfully loaded ${numCustomTitles} custom titles`);
-
-          if (numCustomTitles > 0) {
-            // Log a few examples to verify they're loaded correctly
-            const examples = Object.entries(titlesFromFile).slice(0, 3);
-            for (const [original, customTitles] of examples) {
-              logger.info(
-                `Example custom title: "${original}" -> "${customTitles.join('", "')}"`
-              );
-            }
-          } else {
-            logger.info(
-              'No custom titles were loaded from the file. The file might be empty or have invalid format.'
-            );
-          }
-          break;
-        }
-      } catch (error) {
-        logger.info(`Error checking path ${filePath}: ${error}`);
-      }
-    }
-
-    if (!loadedPath) {
+  if (numCustomTitles > 0) {
+    // Log a few examples to verify they're loaded correctly
+    const examples = Object.entries(titlesFromFile).slice(0, 3);
+    for (const [original, customTitles] of examples) {
       logger.info(
-        `Could not find custom-titles.json file. Using built-in custom titles only. Built-in custom titles count: ${Object.keys(titlesFromFile).length}`
+        `Example custom title: "${original}" -> "${customTitles.join('", "')}"`
       );
-      logger.info('Some examples of built-in custom titles:');
-      const examples = Object.entries(titlesFromFile).slice(0, 5);
-      for (const [original, customTitles] of examples) {
-        logger.info(`  "${original}" -> "${customTitles.join('", "')}"`);
-      }
-    } else {
-      logger.info(`Using custom titles from: ${loadedPath}`);
     }
+  } else {
+    logger.info(
+      'No custom titles were loaded from the file. The file might be empty or have invalid format.'
+    );
   }
 } catch (error) {
   logger.error('Error loading custom titles file:', error);
-  logger.info('Using built-in custom titles as fallback');
+  logger.info('Using imported custom titles as fallback');
+  titlesFromFile = customTitlesJson;
 }
 
 // Import custom template for landing page
@@ -320,7 +264,6 @@ builder.defineStreamHandler(
     const {
       username,
       password,
-      customTitles,
       strictTitleMatching,
       preferredLanguage,
       sortingPreference,
@@ -367,31 +310,12 @@ builder.defineStreamHandler(
         `Preferred language: ${preferredLang ? preferredLang : 'No preference'}`
       );
 
-      // Combine config-provided custom titles with titles from file
-      let customTitles = { ...titlesFromFile };
+      // Use custom titles from custom-titles.json
+      const customTitles = { ...titlesFromFile };
 
       logger.info(
-        `Using ${Object.keys(customTitles).length} custom titles (${Object.keys(titlesFromFile).length} from built-in/file + additional from config)`
+        `Using ${Object.keys(customTitles).length} custom titles from custom-titles.json`
       );
-
-      // Add any custom titles from configuration
-      if (customTitles) {
-        logger.info(`Additional custom titles provided in configuration`);
-        const customTitlesObj = parseCustomTitles(customTitles);
-        const customCount = Object.keys(customTitlesObj).length;
-        logger.info(`Parsed ${customCount} custom titles from configuration`);
-
-        if (customCount > 0) {
-          // Merge custom titles take precedence
-          customTitles = {
-            ...titlesFromFile,
-            ...customTitlesObj,
-          };
-          logger.info(
-            `Combined custom titles count: ${Object.keys(customTitles).length}`
-          );
-        }
-      }
 
       // For troubleshooting:
       logger.info(`Sorting preference from config: ${sortingPreference}`);
@@ -475,10 +399,6 @@ builder.defineStreamHandler(
 
       const api = new EasynewsAPI({ username, password });
 
-      // Use alternativeNames from metadata if available, or generate them
-      // Convert custom titles to JSON string for getAlternativeTitles
-      const titlesJson = JSON.stringify(customTitles);
-
       logger.info(`Getting alternative titles for: ${meta.name}`);
 
       // Initialize with the original title
@@ -507,7 +427,7 @@ builder.defineStreamHandler(
       // Use getAlternativeTitles to find additional matches (like partial matches)
       const additionalTitles = getAlternativeTitles(
         meta.name,
-        titlesJson
+        customTitles
       ).filter((alt) => !allTitles.includes(alt) && alt !== meta.name);
 
       if (additionalTitles.length > 0) {

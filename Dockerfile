@@ -39,6 +39,9 @@ COPY --from=builder /build/packages/api/package.*json ./packages/api/
 COPY --from=builder /build/packages/addon/dist ./packages/addon/dist
 COPY --from=builder /build/packages/api/dist ./packages/api/dist
 
+# Copy the custom-titles.json file.
+COPY --from=builder /build/custom-titles.json ./custom-titles.json
+
 COPY --from=builder /build/node_modules ./node_modules
 
 EXPOSE 1337
