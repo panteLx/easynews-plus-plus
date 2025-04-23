@@ -1,3 +1,18 @@
+## [2.2.0](https://github.com/panteLx/easynews-plus-plus/compare/v2.1.1...v2.2.0) (2025-04-23)
+
+### Features
+
+* Add Bulgarian language support ([d4dbc9d](https://github.com/panteLx/easynews-plus-plus/commit/d4dbc9db1a5e80d05ed1a639ae3f81ef7f153f32))
+* Add Bulgarian language support ([8a467dc](https://github.com/panteLx/easynews-plus-plus/commit/8a467dcd1711ef5524fff3c4eab66aad20d12999))
+* Add Bulgarian language support ([ebe0968](https://github.com/panteLx/easynews-plus-plus/commit/ebe0968b24789d9debb231a19c492d9f275601c5))
+
+### Bug Fixes
+
+* Bulgarian language support to custom template and manifest ([7ce52c3](https://github.com/panteLx/easynews-plus-plus/commit/7ce52c3f7c3ae9e6b41b5bf14cc032f5ebe53935))
+
+### Reverts
+
+* Revert "-" ([cb2ee50](https://github.com/panteLx/easynews-plus-plus/commit/cb2ee50531949bacf0910fcf2f375dd883d3b32b))
 ## [2.1.1](https://github.com/panteLx/easynews-plus-plus/compare/v2.1.0...v2.1.1) (2025-04-22)
 
 ### Bug Fixes
