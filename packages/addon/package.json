@@ -8,7 +8,7 @@
     "build": "tsc",
     "prepublish": "npm run build",
     "start": "node dist/server.js",
-    "start:dev": "cross-env NODE_ENV=dev tsx watch src/server.ts"
+    "start:dev": "tsx watch src/server.ts"
   },
   "description": "Addon package for Easynews++",
   "devDependencies": {
