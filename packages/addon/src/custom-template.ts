@@ -1,10 +1,5 @@
 import { Manifest } from 'stremio-addon-sdk';
-import {
-  TranslationKeys,
-  getTranslations,
-  getUILanguage,
-  ISO_TO_LANGUAGE,
-} from './i18n';
+import { TranslationKeys, getTranslations, getUILanguage, ISO_TO_LANGUAGE } from './i18n';
 
 function landingTemplate(manifest: Manifest): string {
   const configurationFields = manifest.config || [];
@@ -13,22 +8,15 @@ function landingTemplate(manifest: Manifest): string {
     : '';
 
   // Find UI language field to determine which language to use
-  const uiLanguageField = configurationFields.find(
-    (field: any) => field.key === 'uiLanguage'
-  );
+  const uiLanguageField = configurationFields.find((field: any) => field.key === 'uiLanguage');
   const defaultUILanguage = uiLanguageField?.default || 'eng';
 
   // Get translations based on the default UI language
   const translations = getTranslations(defaultUILanguage);
 
   // For debugging
-  console.log(
-    `Using UI language: ${defaultUILanguage}, translations found: ${!!translations}`
-  );
-  console.log(
-    `Translations loaded:`,
-    JSON.stringify(translations).substring(0, 200) + '...'
-  );
+  console.log(`Using UI language: ${defaultUILanguage}, translations found: ${!!translations}`);
+  console.log(`Translations loaded:`, JSON.stringify(translations).substring(0, 200) + '...');
 
   // Add a timestamp parameter to prevent caching
   const cacheBreaker = Date.now();
@@ -42,116 +30,62 @@ function landingTemplate(manifest: Manifest): string {
       return { ...field, title: translations.form.username };
     } else if (field.key === 'password' && translations.form.password) {
       return { ...field, title: translations.form.password };
-    } else if (
-      field.key === 'strictTitleMatching' &&
-      translations.form.strictTitleMatching
-    ) {
+    } else if (field.key === 'strictTitleMatching' && translations.form.strictTitleMatching) {
       return { ...field, title: translations.form.strictTitleMatching };
-    } else if (
-      field.key === 'preferredLanguage' &&
-      translations.form.preferredLanguage
-    ) {
+    } else if (field.key === 'preferredLanguage' && translations.form.preferredLanguage) {
       // For language selection field, translate both title and options
       const translatedOptions: Record<string, string> = {};
       if (field.options) {
         // Safely access options and translations
-        if (
-          field.options[''] !== undefined &&
-          translations.languages?.noPreference
-        ) {
+        if (field.options[''] !== undefined && translations.languages?.noPreference) {
           translatedOptions[''] = translations.languages.noPreference;
         }
-        if (
-          field.options['eng'] !== undefined &&
-          translations.languages?.english
-        ) {
+        if (field.options['eng'] !== undefined && translations.languages?.english) {
           translatedOptions['eng'] = translations.languages.english;
         }
-        if (
-          field.options['ger'] !== undefined &&
-          translations.languages?.german
-        ) {
+        if (field.options['ger'] !== undefined && translations.languages?.german) {
           translatedOptions['ger'] = translations.languages.german;
         }
-        if (
-          field.options['spa'] !== undefined &&
-          translations.languages?.spanish
-        ) {
+        if (field.options['spa'] !== undefined && translations.languages?.spanish) {
           translatedOptions['spa'] = translations.languages.spanish;
         }
-        if (
-          field.options['fre'] !== undefined &&
-          translations.languages?.french
-        ) {
+        if (field.options['fre'] !== undefined && translations.languages?.french) {
           translatedOptions['fre'] = translations.languages.french;
         }
-        if (
-          field.options['ita'] !== undefined &&
-          translations.languages?.italian
-        ) {
+        if (field.options['ita'] !== undefined && translations.languages?.italian) {
           translatedOptions['ita'] = translations.languages.italian;
         }
-        if (
-          field.options['jpn'] !== undefined &&
-          translations.languages?.japanese
-        ) {
+        if (field.options['jpn'] !== undefined && translations.languages?.japanese) {
           translatedOptions['jpn'] = translations.languages.japanese;
         }
-        if (
-          field.options['por'] !== undefined &&
-          translations.languages?.portuguese
-        ) {
+        if (field.options['por'] !== undefined && translations.languages?.portuguese) {
           translatedOptions['por'] = translations.languages.portuguese;
         }
-        if (
-          field.options['rus'] !== undefined &&
-          translations.languages?.russian
-        ) {
+        if (field.options['rus'] !== undefined && translations.languages?.russian) {
           translatedOptions['rus'] = translations.languages.russian;
         }
-        if (
-          field.options['kor'] !== undefined &&
-          translations.languages?.korean
-        ) {
+        if (field.options['kor'] !== undefined && translations.languages?.korean) {
           translatedOptions['kor'] = translations.languages.korean;
         }
-        if (
-          field.options['chi'] !== undefined &&
-          translations.languages?.chinese
-        ) {
+        if (field.options['chi'] !== undefined && translations.languages?.chinese) {
           translatedOptions['chi'] = translations.languages.chinese;
         }
-        if (
-          field.options['dut'] !== undefined &&
-          translations.languages?.dutch
-        ) {
+        if (field.options['dut'] !== undefined && translations.languages?.dutch) {
           translatedOptions['dut'] = translations.languages.dutch;
         }
-        if (
-          field.options['rum'] !== undefined &&
-          translations.languages?.romanian
-        ) {
+        if (field.options['rum'] !== undefined && translations.languages?.romanian) {
           translatedOptions['rum'] = translations.languages.romanian;
         }
-        if (
-          field.options['bul'] !== undefined &&
-          translations.languages?.bulgarian
-        ) {
+        if (field.options['bul'] !== undefined && translations.languages?.bulgarian) {
           translatedOptions['bul'] = translations.languages.bulgarian;
         }
       }
       return {
         ...field,
         title: translations.form.preferredLanguage,
-        options:
-          Object.keys(translatedOptions).length > 0
-            ? translatedOptions
-            : field.options,
+        options: Object.keys(translatedOptions).length > 0 ? translatedOptions : field.options,
       };
-    } else if (
-      field.key === 'sortingPreference' &&
-      translations.form.sortingMethod
-    ) {
+    } else if (field.key === 'sortingPreference' && translations.form.sortingMethod) {
       // For sorting preference field, translate both title and options
       const translatedOptions: Record<string, string> = {};
       if (field.options) {
@@ -159,45 +93,31 @@ function landingTemplate(manifest: Manifest): string {
           field.options['quality_first'] !== undefined &&
           translations.sortingOptions?.qualityFirst
         ) {
-          translatedOptions['quality_first'] =
-            translations.sortingOptions.qualityFirst;
+          translatedOptions['quality_first'] = translations.sortingOptions.qualityFirst;
         }
         if (
           field.options['language_first'] !== undefined &&
           translations.sortingOptions?.languageFirst
         ) {
-          translatedOptions['language_first'] =
-            translations.sortingOptions.languageFirst;
+          translatedOptions['language_first'] = translations.sortingOptions.languageFirst;
         }
-        if (
-          field.options['size_first'] !== undefined &&
-          translations.sortingOptions?.sizeFirst
-        ) {
-          translatedOptions['size_first'] =
-            translations.sortingOptions.sizeFirst;
+        if (field.options['size_first'] !== undefined && translations.sortingOptions?.sizeFirst) {
+          translatedOptions['size_first'] = translations.sortingOptions.sizeFirst;
         }
-        if (
-          field.options['date_first'] !== undefined &&
-          translations.sortingOptions?.dateFirst
-        ) {
-          translatedOptions['date_first'] =
-            translations.sortingOptions.dateFirst;
+        if (field.options['date_first'] !== undefined && translations.sortingOptions?.dateFirst) {
+          translatedOptions['date_first'] = translations.sortingOptions.dateFirst;
         }
         if (
           field.options['relevance_first'] !== undefined &&
           translations.sortingOptions?.relevanceFirst
         ) {
-          translatedOptions['relevance_first'] =
-            translations.sortingOptions.relevanceFirst;
+          translatedOptions['relevance_first'] = translations.sortingOptions.relevanceFirst;
         }
       }
       return {
         ...field,
         title: translations.form.sortingMethod,
-        options:
-          Object.keys(translatedOptions).length > 0
-            ? translatedOptions
-            : field.options,
+        options: Object.keys(translatedOptions).length > 0 ? translatedOptions : field.options,
       };
     } else if (field.key === 'uiLanguage' && translations.form.uiLanguage) {
       // For UI language selection field, just translate the title

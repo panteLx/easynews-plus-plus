@@ -24,9 +24,7 @@ declare module 'stremio-addon-sdk/src/builder' {
   export default class addonBuilder {
     constructor(manifest: Manifest);
 
-    defineCatalogHandler(
-      handler: (args: Args) => Promise<{ metas: MetaPreview[] } & Cache>
-    ): void;
+    defineCatalogHandler(handler: (args: Args) => Promise<{ metas: MetaPreview[] } & Cache>): void;
 
     defineMetaHandler(
       handler: (args: {

@@ -25,7 +25,7 @@ export enum SortOption {
 
 export type SortOptionKey = keyof typeof SortOption;
 
-export const humanReadableSortOptions = Object.keys(SortOption).map((value) =>
+export const humanReadableSortOptions = Object.keys(SortOption).map(value =>
   toHumanReadable(value as SortOptionKey)
 );
 
@@ -39,10 +39,7 @@ export function toHumanReadable(value: SortOptionKey): string {
     TPN: 'TPN',
   };
 
-  return (
-    mapComplexStrings[value] ??
-    capitalizeFirstLetter(value.split(/(?=[A-Z])/).join(' '))
-  );
+  return mapComplexStrings[value] ?? capitalizeFirstLetter(value.split(/(?=[A-Z])/).join(' '));
 }
 
 export function fromHumanReadable(
@@ -50,15 +47,11 @@ export function fromHumanReadable(
 ): SortOption | undefined {
   if (!value) return undefined;
 
-  const key = Object.keys(SortOption).find(
-    (key) => toHumanReadable(key as SortOptionKey) === value
-  );
+  const key = Object.keys(SortOption).find(key => toHumanReadable(key as SortOptionKey) === value);
 
   return SortOption[key as SortOptionKey];
 }
 
-export function toDirection(
-  value?: DirectionKey | string
-): '+' | '-' | undefined {
+export function toDirection(value?: DirectionKey | string): '+' | '-' | undefined {
   return value ? (value === 'Ascending' ? '+' : '-') : undefined;
 }

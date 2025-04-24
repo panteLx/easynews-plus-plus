@@ -21,18 +21,9 @@ import {
   matchesTitle,
   getAlternativeTitles,
 } from './utils';
-import {
-  EasynewsAPI,
-  SearchOptions,
-  EasynewsSearchResponse,
-} from 'easynews-plus-plus-api';
+import { EasynewsAPI, SearchOptions, EasynewsSearchResponse } from 'easynews-plus-plus-api';
 import { publicMetaProvider } from './meta';
-import {
-  fromHumanReadable,
-  toDirection,
-  SortOption,
-  SortOptionKey,
-} from './sort-option';
+import { fromHumanReadable, toDirection, SortOption, SortOptionKey } from './sort-option';
 import { Stream } from './types';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -56,9 +47,7 @@ const builder = new addonBuilder(manifest);
 const prefix = `${catalog.id}:`;
 
 // Log addon initialization
-logger.info(
-  `Addon initializing - version: ${getVersion()}, log level: ${logger.getLevelName()}`
-);
+logger.info(`Addon initializing - version: ${getVersion()}, log level: ${logger.getLevelName()}`);
 
 // In-memory request cache to reduce API calls and improve response times
 const requestCache = new Map<string, { data: any; timestamp: number }>();
@@ -99,9 +88,7 @@ try {
     // Log a few examples to verify they're loaded correctly
     const examples = Object.entries(titlesFromFile).slice(0, 3);
     for (const [original, customTitles] of examples) {
-      logger.info(
-        `Example custom title: "${original}" -> "${customTitles.join('", "')}"`
-      );
+      logger.info(`Example custom title: "${original}" -> "${customTitles.join('", "')}"`);
     }
   } else {
     logger.info(
@@ -139,15 +126,7 @@ builder.defineCatalogHandler(async ({ extra: { search } }) => {
 });
 
 builder.defineMetaHandler(
-  async ({
-    id,
-    type,
-    config,
-  }: {
-    id: string;
-    type: ContentType;
-    config: AddonConfig;
-  }) => {
+  async ({ id, type, config }: { id: string; type: ContentType; config: AddonConfig }) => {
     const { username, password, logLevel } = config;
 
     // For language filtering in the catalog
@@ -252,15 +231,7 @@ builder.defineMetaHandler(
 );
 
 builder.defineStreamHandler(
-  async ({
-    id,
-    type,
-    config,
-  }: {
-    id: string;
-    type: ContentType;
-    config: AddonConfig;
-  }) => {
+  async ({ id, type, config }: { id: string; type: ContentType; config: AddonConfig }) => {
     const {
       username,
       password,
@@ -298,17 +269,12 @@ builder.defineStreamHandler(
       }
 
       // Parse strictTitleMatching option (checkbox returns string 'on' or undefined)
-      const useStrictMatching =
-        strictTitleMatching === 'on' || strictTitleMatching === 'true';
-      logger.info(
-        `Strict title matching: ${useStrictMatching ? 'enabled' : 'disabled'}`
-      );
+      const useStrictMatching = strictTitleMatching === 'on' || strictTitleMatching === 'true';
+      logger.info(`Strict title matching: ${useStrictMatching ? 'enabled' : 'disabled'}`);
 
       // Get preferred language from configuration
       const preferredLang = preferredLanguage || '';
-      logger.info(
-        `Preferred language: ${preferredLang ? preferredLang : 'No preference'}`
-      );
+      logger.info(`Preferred language: ${preferredLang ? preferredLang : 'No preference'}`);
 
       // Use custom titles from custom-titles.json
       const customTitles = { ...titlesFromFile };
@@ -380,9 +346,7 @@ builder.defineStreamHandler(
           `Direct custom title found for "${meta.name}": "${customTitles[meta.name].join('", "')}"`
         );
       } else {
-        logger.info(
-          `No direct custom title found for "${meta.name}", checking partial matches`
-        );
+        logger.info(`No direct custom title found for "${meta.name}", checking partial matches`);
 
         // Look for partial matches in title keys
         for (const [key, values] of Object.entries(customTitles)) {
@@ -414,32 +378,23 @@ builder.defineStreamHandler(
 
       // Add any alternative names from meta (if available)
       if (meta.alternativeNames && meta.alternativeNames.length > 0) {
-        logger.info(
-          `Adding ${meta.alternativeNames.length} alternative names from metadata`
-        );
+        logger.info(`Adding ${meta.alternativeNames.length} alternative names from metadata`);
         // Filter out duplicates
-        const newAlternatives = meta.alternativeNames.filter(
-          (alt) => !allTitles.includes(alt)
-        );
+        const newAlternatives = meta.alternativeNames.filter(alt => !allTitles.includes(alt));
         allTitles = [...allTitles, ...newAlternatives];
       }
 
       // Use getAlternativeTitles to find additional matches (like partial matches)
-      const additionalTitles = getAlternativeTitles(
-        meta.name,
-        customTitles
-      ).filter((alt) => !allTitles.includes(alt) && alt !== meta.name);
+      const additionalTitles = getAlternativeTitles(meta.name, customTitles).filter(
+        alt => !allTitles.includes(alt) && alt !== meta.name
+      );
 
       if (additionalTitles.length > 0) {
-        logger.info(
-          `Adding ${additionalTitles.length} additional titles from partial matches`
-        );
+        logger.info(`Adding ${additionalTitles.length} additional titles from partial matches`);
         allTitles = [...allTitles, ...additionalTitles];
       }
 
-      logger.info(
-        `Will search for ${allTitles.length} titles: ${allTitles.join(', ')}`
-      );
+      logger.info(`Will search for ${allTitles.length} titles: ${allTitles.join(', ')}`);
 
       // Store all search results here
       const allSearchResults: {
@@ -473,9 +428,7 @@ builder.defineStreamHandler(
             const examples = res.data.slice(0, 2);
             for (const file of examples) {
               const title = getPostTitle(file);
-              logger.info(
-                `Example result: "${title}" (${file['4'] || 'unknown size'})`
-              );
+              logger.info(`Example result: "${title}" (${file['4'] || 'unknown size'})`);
             }
           }
         } catch (error) {
@@ -486,9 +439,7 @@ builder.defineStreamHandler(
 
       // If we get no or few results, try with year included for more specificity
       if (allSearchResults.length === 0 && meta.year !== undefined) {
-        logger.info(
-          `No results found without year, trying with year: ${meta.year}`
-        );
+        logger.info(`No results found without year, trying with year: ${meta.year}`);
 
         for (const titleVariant of allTitles) {
           // Skip empty titles
@@ -515,9 +466,7 @@ builder.defineStreamHandler(
               const examples = res.data.slice(0, 2);
               for (const file of examples) {
                 const title = getPostTitle(file);
-                logger.info(
-                  `Example result: "${title}" (${file['4'] || 'unknown size'})`
-                );
+                logger.info(`Example result: "${title}" (${file['4'] || 'unknown size'})`);
               }
             }
           } catch (error) {
@@ -570,26 +519,20 @@ builder.defineStreamHandler(
             }
 
             // Use strictTitleMatching setting if enabled for series
-            if (
-              !queries.some((q) => matchesTitle(title, q, useStrictMatching))
-            ) {
+            if (!queries.some(q => matchesTitle(title, q, useStrictMatching))) {
               continue;
             }
           }
 
           // For movies, check if title matches any of the query variants
           // Other content types are loosely matched
-          const matchesAnyVariant = allTitles.some((titleVariant) => {
+          const matchesAnyVariant = allTitles.some(titleVariant => {
             const variantQuery = buildSearchQuery(type, {
               ...meta,
               name: titleVariant,
             });
             // For movies, always use strictTitleMatching if enabled, otherwise default to movie behavior
-            return matchesTitle(
-              title,
-              variantQuery,
-              type === 'movie' || useStrictMatching
-            );
+            return matchesTitle(title, variantQuery, type === 'movie' || useStrictMatching);
           });
 
           if (!matchesAnyVariant) {
@@ -616,9 +559,7 @@ builder.defineStreamHandler(
 
       // Sort streams based on user preference
       if (sortingPreference === 'language_first' && preferredLang) {
-        logger.info(
-          `Applying language-first sorting for language: ${preferredLang}`
-        );
+        logger.info(`Applying language-first sorting for language: ${preferredLang}`);
 
         // Special handling for language-first sorting
         // First, separate streams by language
@@ -629,9 +570,7 @@ builder.defineStreamHandler(
         for (const stream of streams) {
           const file = (stream as any)._temp?.file;
           const hasPreferredLang =
-            file?.alangs &&
-            Array.isArray(file.alangs) &&
-            file.alangs.includes(preferredLang);
+            file?.alangs && Array.isArray(file.alangs) && file.alangs.includes(preferredLang);
 
           if (hasPreferredLang) {
             preferredLangStreams.push(stream);
@@ -654,11 +593,7 @@ builder.defineStreamHandler(
 
           // Get quality scores
           const getQualityScore = (quality: string): number => {
-            if (
-              quality?.includes('4K') ||
-              quality?.includes('2160p') ||
-              quality?.includes('UHD')
-            )
+            if (quality?.includes('4K') || quality?.includes('2160p') || quality?.includes('UHD'))
               return 4;
             if (quality?.includes('1080p')) return 3;
             if (quality?.includes('720p')) return 2;
@@ -710,10 +645,8 @@ builder.defineStreamHandler(
           // Extract stream data
           const aFile = (a as any)._temp?.file;
           const bFile = (b as any)._temp?.file;
-          const aHasPreferredLang =
-            preferredLang && aFile?.alangs?.includes(preferredLang);
-          const bHasPreferredLang =
-            preferredLang && bFile?.alangs?.includes(preferredLang);
+          const aHasPreferredLang = preferredLang && aFile?.alangs?.includes(preferredLang);
+          const bHasPreferredLang = preferredLang && bFile?.alangs?.includes(preferredLang);
 
           // Extract quality info
           const aDesc = a.description?.split('\n') || [];
@@ -723,11 +656,7 @@ builder.defineStreamHandler(
 
           // Get quality scores
           const getQualityScore = (quality: string): number => {
-            if (
-              quality?.includes('4K') ||
-              quality?.includes('2160p') ||
-              quality?.includes('UHD')
-            )
+            if (quality?.includes('4K') || quality?.includes('2160p') || quality?.includes('UHD'))
               return 4;
             if (quality?.includes('1080p')) return 3;
             if (quality?.includes('720p')) return 2;
@@ -876,9 +805,7 @@ function mapStream({
 
   // Log language information for debugging
   if (file.alangs) {
-    logger.info(
-      `Stream "${title}" has languages: ${JSON.stringify(file.alangs)}`
-    );
+    logger.info(`Stream "${title}" has languages: ${JSON.stringify(file.alangs)}`);
   } else {
     logger.info(`Stream "${title}" has no language information`);
   }
