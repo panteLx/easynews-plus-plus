@@ -1,0 +1,32 @@
+on:
+  push:
+    tags:
+      - 'v*'
+name: Test and Release
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '23.x'
+      - run: npm ci
+      - run: npm run test
+
+  git-release:
+    needs: [test]
+    name: Github Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install Node
+        uses: actions/setup-node@v4
+      - name: Release to Github
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx changelogithub
