@@ -21,10 +21,7 @@ describe('sanitizeTitle', () => {
   // See also: https://github.com/sleeyax/stremio-easynews-addon/issues/38#issuecomment-2467015435.
   it.each([
     ['Three Colors: Blue (1993)', 'three colors blue  1993'],
-    [
-      'Willy Wonka & the Chocolate Factory (1973)',
-      'willy wonka and the chocolate factory  1973',
-    ],
+    ['Willy Wonka & the Chocolate Factory (1973)', 'willy wonka and the chocolate factory  1973'],
     ["America's got talent", 'americas got talent'],
     ['WALL-E (2008)', 'wall e  2008'],
     ['WALL·E', 'walle'],

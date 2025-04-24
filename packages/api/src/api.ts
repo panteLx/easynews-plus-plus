@@ -5,17 +5,10 @@ export class EasynewsAPI {
   private readonly baseUrl = 'https://members.easynews.com';
   private readonly username: string;
   private readonly password: string;
-  private readonly cache = new Map<
-    string,
-    { data: EasynewsSearchResponse; timestamp: number }
-  >();
+  private readonly cache = new Map<string, { data: EasynewsSearchResponse; timestamp: number }>();
   private readonly cacheTTL = 1000 * 60 * 15; // 15 minutes
 
-  constructor(options: {
-    username: string;
-    password: string;
-    cacheTTL?: number;
-  }) {
+  constructor(options: { username: string; password: string; cacheTTL?: number }) {
     if (!options) {
       throw new Error('Missing options');
     }
@@ -139,9 +132,7 @@ export class EasynewsAPI {
     } catch (error) {
       if (error instanceof Error) {
         if (error.name === 'AbortError') {
-          throw new Error(
-            `Search request for '${query}' timed out after 20 seconds`
-          );
+          throw new Error(`Search request for '${query}' timed out after 20 seconds`);
         }
         throw error;
       }

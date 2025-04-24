@@ -134,9 +134,7 @@ export function getTranslations(langCode: string): TranslationKeys {
   const language = ISO_TO_LANGUAGE[langCode] || (langCode as Language);
 
   // Return translations if language is supported, otherwise fall back to English
-  return language in translations
-    ? translations[language]
-    : translations[DEFAULT_LANGUAGE];
+  return language in translations ? translations[language] : translations[DEFAULT_LANGUAGE];
 }
 
 /**
@@ -561,8 +559,7 @@ export const translations: Translations = {
     form: {
       username: '用户名',
       password: '密码',
-      strictTitleMatching:
-        '严格标题匹配（过滤掉与电影或剧集标题不完全匹配的结果）',
+      strictTitleMatching: '严格标题匹配（过滤掉与电影或剧集标题不完全匹配的结果）',
       preferredLanguage: '首选音频语言',
       sortingMethod: '排序方法',
       uiLanguage: 'UI 语言',
@@ -677,7 +674,7 @@ export const translations: Translations = {
       sizeFirst: 'Mărimea fișierului (cele mai mari înainte)',
       dateFirst: 'Data adăugării (cele mai recente înainte)',
       relevanceFirst: 'Relevantă (cele mai bune potriviri înainte)',
-    }
+    },
   },
   // Bulgarian
   bg: {

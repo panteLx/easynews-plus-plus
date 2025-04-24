@@ -1,22 +1,32 @@
+name: Test and Release on GitHub
+
 on:
   push:
     tags:
       - 'v*'
-name: Test and Release
+
 jobs:
   test:
+    strategy:
+      matrix:
+        node-version: [20.x, 21.x, 22.x, 23.x]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js
+
+      - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
-          node-version: '23.x'
-      - run: npm ci
-      - run: npm run test
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+      - name: Run tests
+        run: npm run test
 
   git-release:
-    needs: [test]
+    needs: test
     name: Github Release
     runs-on: ubuntu-latest
     steps:
@@ -28,6 +38,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '23.x'
+          cache: 'npm'
       - name: Release to Github
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

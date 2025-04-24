@@ -15,17 +15,12 @@ type ServerOptions = {
 };
 
 // Helper function to create a deep clone of the manifest with a specified language
-function createManifestWithLanguage(
-  addonInterface: AddonInterface,
-  lang: string
-) {
+function createManifestWithLanguage(addonInterface: AddonInterface, lang: string) {
   const manifest = JSON.parse(JSON.stringify(addonInterface.manifest)); // Deep clone
 
   // Find and update the uiLanguage field
   if (manifest.config) {
-    const uiLangFieldIndex = manifest.config.findIndex(
-      (field: any) => field.key === 'uiLanguage'
-    );
+    const uiLangFieldIndex = manifest.config.findIndex((field: any) => field.key === 'uiLanguage');
     if (uiLangFieldIndex >= 0 && lang) {
       console.log(`Setting language in manifest to: ${lang}`);
       manifest.config[uiLangFieldIndex].default = lang;
@@ -35,10 +30,7 @@ function createManifestWithLanguage(
   return manifest;
 }
 
-export function serveHTTP(
-  addonInterface: AddonInterface,
-  opts: ServerOptions = {}
-) {
+export function serveHTTP(addonInterface: AddonInterface, opts: ServerOptions = {}) {
   if (addonInterface.constructor.name !== 'AddonInterface') {
     throw new Error('first argument must be an instance of AddonInterface');
   }
@@ -79,10 +71,7 @@ export function serveHTTP(
   if (hasConfig)
     app.get('/configure', (req: Request, res: Response) => {
       // Set no-cache headers
-      res.setHeader(
-        'Cache-Control',
-        'no-store, no-cache, must-revalidate, proxy-revalidate'
-      );
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
       res.setHeader('Pragma', 'no-cache');
       res.setHeader('Expires', '0');
       res.setHeader('content-type', 'text/html');
@@ -112,8 +101,7 @@ export function serveHTTP(
     const location = path.join(process.cwd(), opts.static);
     try {
       const fs = require('fs');
-      if (!fs.existsSync(location))
-        throw new Error('directory to serve does not exist');
+      if (!fs.existsSync(location)) throw new Error('directory to serve does not exist');
       app.use(opts.static, express.static(location));
     } catch (e) {
       console.error('Error setting up static directory:', e);

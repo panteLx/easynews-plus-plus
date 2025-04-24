@@ -19,8 +19,6 @@
 
 **Self-Hosting:** [Check out the Self-Hosting Guide](#%EF%B8%8F-self-hosting-guide)
 
-**Changelog:** [View all changes](./CHANGELOG.md)
-
 **Support the Project:** [Buy Me A Coffee](https://buymeacoffee.com/pantel)
 
 ---

@@ -1,10 +1,7 @@
 import { Hono } from 'hono';
 import { getRouter } from 'hono-stremio';
 import { addonInterface, customTemplate } from 'easynews-plus-plus-addon';
-import {
-  getTranslations,
-  getUILanguage,
-} from 'easynews-plus-plus-addon/dist/i18n';
+import { getTranslations, getUILanguage } from 'easynews-plus-plus-addon/dist/i18n';
 
 // Create the router with the default HTML
 const defaultHTML = customTemplate(addonInterface.manifest);
@@ -18,9 +15,7 @@ function createManifestWithLanguage(lang: string) {
 
   // Find and update the uiLanguage field
   if (manifest.config) {
-    const uiLangFieldIndex = manifest.config.findIndex(
-      (field: any) => field.key === 'uiLanguage'
-    );
+    const uiLangFieldIndex = manifest.config.findIndex((field: any) => field.key === 'uiLanguage');
     if (uiLangFieldIndex >= 0 && lang) {
       console.log(`Setting language in manifest to: ${lang}`);
       manifest.config[uiLangFieldIndex].default = lang;
@@ -31,12 +26,9 @@ function createManifestWithLanguage(lang: string) {
 }
 
 // Add the configure route for direct access with language selection
-app.get('/configure', (c) => {
+app.get('/configure', c => {
   // Set no-cache headers
-  c.header(
-    'Cache-Control',
-    'no-store, no-cache, must-revalidate, proxy-revalidate'
-  );
+  c.header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
   c.header('Pragma', 'no-cache');
   c.header('Expires', '0');
 
@@ -65,7 +57,7 @@ app.get('/configure', (c) => {
 
 // If we have a config, add a redirect from the root to configure
 if ((addonInterface.manifest.config || []).length > 0) {
-  app.get('/', (c) => {
+  app.get('/', c => {
     // Pass any language parameter to the configure route
     const lang = c.req.query('lang') || '';
     const redirectUrl = lang ? `/configure?lang=${lang}` : '/configure';

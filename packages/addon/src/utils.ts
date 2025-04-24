@@ -101,8 +101,7 @@ export function matchesTitle(title: string, query: string, strict: boolean) {
         const queryYear = queryYearMatch[1];
         return (
           sanitizedParsedTitle.replace(queryYear, '').trim() ===
-            sanitizedQuery.replace(queryYear, '').trim() &&
-          year.toString() === queryYear
+            sanitizedQuery.replace(queryYear, '').trim() && year.toString() === queryYear
         );
       }
     }
@@ -128,7 +127,7 @@ export function matchesTitle(title: string, query: string, strict: boolean) {
 
   // Check that all words in the query appear in the title
   const queryWords = sanitizedQuery.split(/\s+/);
-  const allWordsMatch = queryWords.every((word) => {
+  const allWordsMatch = queryWords.every(word => {
     // Skip very short words (1-2 chars) to avoid false positives
     if (word.length <= 2) return true;
     return sanitizedTitle.includes(word);
@@ -139,13 +138,11 @@ export function matchesTitle(title: string, query: string, strict: boolean) {
   if (queryWords.length > 1 && !strict) {
     // Count matching words
     const matchingWords = queryWords.filter(
-      (word) => word.length > 2 && sanitizedTitle.includes(word)
+      word => word.length > 2 && sanitizedTitle.includes(word)
     ).length;
 
     // If more than 70% of significant words match, consider it a match
-    const significantWords = queryWords.filter(
-      (word) => word.length > 2
-    ).length;
+    const significantWords = queryWords.filter(word => word.length > 2).length;
     if (significantWords > 0) {
       const matchRatio = matchingWords / significantWords;
       return matchRatio >= 0.7;
@@ -156,11 +153,7 @@ export function matchesTitle(title: string, query: string, strict: boolean) {
 }
 
 export function createStreamUrl(
-  {
-    downURL,
-    dlFarm,
-    dlPort,
-  }: Pick<EasynewsSearchResponse, 'downURL' | 'dlFarm' | 'dlPort'>,
+  { downURL, dlFarm, dlPort }: Pick<EasynewsSearchResponse, 'downURL' | 'dlFarm' | 'dlPort'>,
   username: string,
   password: string
 ) {
@@ -196,10 +189,7 @@ export function getSize(file: FileData) {
 /**
  * Extract video quality information from the title or fallback resolution
  */
-export function getQuality(
-  title: string,
-  fallbackResolution?: string
-): string | undefined {
+export function getQuality(title: string, fallbackResolution?: string): string | undefined {
   const { resolution } = parseTorrentTitle(title);
 
   // Try to find quality indicators in the title if resolution not found
@@ -229,10 +219,7 @@ export function getQuality(
   return resolution ?? fallbackResolution;
 }
 
-export function createThumbnailUrl(
-  res: EasynewsSearchResponse,
-  file: FileData
-) {
+export function createThumbnailUrl(res: EasynewsSearchResponse, file: FileData) {
   const id = file['0'];
   const idChars = id.slice(0, 3);
   const thumbnailSlug = file['10'];
@@ -267,16 +254,12 @@ export function loadCustomTitles(filePath: string): Record<string, string[]> {
       // Try to parse the file content
       try {
         const titlesFromFile = JSON.parse(fileContent);
-        logger.info(
-          `Parsed ${Object.keys(titlesFromFile).length} custom titles from file`
-        );
+        logger.info(`Parsed ${Object.keys(titlesFromFile).length} custom titles from file`);
 
         // Log a sample of custom titles for debugging
         const sampleKeys = Object.keys(titlesFromFile).slice(0, 3);
         for (const key of sampleKeys) {
-          logger.info(
-            `Sample custom title: "${key}" -> ${JSON.stringify(titlesFromFile[key])}`
-          );
+          logger.info(`Sample custom title: "${key}" -> ${JSON.stringify(titlesFromFile[key])}`);
         }
 
         // Merge with built-in custom titles (file custom titles take precedence)
@@ -286,14 +269,10 @@ export function loadCustomTitles(filePath: string): Record<string, string[]> {
         };
       } catch (parseError) {
         logger.error(`Error parsing JSON in ${filePath}:`, parseError);
-        logger.error(
-          `First 100 characters of file: ${fileContent.substring(0, 100)}...`
-        );
+        logger.error(`First 100 characters of file: ${fileContent.substring(0, 100)}...`);
       }
     } else if (filePath) {
-      logger.info(
-        `File does not exist or filesystem access unavailable: ${filePath}`
-      );
+      logger.info(`File does not exist or filesystem access unavailable: ${filePath}`);
     }
   } catch (error) {
     logger.info(`Error loading custom titles: ${error}`);
@@ -348,10 +327,7 @@ export function getAlternativeTitles(
       foundMatch = true;
       // Title contains a known English title, add the custom equivalents
       for (const customTitle of customTitles) {
-        const customTitleReplaced = title.replace(
-          new RegExp(englishTitle, 'i'),
-          customTitle
-        );
+        const customTitleReplaced = title.replace(new RegExp(englishTitle, 'i'), customTitle);
         if (!alternatives.includes(customTitleReplaced)) {
           alternatives.push(customTitleReplaced);
         }
@@ -366,10 +342,7 @@ export function getAlternativeTitles(
       if (title.toLowerCase().includes(customTitle.toLowerCase())) {
         foundMatch = true;
         // Title contains a known custom title, add the English equivalent
-        const englishTitle1 = title.replace(
-          new RegExp(customTitle, 'i'),
-          englishTitle
-        );
+        const englishTitle1 = title.replace(new RegExp(customTitle, 'i'), englishTitle);
         if (!alternatives.includes(englishTitle1)) {
           alternatives.push(englishTitle1);
         }
@@ -379,9 +352,7 @@ export function getAlternativeTitles(
 
   // Log whether we found any matches
   if (foundMatch) {
-    logger.info(
-      `Found ${alternatives.length - 1} alternative titles for "${title}"`
-    );
+    logger.info(`Found ${alternatives.length - 1} alternative titles for "${title}"`);
   } else {
     logger.info(`No alternative titles found for "${title}"`);
   }
@@ -392,10 +363,7 @@ export function getAlternativeTitles(
 /**
  * Build a search query for different content types
  */
-export function buildSearchQuery(
-  type: ContentType,
-  meta: MetaProviderResponse
-) {
+export function buildSearchQuery(type: ContentType, meta: MetaProviderResponse) {
   let query = `${meta.name}`;
 
   if (type === 'series') {
@@ -465,11 +433,7 @@ export function parseLogLevel(level: string | undefined): LogLevel {
     default:
       // Try to parse as number
       const numLevel = parseInt(level, 10);
-      if (
-        !isNaN(numLevel) &&
-        numLevel >= LogLevel.NONE &&
-        numLevel <= LogLevel.TRACE
-      ) {
+      if (!isNaN(numLevel) && numLevel >= LogLevel.NONE && numLevel <= LogLevel.TRACE) {
         return numLevel;
       }
       return LogLevel.INFO;
@@ -566,10 +530,7 @@ export const logger = {
    */
   trace: (message: string, ...optionalParams: any[]) => {
     if (logger.level >= LogLevel.TRACE) {
-      console.debug(
-        `${logger.formatPrefix()} [TRACE] ${message}`,
-        ...optionalParams
-      );
+      console.debug(`${logger.formatPrefix()} [TRACE] ${message}`, ...optionalParams);
     }
   },
 
@@ -580,10 +541,7 @@ export const logger = {
    */
   debug: (message: string, ...optionalParams: any[]) => {
     if (logger.level >= LogLevel.DEBUG) {
-      console.debug(
-        `${logger.formatPrefix()} [DEBUG] ${message}`,
-        ...optionalParams
-      );
+      console.debug(`${logger.formatPrefix()} [DEBUG] ${message}`, ...optionalParams);
     }
   },
 
@@ -605,10 +563,7 @@ export const logger = {
    */
   warn: (message: string, ...optionalParams: any[]) => {
     if (logger.level >= LogLevel.WARN) {
-      console.warn(
-        `${logger.formatPrefix()} [WARN] ${message}`,
-        ...optionalParams
-      );
+      console.warn(`${logger.formatPrefix()} [WARN] ${message}`, ...optionalParams);
     }
   },
 
@@ -619,19 +574,12 @@ export const logger = {
    */
   error: (message: string, ...optionalParams: any[]) => {
     if (logger.level >= LogLevel.ERROR) {
-      console.error(
-        `${logger.formatPrefix()} [ERROR] ${message}`,
-        ...optionalParams
-      );
+      console.error(`${logger.formatPrefix()} [ERROR] ${message}`, ...optionalParams);
     }
   },
 };
 
-export function logError(message: {
-  message: string;
-  error: unknown;
-  context: unknown;
-}) {
+export function logError(message: { message: string; error: unknown; context: unknown }) {
   logger.error(`Error: ${message.message}`, message);
 }
 
