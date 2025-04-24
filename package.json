@@ -3,7 +3,7 @@
   "version": "2.2.1",
   "main": "dist/server.js",
   "scripts": {
-    "test": "npm run build && npm run test --workspaces",
+    "test": "npm run test --workspaces",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",

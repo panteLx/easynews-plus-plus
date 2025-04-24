@@ -8,17 +8,36 @@ import {
   capitalizeFirstLetter,
   parseLogLevel,
   LogLevel,
+  createStreamUrl,
+  createStreamPath,
+  getFileExtension,
+  getPostTitle,
+  getDuration,
+  getSize,
+  getAlternativeTitles,
+  buildSearchQuery,
 } from './utils.js';
 import { FileData } from 'easynews-plus-plus-api';
 import * as parseTorrentTitle from 'parse-torrent-title';
+import type { ContentType } from 'stremio-addon-sdk';
 
-// Mock parse-torrent-title module
 vi.mock('parse-torrent-title', () => ({
   parse: vi.fn(),
 }));
 
+vi.mock('./utils.js', async () => {
+  const actual = await vi.importActual('./utils.js');
+  return {
+    ...actual,
+    logger: {
+      info: vi.fn(),
+      debug: vi.fn(),
+      error: vi.fn(),
+    },
+  };
+});
+
 describe('sanitizeTitle', () => {
-  // See also: https://github.com/sleeyax/stremio-easynews-addon/issues/38#issuecomment-2467015435.
   it.each([
     ['Three Colors: Blue (1993)', 'three colors blue  1993'],
     ['Willy Wonka & the Chocolate Factory (1973)', 'willy wonka and the chocolate factory  1973'],
@@ -38,6 +57,9 @@ describe('sanitizeTitle', () => {
     ['Amérîcâ', 'amérîcâ'],
     ["D'où vient-il?", 'doù vient il'],
     ['Fête du cinéma', 'fête du cinéma'],
+    ['Star Wars: Episode IV - A New Hope', 'star wars episode iv a new hope'],
+    ['Breaking Bad: S01E01', 'breaking bad s01e01'],
+    ['The 100 (TV Series)', 'the 100  tv series'],
   ])("sanitizes the title '%s'", (input, expected) => {
     expect(sanitizeTitle(input)).toBe(expected);
   });
@@ -45,25 +67,39 @@ describe('sanitizeTitle', () => {
 
 describe('matchesTitle', () => {
   it.each([
-    // ignore apostrophes
     ["America's Next Top Model", "America's", true],
     ["America's Next Top Model", 'Americas', true],
-    // french characters should match exactly
     ['Fête du cinéma', 'cinema', false],
     ['Fête du cinéma', 'cinéma', true],
     ['Fête du cinéma', 'Fete', false],
     ['Fête du cinéma', 'Fête', true],
-    // ignore special characters
     ['Am_er-ic.a the Beautiful', 'America the Beautiful', false],
     ['Am_er-ic.a the Beautiful', 'Am er ic a the Beautiful', true],
-    // test season/episode matching
     ['Breaking Bad S01E01', 'breaking bad s01e01', true],
     ['Breaking Bad', 'breaking bad s01e01', false],
-    // The actual implementation allows titles with season/episode patterns to match with just the main title
     ['Game of Thrones s03E05', 'Game of Thrones', true],
     ['Game of Thrones s03E05', 'Game of Thrones s03e05', true],
+    ['The Walking Dead S10E16', 'the walking dead s10e16', true],
+    ['The Walking Dead S10E16', 'the walking dead s10e15', false],
+    ['Stranger Things 4K HDR', 'stranger things', true],
+    ['Interstellar (2014) 1080p', 'interstellar 2014', true],
   ])("matches the title '%s' with query '%s'", (title, query, expected) => {
     expect(matchesTitle(title, query, false)).toBe(expected);
+  });
+
+  it('handles strict mode properly', () => {
+    (parseTorrentTitle.parse as any).mockImplementation((title: string) => {
+      if (title === 'The Matrix 1999') {
+        return {
+          title: 'The Matrix',
+          year: 1999,
+        };
+      }
+      return {};
+    });
+
+    expect(matchesTitle('The Matrix 1999', 'The Matrix 1999', true)).toBe(true);
+    expect(matchesTitle('The Matrix 1999', 'The Matrix', true)).toBe(true);
   });
 });
 
@@ -198,7 +234,6 @@ describe('isBadVideo', () => {
   });
 
   it('identifies small files as bad', () => {
-    // 10MB (below 20MB threshold)
     const smallVideo = {
       '0': '123456',
       '10': 'Small Video',
@@ -211,7 +246,6 @@ describe('isBadVideo', () => {
     } as unknown as FileData;
     expect(isBadVideo(smallVideo)).toBeTruthy();
 
-    // 30MB (above 20MB threshold)
     const largeVideo = {
       '0': '123456',
       '10': 'Large Video',
@@ -224,6 +258,20 @@ describe('isBadVideo', () => {
     } as unknown as FileData;
     expect(isBadVideo(largeVideo)).toBeFalsy();
   });
+
+  it('handles combinations of bad properties', () => {
+    const badCombination = {
+      '0': '123456',
+      '10': 'Bad Combination',
+      '11': '.mp4',
+      '14': '60m',
+      rawSize: 50 * 1024 * 1024,
+      type: 'VIDEO',
+      passwd: true,
+      virus: false,
+    } as unknown as FileData;
+    expect(isBadVideo(badCombination)).toBeTruthy();
+  });
 });
 
 describe('getQuality', () => {
@@ -232,7 +280,6 @@ describe('getQuality', () => {
   });
 
   it('extracts resolution from title using parseTorrentTitle', () => {
-    // Mock the resolution values for each test case
     (parseTorrentTitle.parse as any).mockReturnValueOnce({
       resolution: '720p',
     });
@@ -246,20 +293,22 @@ describe('getQuality', () => {
       resolution: undefined,
     });
 
-    // For 720p and 1080p, it should return the resolution directly
     expect(getQuality('Movie Title 720p')).toBe('720p');
     expect(getQuality('Movie Title 1080p')).toBe('1080p');
-
-    // We can't test the pattern matching for 2160p and 4K directly,
-    // so we'll just skip these tests for now
-    // expect(getQuality('Movie Title 2160p')).toBe('4K/2160p');
-    // expect(getQuality('Movie Title 4k')).toBe('4K');
   });
 
   it('uses fallback resolution when title has no quality info', () => {
     (parseTorrentTitle.parse as any).mockReturnValue({ resolution: undefined });
     expect(getQuality('Movie Title', '720p')).toBe('720p');
     expect(getQuality('Movie Title')).toBeUndefined();
+  });
+
+  it('handles different resolution formats', () => {
+    vi.resetAllMocks();
+    (parseTorrentTitle.parse as any).mockReturnValue({ resolution: undefined });
+    expect(getQuality('Movie Title 4K HDR')).toBe('4K');
+    expect(getQuality('Movie Title UHD 2160p')).toBe('4K/2160p');
+    expect(getQuality('Movie Title 720p HEVC')).toBe('720p');
   });
 });
 
@@ -274,6 +323,11 @@ describe('extractDigits', () => {
   it('returns undefined for strings without digits', () => {
     expect(extractDigits('abc')).toBeUndefined();
     expect(extractDigits('')).toBeUndefined();
+  });
+
+  it('extracts multi-digit numbers', () => {
+    expect(extractDigits('abc12345def')).toBe(12345);
+    expect(extractDigits('Season 2 Episode 10')).toBe(2);
   });
 });
 
@@ -291,6 +345,11 @@ describe('capitalizeFirstLetter', () => {
   it('handles already capitalized strings', () => {
     expect(capitalizeFirstLetter('Hello')).toBe('Hello');
     expect(capitalizeFirstLetter('HELLO')).toBe('HELLO');
+  });
+
+  it('handles strings with non-letter first characters', () => {
+    expect(capitalizeFirstLetter('123abc')).toBe('123abc');
+    expect(capitalizeFirstLetter(' hello')).toBe(' hello');
   });
 });
 
@@ -317,5 +376,144 @@ describe('parseLogLevel', () => {
 
   it('returns INFO level for invalid input', () => {
     expect(parseLogLevel('INVALID')).toBe(LogLevel.INFO);
+  });
+
+  it('returns INFO level for mixed case input', () => {
+    expect(parseLogLevel('InFo')).toBe(LogLevel.INFO);
+    expect(parseLogLevel('dEbUg')).toBe(LogLevel.DEBUG);
+  });
+});
+
+describe('createStreamUrl', () => {
+  it('creates a stream URL with authentication', () => {
+    const response = {
+      downURL: 'https://example.com/down',
+      dlFarm: 'farm1',
+      dlPort: 'port1',
+    } as unknown as any;
+
+    const url = createStreamUrl(response, 'testuser', 'testpass');
+    expect(url).toBe('https://testuser:testpass@example.com/down/farm1/port1');
+  });
+
+  it('handles different URL formats', () => {
+    const response = {
+      downURL: 'https://cdn.example.com/download',
+      dlFarm: 'farm2',
+      dlPort: 'port2',
+    } as unknown as any;
+
+    const url = createStreamUrl(response, 'user@domain.com', 'complex@pass!123');
+    expect(url).toBe(
+      'https://user@domain.com:complex@pass!123@cdn.example.com/download/farm2/port2'
+    );
+  });
+});
+
+describe('createStreamPath', () => {
+  it('creates a valid stream path from file data', () => {
+    const file = {
+      '0': 'abc123',
+      '10': 'movie_title',
+      '11': '.mp4',
+    } as unknown as FileData;
+
+    const path = createStreamPath(file);
+    expect(path).toBe('abc123.mp4/movie_title.mp4');
+  });
+
+  it('handles missing data', () => {
+    const file = {
+      '0': 'abc123',
+    } as unknown as FileData;
+
+    const path = createStreamPath(file);
+    expect(path).toBe('abc123/');
+  });
+});
+
+describe('getFileExtension, getPostTitle, getDuration, getSize', () => {
+  const file = {
+    '2': '.mp4',
+    '4': '1.2GB',
+    '10': 'Sample Video',
+    '14': '120m',
+  } as unknown as FileData;
+
+  it('extracts file extension correctly', () => {
+    expect(getFileExtension(file)).toBe('.mp4');
+    expect(getFileExtension({} as FileData)).toBe('');
+  });
+
+  it('extracts post title correctly', () => {
+    expect(getPostTitle(file)).toBe('Sample Video');
+    expect(getPostTitle({} as FileData)).toBe('');
+  });
+
+  it('extracts duration correctly', () => {
+    expect(getDuration(file)).toBe('120m');
+    expect(getDuration({} as FileData)).toBe('');
+  });
+
+  it('extracts size correctly', () => {
+    expect(getSize(file)).toBe('1.2GB');
+    expect(getSize({} as FileData)).toBe('');
+  });
+});
+
+describe('getAlternativeTitles', () => {
+  it('returns alternative titles from custom titles input', () => {
+    const mockCustomTitles = {
+      matrix: ['The Matrix', 'Matrix', 'The Matrix 1999'],
+    };
+
+    const alternatives = getAlternativeTitles('matrix', mockCustomTitles);
+    expect(alternatives).toEqual(['matrix', 'The Matrix', 'Matrix', 'The Matrix 1999']);
+  });
+
+  it('returns empty array when no alternatives found', () => {
+    const mockCustomTitles = {
+      matrix: ['The Matrix', 'Matrix'],
+    };
+
+    const alternatives = getAlternativeTitles('inception', mockCustomTitles);
+    expect(alternatives).toEqual(['inception']);
+  });
+});
+
+describe('buildSearchQuery', () => {
+  it('builds a search query for a movie', () => {
+    const meta = {
+      name: 'The Matrix',
+      type: 'movie',
+      year: 1999,
+    };
+
+    const query = buildSearchQuery('movie' as ContentType, meta as any);
+    expect(query).toContain('The Matrix');
+    expect(query).toContain('1999');
+  });
+
+  it('builds a search query for a series with episode information', () => {
+    const meta = {
+      name: 'Breaking Bad',
+      type: 'series',
+      season: 1,
+      episode: 1,
+    };
+
+    const query = buildSearchQuery('series' as ContentType, meta as any);
+    expect(query).toContain('Breaking Bad');
+    expect(query).toContain('S01E01');
+  });
+
+  it('handles undefined episode information', () => {
+    const meta = {
+      name: 'Friends',
+      type: 'series',
+    };
+
+    const query = buildSearchQuery('series' as ContentType, meta as any);
+    expect(query).toBe('Friends');
   });
 });
