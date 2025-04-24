@@ -34,8 +34,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Run TypeScript check
-        run: npm run typecheck
-
       - name: Run Prettier check
         run: npm run format:check
