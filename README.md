@@ -225,14 +225,21 @@ $ npm run dev:cf
 
 ### 📝 Release Process
 
-Create a new version tag and release:
+Bump the version tag, release and publish to npm:
 
 ```bash
 $ npm run release
 ```
 
 > [!NOTE]  
-> This will only create a new version tag and release on GitHub if the script found fix or feat commits since the latest tag.
+> Enable workflow "docker-publish" to automatically build and publish the docker image to GitHub Container Registry. Enable workflow "release" to automatically create a new version tag and release on GitHub.
+
+### 📦 Workflows
+
+- `pr.yml`: Lint PR titles
+- `test.yml`: Test if the addon works as expected
+- `release.yml`: Release a new version to GitHub
+- `docker-publish.yml`: Build and publish the docker image to GitHub Container Registry
 
 ---
 
