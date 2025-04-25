@@ -56,12 +56,16 @@
 > [!NOTE]  
 > To add custom titles to the public instance, please create a new issue with your suggestions.
 
-### 🌍 Language Filtering
+### 🔧 Advanced Configuration Options & Language Filtering
+
+- Quality filtering to display only streams with specific resolutions
+- Customizable maximum results per quality to balance stream variety and performance
+- File size limitation to filter out excessively large files
 
 - Preferred audio language selection from multiple supported options
-- Automatic prioritization of content in your preferred language
-- Clear language labeling in stream descriptions
-- Visual indicators for preferred language content (⭐)
+  - Automatic prioritization of content in your preferred language
+  - Clear language labeling in stream descriptions
+  - Visual indicators for preferred language content (⭐)
 
 > [!NOTE]  
 > If you would like additional languages added to the public instance, please create a new issue with your request.

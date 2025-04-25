@@ -37,6 +37,10 @@ export type TranslationKeys = {
     preferredLanguage: string;
     sortingMethod: string;
     uiLanguage: string;
+    showQualities: string;
+    maxResultsPerQuality: string;
+    maxFileSize: string;
+    noLimit: string;
   };
   // Languages
   languages: {
@@ -62,6 +66,9 @@ export type TranslationKeys = {
     sizeFirst: string;
     dateFirst: string;
     relevanceFirst: string;
+  };
+  qualityOptions: {
+    allQualities: string;
   };
 };
 
@@ -168,6 +175,10 @@ export const translations: Translations = {
       preferredLanguage: 'Preferred Audio Language',
       sortingMethod: 'Sorting Method',
       uiLanguage: 'UI Language',
+      showQualities: 'Qualities to show in streams list',
+      maxResultsPerQuality: 'Max results per quality',
+      maxFileSize: 'Max file size in GB',
+      noLimit: 'No limit',
     },
     languages: {
       noPreference: 'No preference',
@@ -192,6 +203,9 @@ export const translations: Translations = {
       dateFirst: 'Date Added (newest first)',
       relevanceFirst: 'Relevance (best matches first)',
     },
+    qualityOptions: {
+      allQualities: 'All Qualities',
+    },
   },
   // German
   de: {
@@ -212,6 +226,10 @@ export const translations: Translations = {
       preferredLanguage: 'Bevorzugte Audiosprache',
       sortingMethod: 'Sortiermethode',
       uiLanguage: 'UI-Sprache',
+      showQualities: 'Anzuzeigende Qualitäten in der Streamliste',
+      maxResultsPerQuality: 'Maximale Ergebnisse pro Qualität',
+      maxFileSize: 'Maximale Dateigröße in GB',
+      noLimit: 'Kein Limit',
     },
     languages: {
       noPreference: 'Keine Präferenz',
@@ -236,6 +254,9 @@ export const translations: Translations = {
       dateFirst: 'Hinzugefügt am (neueste zuerst)',
       relevanceFirst: 'Relevanz (beste Treffer zuerst)',
     },
+    qualityOptions: {
+      allQualities: 'Alle Qualitäten',
+    },
   },
   // Spanish
   es: {
@@ -256,6 +277,10 @@ export const translations: Translations = {
       preferredLanguage: 'Idioma de audio preferido',
       sortingMethod: 'Método de clasificación',
       uiLanguage: 'Idioma de la interfaz de usuario',
+      showQualities: 'Calidades a mostrar en la lista de streams',
+      maxResultsPerQuality: 'Máx. resultados por calidad',
+      maxFileSize: 'Tamaño máx. del archivo en GB',
+      noLimit: 'Sin límite',
     },
     languages: {
       noPreference: 'Sin preferencia',
@@ -280,6 +305,9 @@ export const translations: Translations = {
       dateFirst: 'Fecha de adición (más recientes primero)',
       relevanceFirst: 'Relevancia (mejores coincidencias primero)',
     },
+    qualityOptions: {
+      allQualities: 'Todas las calidades',
+    },
   },
   // French
   fr: {
@@ -300,6 +328,10 @@ export const translations: Translations = {
       preferredLanguage: 'Langue audio préférée',
       sortingMethod: 'Méthode de tri',
       uiLanguage: "Langue de l'interface",
+      showQualities: 'Qualités à afficher dans la liste des streams',
+      maxResultsPerQuality: 'Résultats max. par qualité',
+      maxFileSize: 'Taille max. du fichier en Go',
+      noLimit: 'Sans limite',
     },
     languages: {
       noPreference: 'Sans préférence',
@@ -324,6 +356,9 @@ export const translations: Translations = {
       dateFirst: "Date d'ajout (plus récent d'abord)",
       relevanceFirst: "Pertinence (meilleures correspondances d'abord)",
     },
+    qualityOptions: {
+      allQualities: 'Toutes les qualités',
+    },
   },
   // Italian
   it: {
@@ -344,6 +379,10 @@ export const translations: Translations = {
       preferredLanguage: 'Lingua audio preferita',
       sortingMethod: 'Metodo di ordinamento',
       uiLanguage: "Lingua dell'interfaccia utente",
+      showQualities: 'Calità da mostrare nella lista degli stream',
+      maxResultsPerQuality: 'Risultati max. per calità',
+      maxFileSize: 'Dimensione massima del file in GB',
+      noLimit: 'Senza limite',
     },
     languages: {
       noPreference: 'Nessuna preferenza',
@@ -368,6 +407,9 @@ export const translations: Translations = {
       dateFirst: 'Data di aggiunta (i più recenti prima)',
       relevanceFirst: 'Rilevanza (migliori corrispondenze prima)',
     },
+    qualityOptions: {
+      allQualities: 'Tutte le qualità',
+    },
   },
   // Japanese
   ja: {
@@ -388,6 +430,10 @@ export const translations: Translations = {
       preferredLanguage: '優先する音声言語',
       sortingMethod: '並べ替え方法',
       uiLanguage: 'UI言語',
+      showQualities: 'ストリームリストに表示する画質',
+      maxResultsPerQuality: '画質ごとの最大結果数',
+      maxFileSize: 'ファイルサイズの最大値 (GB)',
+      noLimit: '制限なし',
     },
     languages: {
       noPreference: '優先なし',
@@ -412,6 +458,9 @@ export const translations: Translations = {
       dateFirst: '追加日（最新優先）',
       relevanceFirst: '関連性（最良の一致優先）',
     },
+    qualityOptions: {
+      allQualities: 'すべての画質',
+    },
   },
   // Portuguese
   pt: {
@@ -432,6 +481,10 @@ export const translations: Translations = {
       preferredLanguage: 'Idioma de áudio preferido',
       sortingMethod: 'Método de classificação',
       uiLanguage: 'Idioma da interface de usuário',
+      showQualities: 'Qualidades a serem exibidas na lista de streams',
+      maxResultsPerQuality: 'Máx. resultados por qualidade',
+      maxFileSize: 'Tamanho máx. do arquivo em GB',
+      noLimit: 'Sem limite',
     },
     languages: {
       noPreference: 'Sem preferência',
@@ -456,6 +509,9 @@ export const translations: Translations = {
       dateFirst: 'Data de adição (mais recentes primeiro)',
       relevanceFirst: 'Relevância (melhores correspondências primeiro)',
     },
+    qualityOptions: {
+      allQualities: 'Todas as qualidades',
+    },
   },
   // Russian
   ru: {
@@ -476,6 +532,10 @@ export const translations: Translations = {
       preferredLanguage: 'Предпочтительный язык аудио',
       sortingMethod: 'Метод сортировки',
       uiLanguage: 'Язык интерфейса',
+      showQualities: 'Качество для отображения в списке потоков',
+      maxResultsPerQuality: 'Максимальное количество результатов на качество',
+      maxFileSize: 'Максимальный размер файла (ГБ)',
+      noLimit: 'Без ограничения',
     },
     languages: {
       noPreference: 'Без предпочтений',
@@ -500,6 +560,9 @@ export const translations: Translations = {
       dateFirst: 'Дата добавления (сначала новейшие)',
       relevanceFirst: 'Релевантность (сначала лучшие совпадения)',
     },
+    qualityOptions: {
+      allQualities: 'Все качества',
+    },
   },
   // Korean
   ko: {
@@ -520,6 +583,10 @@ export const translations: Translations = {
       preferredLanguage: '선호하는 오디오 언어',
       sortingMethod: '정렬 방법',
       uiLanguage: 'UI 언어',
+      showQualities: '스트림 목록에 표시할 화질',
+      maxResultsPerQuality: '화질당 최대 결과 수',
+      maxFileSize: '파일 크기의 최대값 (GB)',
+      noLimit: '제한 없음',
     },
     languages: {
       noPreference: '선호도 없음',
@@ -544,6 +611,9 @@ export const translations: Translations = {
       dateFirst: '추가된 날짜 (최신 우선)',
       relevanceFirst: '관련성 (가장 일치하는 것 우선)',
     },
+    qualityOptions: {
+      allQualities: '모든 화질',
+    },
   },
   // Chinese
   zh: {
@@ -563,6 +633,10 @@ export const translations: Translations = {
       preferredLanguage: '首选音频语言',
       sortingMethod: '排序方法',
       uiLanguage: 'UI 语言',
+      showQualities: '在流列表中显示的画质',
+      maxResultsPerQuality: '每个画质的最多结果数',
+      maxFileSize: '文件大小最大值 (GB)',
+      noLimit: '无限制',
     },
     languages: {
       noPreference: '无偏好',
@@ -587,6 +661,9 @@ export const translations: Translations = {
       dateFirst: '添加日期（最新优先）',
       relevanceFirst: '相关性（最佳匹配优先）',
     },
+    qualityOptions: {
+      allQualities: '所有画质',
+    },
   },
   // Dutch
   nl: {
@@ -607,6 +684,10 @@ export const translations: Translations = {
       preferredLanguage: 'Voorgestelde audiolanguage',
       sortingMethod: 'Sorteermethode',
       uiLanguage: 'Gebruikersinterface-taal',
+      showQualities: 'Kwaliteiten om weer te geven in de streamlijst',
+      maxResultsPerQuality: 'Maximale resultaten per kwaliteit',
+      maxFileSize: 'Maximale bestandsgrootte in GB',
+      noLimit: 'Geen limiet',
     },
     languages: {
       noPreference: 'Geen voorkeur',
@@ -631,6 +712,9 @@ export const translations: Translations = {
       dateFirst: 'Datum toegevoegd (nieuwste eerst)',
       relevanceFirst: 'Relevantie (beste overeenkomsten eerst)',
     },
+    qualityOptions: {
+      allQualities: 'Alle kwaliteiten',
+    },
   },
   // Romanian
   ro: {
@@ -651,6 +735,10 @@ export const translations: Translations = {
       preferredLanguage: 'Limbă audio preferată',
       sortingMethod: 'Metodă de sortare',
       uiLanguage: 'Limbă interfacă',
+      showQualities: 'Calități pentru afișare în lista de streamuri',
+      maxResultsPerQuality: 'Rezultate maxime pe calitate',
+      maxFileSize: 'Mărimea maximă a fișierului în GB',
+      noLimit: 'Nici un limit',
     },
     languages: {
       noPreference: 'Fără preferință',
@@ -675,6 +763,9 @@ export const translations: Translations = {
       dateFirst: 'Data adăugării (cele mai recente înainte)',
       relevanceFirst: 'Relevantă (cele mai bune potriviri înainte)',
     },
+    qualityOptions: {
+      allQualities: 'Toate calitățile',
+    },
   },
   // Bulgarian
   bg: {
@@ -695,6 +786,10 @@ export const translations: Translations = {
       preferredLanguage: 'Предпочитан аудио език',
       sortingMethod: 'Метод на сортиране',
       uiLanguage: 'Език на потребителския интерфейс',
+      showQualities: 'Качество за показване в списъка с потоци',
+      maxResultsPerQuality: 'Максимален брой резултати на качество',
+      maxFileSize: 'Максимален размер на файла (GB)',
+      noLimit: 'Без ограничение',
     },
     languages: {
       noPreference: 'Без предпочитания',
@@ -718,6 +813,9 @@ export const translations: Translations = {
       sizeFirst: 'Размер на файла (първо най-големият)',
       dateFirst: 'Дата на добавяне (най-новата първа)',
       relevanceFirst: 'Релевантност (първо най-добрите съвпадения)',
+    },
+    qualityOptions: {
+      allQualities: 'Всички качества',
     },
   },
 };

@@ -27,11 +27,71 @@ function landingTemplate(manifest: Manifest): string {
   // Replace the field titles with their translated versions if they exist
   const translatedFields = configurationFields.map((field: any) => {
     if (field.key === 'username' && translations.form.username) {
-      return { ...field, title: translations.form.username };
+      return { ...field, title: 'Easynews ' + translations.form.username };
     } else if (field.key === 'password' && translations.form.password) {
-      return { ...field, title: translations.form.password };
+      return { ...field, title: 'Easynews ' + translations.form.password };
     } else if (field.key === 'strictTitleMatching' && translations.form.strictTitleMatching) {
       return { ...field, title: translations.form.strictTitleMatching };
+    } else if (field.key === 'sortingPreference' && translations.form.sortingMethod) {
+      // For sorting preference field, translate both title and options
+      const translatedOptions: Record<string, string> = {};
+      if (field.options) {
+        if (
+          field.options['quality_first'] !== undefined &&
+          translations.sortingOptions?.qualityFirst
+        ) {
+          translatedOptions['quality_first'] = translations.sortingOptions.qualityFirst;
+        }
+        if (
+          field.options['language_first'] !== undefined &&
+          translations.sortingOptions?.languageFirst
+        ) {
+          translatedOptions['language_first'] = translations.sortingOptions.languageFirst;
+        }
+        if (field.options['size_first'] !== undefined && translations.sortingOptions?.sizeFirst) {
+          translatedOptions['size_first'] = translations.sortingOptions.sizeFirst;
+        }
+        if (field.options['date_first'] !== undefined && translations.sortingOptions?.dateFirst) {
+          translatedOptions['date_first'] = translations.sortingOptions.dateFirst;
+        }
+        if (
+          field.options['relevance_first'] !== undefined &&
+          translations.sortingOptions?.relevanceFirst
+        ) {
+          translatedOptions['relevance_first'] = translations.sortingOptions.relevanceFirst;
+        }
+      }
+      return {
+        ...field,
+        title: translations.form.sortingMethod,
+        options: Object.keys(translatedOptions).length > 0 ? translatedOptions : field.options,
+      };
+    } else if (field.key === 'uiLanguage' && translations.form.uiLanguage) {
+      return { ...field, title: translations.form.uiLanguage };
+    } else if (field.key === 'showQualities' && translations.form.showQualities) {
+      // For showQualities field, translate the title and the "All Qualities" option
+      const translatedOptions: Record<string, string> = {};
+      if (field.options) {
+        // Copy all existing options
+        Object.entries(field.options).forEach(([key, value]) => {
+          // Check if this is the "All Qualities" option and translate it
+          if (key === '4k,1080p,720p,480p' && translations.qualityOptions.allQualities) {
+            translatedOptions[key] = translations.qualityOptions.allQualities;
+          } else {
+            // Keep other options as is
+            translatedOptions[key] = value as string;
+          }
+        });
+      }
+      return {
+        ...field,
+        title: translations.form.showQualities,
+        options: Object.keys(translatedOptions).length > 0 ? translatedOptions : field.options,
+      };
+    } else if (field.key === 'maxResultsPerQuality' && translations.form.maxResultsPerQuality) {
+      return { ...field, title: translations.form.maxResultsPerQuality };
+    } else if (field.key === 'maxFileSize' && translations.form.maxFileSize) {
+      return { ...field, title: translations.form.maxFileSize };
     } else if (field.key === 'preferredLanguage' && translations.form.preferredLanguage) {
       // For language selection field, translate both title and options
       const translatedOptions: Record<string, string> = {};
@@ -84,46 +144,6 @@ function landingTemplate(manifest: Manifest): string {
         ...field,
         title: translations.form.preferredLanguage,
         options: Object.keys(translatedOptions).length > 0 ? translatedOptions : field.options,
-      };
-    } else if (field.key === 'sortingPreference' && translations.form.sortingMethod) {
-      // For sorting preference field, translate both title and options
-      const translatedOptions: Record<string, string> = {};
-      if (field.options) {
-        if (
-          field.options['quality_first'] !== undefined &&
-          translations.sortingOptions?.qualityFirst
-        ) {
-          translatedOptions['quality_first'] = translations.sortingOptions.qualityFirst;
-        }
-        if (
-          field.options['language_first'] !== undefined &&
-          translations.sortingOptions?.languageFirst
-        ) {
-          translatedOptions['language_first'] = translations.sortingOptions.languageFirst;
-        }
-        if (field.options['size_first'] !== undefined && translations.sortingOptions?.sizeFirst) {
-          translatedOptions['size_first'] = translations.sortingOptions.sizeFirst;
-        }
-        if (field.options['date_first'] !== undefined && translations.sortingOptions?.dateFirst) {
-          translatedOptions['date_first'] = translations.sortingOptions.dateFirst;
-        }
-        if (
-          field.options['relevance_first'] !== undefined &&
-          translations.sortingOptions?.relevanceFirst
-        ) {
-          translatedOptions['relevance_first'] = translations.sortingOptions.relevanceFirst;
-        }
-      }
-      return {
-        ...field,
-        title: translations.form.sortingMethod,
-        options: Object.keys(translatedOptions).length > 0 ? translatedOptions : field.options,
-      };
-    } else if (field.key === 'uiLanguage' && translations.form.uiLanguage) {
-      // For UI language selection field, just translate the title
-      return {
-        ...field,
-        title: translations.form.uiLanguage,
       };
     }
     return field;
@@ -248,6 +268,7 @@ function landingTemplate(manifest: Manifest): string {
     
     input[type="text"],
     input[type="password"],
+    input[type="number"],
     select {
       width: 100%;
       padding: 0.75rem;
@@ -263,6 +284,7 @@ function landingTemplate(manifest: Manifest): string {
     
     input[type="text"]:focus,
     input[type="password"]:focus,
+    input[type="number"]:focus,
     select:focus {
       border-color: var(--ring);
       box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
@@ -348,6 +370,17 @@ function landingTemplate(manifest: Manifest): string {
       display: block;
     }
     
+    /* Side-by-side fields */
+    .form-row {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-col {
+      flex: 1;
+    }
+    
     a {
       text-decoration: none;
     }
@@ -383,6 +416,8 @@ function landingTemplate(manifest: Manifest): string {
       justify-content: center;
       gap: 1rem;
       margin-top: 2rem;
+      border-top: 1px solid var(--border);
+      padding-top: 2rem;
     }
     
     .select-wrapper {
@@ -401,6 +436,17 @@ function landingTemplate(manifest: Manifest): string {
       border-bottom: 2px solid var(--foreground);
       transform: translateY(-70%) rotate(45deg);
       opacity: 0.5;
+    }
+    
+    /* Styles for number input arrows */
+    input[type="number"] {
+      -moz-appearance: textfield;
+    }
+    
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
     }
     
     select {
@@ -507,6 +553,7 @@ function landingTemplate(manifest: Manifest): string {
         flex-direction: column;
         gap: 0.75rem;
         width: 100%;
+        border-top: 1px solid var(--border);
       }
       
       .button-group button {
@@ -539,6 +586,11 @@ function landingTemplate(manifest: Manifest): string {
       
       .checkbox-title {
         font-size: 1rem;
+      }
+      
+      .form-row {
+        flex-direction: column;
+        gap: 1.25rem;
       }
     }
 
@@ -614,11 +666,41 @@ function landingTemplate(manifest: Manifest): string {
               </div>
             </div>`;
             } else {
-              return `
+              // Handle maxResultsPerQuality and maxFileSize fields differently
+              if (field.key === 'maxResultsPerQuality') {
+                // Store this field to be rendered with maxFileSize
+                return `<!-- maxResultsPerQuality -->`;
+              } else if (field.key === 'maxFileSize') {
+                // Find the maxResultsPerQuality field
+                const maxResultsField = translatedFields.find(
+                  (f: any) => f.key === 'maxResultsPerQuality'
+                );
+                if (maxResultsField) {
+                  return `
+            <div class="form-row">
+              <div class="form-col">
+                <label for="maxResultsPerQuality">${maxResultsField.title}</label>
+                <input type="${maxResultsField.type}" placeholder="${translations.form.noLimit}" name="maxResultsPerQuality" id="maxResultsPerQuality" ${maxResultsField.required ? 'required' : ''}>
+              </div>
+              <div class="form-col">
+                <label for="${field.key}">${field.title}</label>
+                <input type="${field.type}" placeholder="${translations.form.noLimit}" name="${field.key}" id="${field.key}" ${field.required ? 'required' : ''}>
+              </div>
+            </div>`;
+                } else {
+                  return `
+            <div class="form-group">
+              <label for="${field.key}">${field.title}</label>
+              <input type="${field.type}" placeholder="${translations.form.noLimit}" name="${field.key}" id="${field.key}" ${field.required ? 'required' : ''}>
+            </div>`;
+                }
+              } else {
+                return `
             <div class="form-group">
               <label for="${field.key}">${field.title}</label>
               <input type="${field.type}" name="${field.key}" id="${field.key}" ${field.required ? 'required' : ''}>
             </div>`;
+              }
             }
           })
           .join('')}

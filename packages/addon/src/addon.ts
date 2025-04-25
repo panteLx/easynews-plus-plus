@@ -37,6 +37,9 @@ interface AddonConfig {
   preferredLanguage?: string;
   sortingPreference?: string;
   logLevel?: string; // Add log level configuration option
+  showQualities?: string; // Comma-separated list of qualities to show
+  maxResultsPerQuality?: string; // Max results per quality
+  maxFileSize?: string; // Max file size in GB
   [key: string]: any;
 }
 
@@ -239,6 +242,9 @@ builder.defineStreamHandler(
       preferredLanguage,
       sortingPreference,
       logLevel,
+      showQualities,
+      maxResultsPerQuality,
+      maxFileSize,
       ...options
     } = config;
 
@@ -255,7 +261,9 @@ builder.defineStreamHandler(
 
     // Include settings in cache key to ensure
     // users with different settings get different cache results
-    const cacheKey = `${id}:v2:strict=${strictTitleMatching === 'on' || strictTitleMatching === 'true'}:lang=${preferredLanguage || ''}:sort=${sortingPreference}`;
+    const cacheKey = `${id}:v3:user=${username}:strict=${strictTitleMatching === 'on' || strictTitleMatching === 'true'}:lang=${preferredLanguage || ''}:sort=${sortingPreference}:qualities=${showQualities || ''}:maxPerQuality=${maxResultsPerQuality || ''}:maxSize=${maxFileSize || ''}`;
+
+    // const cacheKey = `${id}:v3:strict=${strictTitleMatching === 'on' || strictTitleMatching === 'true'}:lang=${preferredLanguage || ''}:sort=${sortingPreference}:qualities=${showQualities || ''}:maxPerQuality=${maxResultsPerQuality || ''}:maxSize=${maxFileSize || ''}`;
     logger.info(`Cache key: ${cacheKey}`);
     const cached = getFromCache<{ streams: Stream[] }>(cacheKey);
 
@@ -275,6 +283,38 @@ builder.defineStreamHandler(
       // Get preferred language from configuration
       const preferredLang = preferredLanguage || '';
       logger.info(`Preferred language: ${preferredLang ? preferredLang : 'No preference'}`);
+
+      // Parse quality filters
+      // const qualityFilters = showQualities
+      //   ? showQualities.split(',').map(q => q.trim())
+      //   : ['4k', '1080p', '720p', '480p'];
+
+      const qualityFilters = showQualities
+        ? showQualities
+            .split(',')
+            .map(q => q.trim().toLowerCase())
+            .filter(Boolean)
+        : ['4k', '1080p', '720p', '480p'];
+
+      logger.info(`Quality filters: ${qualityFilters.join(', ')}`);
+
+      // Parse max results per quality (0 = no limit)
+      // const maxResultsPerQualityValue = parseInt(maxResultsPerQuality || '0');
+      let maxResultsPerQualityValue = parseInt(maxResultsPerQuality ?? '0', 10);
+      if (Number.isNaN(maxResultsPerQualityValue) || maxResultsPerQualityValue < 0) {
+        maxResultsPerQualityValue = 0;
+      }
+      logger.info(
+        `Max results per quality: ${maxResultsPerQualityValue === 0 ? 'No limit' : maxResultsPerQualityValue}`
+      );
+
+      // Parse max file size (0 = no limit)
+      // const maxFileSizeGB = parseFloat(maxFileSize || '0');
+      let maxFileSizeGB = parseFloat(maxFileSize ?? '0');
+      if (Number.isNaN(maxFileSizeGB) || maxFileSizeGB < 0) {
+        maxFileSizeGB = 0;
+      }
+      logger.info(`Max file size: ${maxFileSizeGB === 0 ? 'No limit' : maxFileSizeGB + ' GB'}`);
 
       // Use custom titles from custom-titles.json
       const customTitles = { ...titlesFromFile };
@@ -480,10 +520,12 @@ builder.defineStreamHandler(
         return { streams: [] };
       }
 
-      const streams: Stream[] = [];
-      const processedHashes = new Set<string>(); // To avoid duplicate files
+      const processedHashes = new Set<string>();
 
-      // Process all search results
+      // Store all streams here
+      let streams: Stream[] = [];
+
+      // Process each search result
       for (const { query, result: res } of allSearchResults) {
         for (const file of res.data ?? []) {
           const title = getPostTitle(file);
@@ -752,6 +794,139 @@ builder.defineStreamHandler(
               return compareSize();
           }
         });
+      }
+
+      // After all streams have been collected, filter and limit them based on user settings
+      if (streams.length > 0) {
+        const originalCount = streams.length;
+        logger.info(`Starting filters with ${originalCount} streams`);
+
+        // Filter streams by quality
+        const defaultQualitySet = ['4k', '1080p', '720p', '480p'];
+        const isCustomQualityFilter = !(
+          qualityFilters.length === defaultQualitySet.length &&
+          qualityFilters.every(q => defaultQualitySet.includes(q))
+        );
+
+        if (isCustomQualityFilter) {
+          const qualityMap: Record<string, string[]> = {
+            '4k': ['4K', 'UHD', '2160p'],
+            '1080p': ['1080p'],
+            '720p': ['720p'],
+            '480p': ['480p', 'SD'],
+          };
+
+          // Create a list of allowed quality strings
+          const allowedQualityTerms: string[] = [];
+          qualityFilters.forEach(q => {
+            if (qualityMap[q]) {
+              allowedQualityTerms.push(...qualityMap[q]);
+            }
+          });
+
+          logger.info(`Filtering for qualities: ${qualityFilters.join(', ')}`);
+          logger.info(`Accepted quality terms: ${allowedQualityTerms.join(', ')}`);
+
+          if (allowedQualityTerms.length > 0) {
+            const filteredStreams = streams.filter(stream => {
+              const quality = stream.name?.split('\n')[1] || '';
+              const matchesQuality = allowedQualityTerms.some(term => quality.includes(term));
+              return matchesQuality;
+            });
+
+            // Only update if we found at least one match
+            if (filteredStreams.length > 0) {
+              streams = filteredStreams;
+              logger.info(`After quality filtering: ${streams.length} streams remain`);
+            } else {
+              logger.warn(`Quality filtering would remove all streams - keeping original results`);
+            }
+          }
+        }
+
+        // Filter streams by file size (only if maxFileSizeGB > 0)
+        if (maxFileSizeGB > 0) {
+          const filteredStreams = streams.filter(stream => {
+            const description = stream.description || '';
+            const sizeLine = description.split('\n').find(line => line.includes('📦'));
+
+            if (!sizeLine) return true; // Keep if we can't determine size
+
+            if (sizeLine.includes('GB')) {
+              const sizeGB = parseFloat(sizeLine.match(/[\d.]+/)?.[0] || '0');
+              return sizeGB <= maxFileSizeGB;
+            }
+
+            if (sizeLine.includes('MB')) {
+              const sizeMB = parseFloat(sizeLine.match(/[\d.]+/)?.[0] || '0');
+              return sizeMB / 1024 <= maxFileSizeGB;
+            }
+
+            return true; // Keep if we can't parse the size
+          });
+
+          // Only update if we found at least one match
+          if (filteredStreams.length > 0) {
+            streams = filteredStreams;
+            logger.info(`After max file size filtering: ${streams.length} streams remain`);
+          } else {
+            logger.warn(`File size filtering would remove all streams - keeping original results`);
+          }
+        }
+
+        // Group streams by quality for limiting per quality (only if maxResultsPerQualityValue > 0)
+        if (maxResultsPerQualityValue > 0) {
+          const streamsByQuality: Record<string, Stream[]> = {};
+
+          // Determine quality category for each stream
+          streams.forEach(stream => {
+            const quality = stream.name?.split('\n')[1] || '';
+            let qualityCategory = 'other';
+
+            if (quality.includes('4K') || quality.includes('UHD') || quality.includes('2160p')) {
+              qualityCategory = '4k';
+            } else if (quality.includes('1080p')) {
+              qualityCategory = '1080p';
+            } else if (quality.includes('720p')) {
+              qualityCategory = '720p';
+            } else if (quality.includes('480p') || quality.includes('SD')) {
+              qualityCategory = '480p';
+            }
+
+            if (!streamsByQuality[qualityCategory]) {
+              streamsByQuality[qualityCategory] = [];
+            }
+            streamsByQuality[qualityCategory].push(stream);
+          });
+
+          // Log the distribution of streams by quality
+          Object.entries(streamsByQuality).forEach(([quality, streams]) => {
+            logger.info(`Quality ${quality}: ${streams.length} streams`);
+          });
+
+          // Apply limits per quality category and rebuild streams array
+          const limitedStreams: Stream[] = [];
+          Object.keys(streamsByQuality).forEach(quality => {
+            const qualityStreams = streamsByQuality[quality];
+            const limitedQualityStreams = qualityStreams.slice(0, maxResultsPerQualityValue);
+            limitedStreams.push(...limitedQualityStreams);
+
+            if (limitedQualityStreams.length < qualityStreams.length) {
+              logger.info(
+                `Quality ${quality}: Limited from ${qualityStreams.length} to ${limitedQualityStreams.length} streams`
+              );
+            }
+          });
+
+          if (limitedStreams.length > 0) {
+            streams = limitedStreams;
+            logger.info(`After applying max results per quality: ${streams.length} streams remain`);
+          } else {
+            logger.warn(`Per-quality limiting would remove all streams - keeping original results`);
+          }
+        }
+
+        logger.info(`Filtering complete: ${originalCount} streams → ${streams.length} streams`);
       }
 
       // Limit to top 25 streams to prevent overwhelming the player
