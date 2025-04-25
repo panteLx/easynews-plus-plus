@@ -261,7 +261,9 @@ builder.defineStreamHandler(
 
     // Include settings in cache key to ensure
     // users with different settings get different cache results
-    const cacheKey = `${id}:v3:strict=${strictTitleMatching === 'on' || strictTitleMatching === 'true'}:lang=${preferredLanguage || ''}:sort=${sortingPreference}:qualities=${showQualities || ''}:maxPerQuality=${maxResultsPerQuality || ''}:maxSize=${maxFileSize || ''}`;
+    const cacheKey = `${id}:v3:user=${username}:strict=${strictTitleMatching === 'on' || strictTitleMatching === 'true'}:lang=${preferredLanguage || ''}:sort=${sortingPreference}:qualities=${showQualities || ''}:maxPerQuality=${maxResultsPerQuality || ''}:maxSize=${maxFileSize || ''}`;
+
+    // const cacheKey = `${id}:v3:strict=${strictTitleMatching === 'on' || strictTitleMatching === 'true'}:lang=${preferredLanguage || ''}:sort=${sortingPreference}:qualities=${showQualities || ''}:maxPerQuality=${maxResultsPerQuality || ''}:maxSize=${maxFileSize || ''}`;
     logger.info(`Cache key: ${cacheKey}`);
     const cached = getFromCache<{ streams: Stream[] }>(cacheKey);
 
@@ -283,19 +285,35 @@ builder.defineStreamHandler(
       logger.info(`Preferred language: ${preferredLang ? preferredLang : 'No preference'}`);
 
       // Parse quality filters
+      // const qualityFilters = showQualities
+      //   ? showQualities.split(',').map(q => q.trim())
+      //   : ['4k', '1080p', '720p', '480p'];
+
       const qualityFilters = showQualities
-        ? showQualities.split(',').map(q => q.trim())
+        ? showQualities
+            .split(',')
+            .map(q => q.trim().toLowerCase())
+            .filter(Boolean)
         : ['4k', '1080p', '720p', '480p'];
+
       logger.info(`Quality filters: ${qualityFilters.join(', ')}`);
 
       // Parse max results per quality (0 = no limit)
-      const maxResultsPerQualityValue = parseInt(maxResultsPerQuality || '0');
+      // const maxResultsPerQualityValue = parseInt(maxResultsPerQuality || '0');
+      let maxResultsPerQualityValue = parseInt(maxResultsPerQuality ?? '0', 10);
+      if (Number.isNaN(maxResultsPerQualityValue) || maxResultsPerQualityValue < 0) {
+        maxResultsPerQualityValue = 0;
+      }
       logger.info(
         `Max results per quality: ${maxResultsPerQualityValue === 0 ? 'No limit' : maxResultsPerQualityValue}`
       );
 
       // Parse max file size (0 = no limit)
-      const maxFileSizeGB = parseFloat(maxFileSize || '0');
+      // const maxFileSizeGB = parseFloat(maxFileSize || '0');
+      let maxFileSizeGB = parseFloat(maxFileSize ?? '0');
+      if (Number.isNaN(maxFileSizeGB) || maxFileSizeGB < 0) {
+        maxFileSizeGB = 0;
+      }
       logger.info(`Max file size: ${maxFileSizeGB === 0 ? 'No limit' : maxFileSizeGB + ' GB'}`);
 
       // Use custom titles from custom-titles.json
