@@ -58,6 +58,14 @@ const uiLanguageOptions = {
   bul: 'Български (Bulgarian)',
 };
 
+// Quality options for streams
+const qualityOptions = {
+  '4k': '4K/UHD/2160p',
+  '1080p': '1080p/FHD',
+  '720p': '720p/HD',
+  '480p': '480p/SD',
+};
+
 export const manifest: Manifest = {
   id: 'community.easynews-plus-plus',
   version,
@@ -79,6 +87,13 @@ export const manifest: Manifest = {
       'eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..51PLy1tUzMKnIWRNR4A7LA.t7KcM925cLQphqv-9WHr59YPtO-snyEl5wBeYvWYs9JlW3tFZ8P_WeGwzVBhVVELh5b3976B8CbnwXVFamteW3suTTf9FnBUMY29NUvn20qQX70EshoCaFh3dy9uowcB.bYVYPWa02j8x1RNx7UG59A',
   },
   config: [
+    {
+      title: englishTranslations.form.uiLanguage,
+      key: 'uiLanguage',
+      type: 'select',
+      options: uiLanguageOptions,
+      default: 'eng',
+    },
     { title: englishTranslations.form.username, key: 'username', type: 'text' },
     {
       title: englishTranslations.form.password,
@@ -105,12 +120,26 @@ export const manifest: Manifest = {
       options: sortingOptions,
       default: 'quality_first',
     },
+
     {
-      title: englishTranslations.form.uiLanguage,
-      key: 'uiLanguage',
+      title: englishTranslations.form.showQualities,
+      key: 'showQualities',
       type: 'select',
-      options: uiLanguageOptions,
-      default: 'eng',
+      options: qualityOptions,
+      default: '4k,1080p,720p,480p',
+      // isMultiSelect: true,
+    },
+    {
+      title: englishTranslations.form.maxResultsPerQuality,
+      key: 'maxResultsPerQuality',
+      type: 'number',
+      default: '0',
+    },
+    {
+      title: englishTranslations.form.maxFileSize,
+      key: 'maxFileSize',
+      type: 'number',
+      default: '0',
     },
   ],
 };

@@ -27,11 +27,21 @@ function landingTemplate(manifest: Manifest): string {
   // Replace the field titles with their translated versions if they exist
   const translatedFields = configurationFields.map((field: any) => {
     if (field.key === 'username' && translations.form.username) {
-      return { ...field, title: translations.form.username };
+      return { ...field, title: 'Easynews ' + translations.form.username };
     } else if (field.key === 'password' && translations.form.password) {
-      return { ...field, title: translations.form.password };
+      return { ...field, title: 'Easynews ' + translations.form.password };
     } else if (field.key === 'strictTitleMatching' && translations.form.strictTitleMatching) {
       return { ...field, title: translations.form.strictTitleMatching };
+    } else if (field.key === 'sortingPreference' && translations.form.sortingMethod) {
+      return { ...field, title: translations.form.sortingMethod };
+    } else if (field.key === 'uiLanguage' && translations.form.uiLanguage) {
+      return { ...field, title: translations.form.uiLanguage };
+    } else if (field.key === 'showQualities' && translations.form.showQualities) {
+      return { ...field, title: translations.form.showQualities };
+    } else if (field.key === 'maxResultsPerQuality' && translations.form.maxResultsPerQuality) {
+      return { ...field, title: translations.form.maxResultsPerQuality };
+    } else if (field.key === 'maxFileSize' && translations.form.maxFileSize) {
+      return { ...field, title: translations.form.maxFileSize };
     } else if (field.key === 'preferredLanguage' && translations.form.preferredLanguage) {
       // For language selection field, translate both title and options
       const translatedOptions: Record<string, string> = {};
