@@ -40,6 +40,7 @@ export type TranslationKeys = {
     showQualities: string;
     maxResultsPerQuality: string;
     maxFileSize: string;
+    noLimit: string;
   };
   // Languages
   languages: {
@@ -175,8 +176,9 @@ export const translations: Translations = {
       sortingMethod: 'Sorting Method',
       uiLanguage: 'UI Language',
       showQualities: 'Qualities to show in streams list',
-      maxResultsPerQuality: 'Max results per quality (0 = no limit)',
-      maxFileSize: 'Max file size in GB (0 = no limit)',
+      maxResultsPerQuality: 'Max results per quality',
+      maxFileSize: 'Max file size in GB',
+      noLimit: 'No limit',
     },
     languages: {
       noPreference: 'No preference',
@@ -225,8 +227,9 @@ export const translations: Translations = {
       sortingMethod: 'Sortiermethode',
       uiLanguage: 'UI-Sprache',
       showQualities: 'Anzuzeigende Qualitäten in der Streamliste',
-      maxResultsPerQuality: 'Maximale Ergebnisse pro Qualität (0 = kein Limit)',
-      maxFileSize: 'Maximale Dateigröße in GB (0 = kein Limit)',
+      maxResultsPerQuality: 'Maximale Ergebnisse pro Qualität',
+      maxFileSize: 'Maximale Dateigröße in GB',
+      noLimit: 'Kein Limit',
     },
     languages: {
       noPreference: 'Keine Präferenz',
@@ -275,8 +278,9 @@ export const translations: Translations = {
       sortingMethod: 'Método de clasificación',
       uiLanguage: 'Idioma de la interfaz de usuario',
       showQualities: 'Calidades a mostrar en la lista de streams',
-      maxResultsPerQuality: 'Máx. resultados por calidad (0 = sin límite)',
-      maxFileSize: 'Tamaño máx. del archivo en GB (0 = sin límite)',
+      maxResultsPerQuality: 'Máx. resultados por calidad',
+      maxFileSize: 'Tamaño máx. del archivo en GB',
+      noLimit: 'Sin límite',
     },
     languages: {
       noPreference: 'Sin preferencia',
@@ -325,8 +329,9 @@ export const translations: Translations = {
       sortingMethod: 'Méthode de tri',
       uiLanguage: "Langue de l'interface",
       showQualities: 'Qualités à afficher dans la liste des streams',
-      maxResultsPerQuality: 'Résultats max. par qualité (0 = sans limite)',
-      maxFileSize: 'Taille max. du fichier en Go (0 = sans limite)',
+      maxResultsPerQuality: 'Résultats max. par qualité',
+      maxFileSize: 'Taille max. du fichier en Go',
+      noLimit: 'Sans limite',
     },
     languages: {
       noPreference: 'Sans préférence',
@@ -375,8 +380,9 @@ export const translations: Translations = {
       sortingMethod: 'Metodo di ordinamento',
       uiLanguage: "Lingua dell'interfaccia utente",
       showQualities: 'Calità da mostrare nella lista degli stream',
-      maxResultsPerQuality: 'Risultati max. per calità (0 = senza limite)',
-      maxFileSize: 'Dimensione massima del file in GB (0 = senza limite)',
+      maxResultsPerQuality: 'Risultati max. per calità',
+      maxFileSize: 'Dimensione massima del file in GB',
+      noLimit: 'Senza limite',
     },
     languages: {
       noPreference: 'Nessuna preferenza',
@@ -425,8 +431,9 @@ export const translations: Translations = {
       sortingMethod: '並べ替え方法',
       uiLanguage: 'UI言語',
       showQualities: 'ストリームリストに表示する画質',
-      maxResultsPerQuality: '画質ごとの最大結果数 (0 = 制限なし)',
-      maxFileSize: 'ファイルサイズの最大値 (GB) (0 = 制限なし)',
+      maxResultsPerQuality: '画質ごとの最大結果数',
+      maxFileSize: 'ファイルサイズの最大値 (GB)',
+      noLimit: '制限なし',
     },
     languages: {
       noPreference: '優先なし',
@@ -475,8 +482,9 @@ export const translations: Translations = {
       sortingMethod: 'Método de classificação',
       uiLanguage: 'Idioma da interface de usuário',
       showQualities: 'Qualidades a serem exibidas na lista de streams',
-      maxResultsPerQuality: 'Máx. resultados por qualidade (0 = sem limite)',
-      maxFileSize: 'Tamanho máx. do arquivo em GB (0 = sem limite)',
+      maxResultsPerQuality: 'Máx. resultados por qualidade',
+      maxFileSize: 'Tamanho máx. do arquivo em GB',
+      noLimit: 'Sem limite',
     },
     languages: {
       noPreference: 'Sem preferência',
@@ -525,8 +533,9 @@ export const translations: Translations = {
       sortingMethod: 'Метод сортировки',
       uiLanguage: 'Язык интерфейса',
       showQualities: 'Качество для отображения в списке потоков',
-      maxResultsPerQuality: 'Максимальное количество результатов на качество (0 = без ограничения)',
-      maxFileSize: 'Максимальный размер файла (ГБ) (0 = без ограничения)',
+      maxResultsPerQuality: 'Максимальное количество результатов на качество',
+      maxFileSize: 'Максимальный размер файла (ГБ)',
+      noLimit: 'Без ограничения',
     },
     languages: {
       noPreference: 'Без предпочтений',
@@ -575,8 +584,9 @@ export const translations: Translations = {
       sortingMethod: '정렬 방법',
       uiLanguage: 'UI 언어',
       showQualities: '스트림 목록에 표시할 화질',
-      maxResultsPerQuality: '화질당 최대 결과 수 (0 = 제한 없음)',
-      maxFileSize: '파일 크기의 최대값 (GB) (0 = 제한 없음)',
+      maxResultsPerQuality: '화질당 최대 결과 수',
+      maxFileSize: '파일 크기의 최대값 (GB)',
+      noLimit: '제한 없음',
     },
     languages: {
       noPreference: '선호도 없음',
@@ -624,8 +634,9 @@ export const translations: Translations = {
       sortingMethod: '排序方法',
       uiLanguage: 'UI 语言',
       showQualities: '在流列表中显示的画质',
-      maxResultsPerQuality: '每个画质的最多结果数 (0 = 无限制)',
-      maxFileSize: '文件大小最大值 (GB) (0 = 无限制)',
+      maxResultsPerQuality: '每个画质的最多结果数',
+      maxFileSize: '文件大小最大值 (GB)',
+      noLimit: '无限制',
     },
     languages: {
       noPreference: '无偏好',
@@ -674,8 +685,9 @@ export const translations: Translations = {
       sortingMethod: 'Sorteermethode',
       uiLanguage: 'Gebruikersinterface-taal',
       showQualities: 'Kwaliteiten om weer te geven in de streamlijst',
-      maxResultsPerQuality: 'Maximale resultaten per kwaliteit (0 = geen limiet)',
-      maxFileSize: 'Maximale bestandsgrootte in GB (0 = geen limiet)',
+      maxResultsPerQuality: 'Maximale resultaten per kwaliteit',
+      maxFileSize: 'Maximale bestandsgrootte in GB',
+      noLimit: 'Geen limiet',
     },
     languages: {
       noPreference: 'Geen voorkeur',
@@ -724,8 +736,9 @@ export const translations: Translations = {
       sortingMethod: 'Metodă de sortare',
       uiLanguage: 'Limbă interfacă',
       showQualities: 'Calități pentru afișare în lista de streamuri',
-      maxResultsPerQuality: 'Rezultate maxime pe calitate (0 = nici un limit)',
-      maxFileSize: 'Mărimea maximă a fișierului în GB (0 = nici un limit)',
+      maxResultsPerQuality: 'Rezultate maxime pe calitate',
+      maxFileSize: 'Mărimea maximă a fișierului în GB',
+      noLimit: 'Nici un limit',
     },
     languages: {
       noPreference: 'Fără preferință',
@@ -774,8 +787,9 @@ export const translations: Translations = {
       sortingMethod: 'Метод на сортиране',
       uiLanguage: 'Език на потребителския интерфейс',
       showQualities: 'Качество за показване в списъка с потоци',
-      maxResultsPerQuality: 'Максимален брой резултати на качество (0 = без ограничение)',
-      maxFileSize: 'Максимален размер на файла (GB) (0 = без ограничение)',
+      maxResultsPerQuality: 'Максимален брой резултати на качество',
+      maxFileSize: 'Максимален размер на файла (GB)',
+      noLimit: 'Без ограничение',
     },
     languages: {
       noPreference: 'Без предпочитания',

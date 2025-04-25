@@ -60,6 +60,7 @@ const uiLanguageOptions = {
 
 // Quality options for streams
 const qualityOptions = {
+  '4k,1080p,720p,480p': englishTranslations.qualityOptions.allQualities,
   '4k': '4K/UHD/2160p',
   '1080p': '1080p/FHD',
   '720p': '720p/HD',
@@ -69,7 +70,6 @@ const qualityOptions = {
   '720p,480p': '720p + 480p',
   '4k,1080p,720p': '4K + 1080p + 720p',
   '1080p,720p,480p': '1080p + 720p + 480p',
-  '4k,1080p,720p,480p': englishTranslations.qualityOptions.allQualities,
 } as Record<string, string>;
 
 export const manifest: Manifest = {
