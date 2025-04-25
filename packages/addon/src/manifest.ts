@@ -56,7 +56,7 @@ const uiLanguageOptions = {
   dut: 'Nederlands (Dutch)',
   rum: 'Română (Romanian)',
   bul: 'Български (Bulgarian)',
-};
+} as Record<string, string>;
 
 // Quality options for streams
 const qualityOptions = {
@@ -64,7 +64,13 @@ const qualityOptions = {
   '1080p': '1080p/FHD',
   '720p': '720p/HD',
   '480p': '480p/SD',
-};
+  '4k,1080p': '4K + 1080p',
+  '1080p,720p': '1080p + 720p',
+  '720p,480p': '720p + 480p',
+  '4k,1080p,720p': '4K + 1080p + 720p',
+  '1080p,720p,480p': '1080p + 720p + 480p',
+  '4k,1080p,720p,480p': englishTranslations.qualityOptions.allQualities,
+} as Record<string, string>;
 
 export const manifest: Manifest = {
   id: 'community.easynews-plus-plus',
@@ -91,7 +97,7 @@ export const manifest: Manifest = {
       title: englishTranslations.form.uiLanguage,
       key: 'uiLanguage',
       type: 'select',
-      options: uiLanguageOptions,
+      options: uiLanguageOptions as any,
       default: 'eng',
     },
     { title: englishTranslations.form.username, key: 'username', type: 'text' },
@@ -110,23 +116,22 @@ export const manifest: Manifest = {
       title: englishTranslations.form.preferredLanguage,
       key: 'preferredLanguage',
       type: 'select',
-      options: languageOptions,
+      options: languageOptions as any,
       default: '',
     },
     {
       title: englishTranslations.form.sortingMethod,
       key: 'sortingPreference',
       type: 'select',
-      options: sortingOptions,
+      options: sortingOptions as any,
       default: 'quality_first',
     },
     {
       title: englishTranslations.form.showQualities,
       key: 'showQualities',
       type: 'select',
-      options: qualityOptions,
+      options: qualityOptions as any,
       default: '4k,1080p,720p,480p',
-      // isMultiSelect: true,
     },
     {
       title: englishTranslations.form.maxResultsPerQuality,

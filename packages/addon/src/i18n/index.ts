@@ -66,6 +66,9 @@ export type TranslationKeys = {
     dateFirst: string;
     relevanceFirst: string;
   };
+  qualityOptions: {
+    allQualities: string;
+  };
 };
 
 // Translation dictionary type
@@ -198,6 +201,9 @@ export const translations: Translations = {
       dateFirst: 'Date Added (newest first)',
       relevanceFirst: 'Relevance (best matches first)',
     },
+    qualityOptions: {
+      allQualities: 'All Qualities',
+    },
   },
   // German
   de: {
@@ -244,6 +250,9 @@ export const translations: Translations = {
       sizeFirst: 'Dateigröße (größte zuerst)',
       dateFirst: 'Hinzugefügt am (neueste zuerst)',
       relevanceFirst: 'Relevanz (beste Treffer zuerst)',
+    },
+    qualityOptions: {
+      allQualities: 'Alle Qualitäten',
     },
   },
   // Spanish
@@ -292,6 +301,9 @@ export const translations: Translations = {
       dateFirst: 'Fecha de adición (más recientes primero)',
       relevanceFirst: 'Relevancia (mejores coincidencias primero)',
     },
+    qualityOptions: {
+      allQualities: 'Todas las calidades',
+    },
   },
   // French
   fr: {
@@ -338,6 +350,9 @@ export const translations: Translations = {
       sizeFirst: "Taille du fichier (plus grand d'abord)",
       dateFirst: "Date d'ajout (plus récent d'abord)",
       relevanceFirst: "Pertinence (meilleures correspondances d'abord)",
+    },
+    qualityOptions: {
+      allQualities: 'Toutes les qualités',
     },
   },
   // Italian
@@ -386,6 +401,9 @@ export const translations: Translations = {
       dateFirst: 'Data di aggiunta (i più recenti prima)',
       relevanceFirst: 'Rilevanza (migliori corrispondenze prima)',
     },
+    qualityOptions: {
+      allQualities: 'Tutte le qualità',
+    },
   },
   // Japanese
   ja: {
@@ -432,6 +450,9 @@ export const translations: Translations = {
       sizeFirst: 'ファイルサイズ（最大優先）',
       dateFirst: '追加日（最新優先）',
       relevanceFirst: '関連性（最良の一致優先）',
+    },
+    qualityOptions: {
+      allQualities: 'すべての画質',
     },
   },
   // Portuguese
@@ -480,6 +501,9 @@ export const translations: Translations = {
       dateFirst: 'Data de adição (mais recentes primeiro)',
       relevanceFirst: 'Relevância (melhores correspondências primeiro)',
     },
+    qualityOptions: {
+      allQualities: 'Todas as qualidades',
+    },
   },
   // Russian
   ru: {
@@ -526,6 +550,9 @@ export const translations: Translations = {
       sizeFirst: 'Размер файла (сначала наибольшие)',
       dateFirst: 'Дата добавления (сначала новейшие)',
       relevanceFirst: 'Релевантность (сначала лучшие совпадения)',
+    },
+    qualityOptions: {
+      allQualities: 'Все качества',
     },
   },
   // Korean
@@ -574,6 +601,9 @@ export const translations: Translations = {
       dateFirst: '추가된 날짜 (최신 우선)',
       relevanceFirst: '관련성 (가장 일치하는 것 우선)',
     },
+    qualityOptions: {
+      allQualities: '모든 화질',
+    },
   },
   // Chinese
   zh: {
@@ -619,6 +649,9 @@ export const translations: Translations = {
       sizeFirst: '文件大小（最大优先）',
       dateFirst: '添加日期（最新优先）',
       relevanceFirst: '相关性（最佳匹配优先）',
+    },
+    qualityOptions: {
+      allQualities: '所有画质',
     },
   },
   // Dutch
@@ -667,6 +700,9 @@ export const translations: Translations = {
       dateFirst: 'Datum toegevoegd (nieuwste eerst)',
       relevanceFirst: 'Relevantie (beste overeenkomsten eerst)',
     },
+    qualityOptions: {
+      allQualities: 'Alle kwaliteiten',
+    },
   },
   // Romanian
   ro: {
@@ -714,6 +750,9 @@ export const translations: Translations = {
       dateFirst: 'Data adăugării (cele mai recente înainte)',
       relevanceFirst: 'Relevantă (cele mai bune potriviri înainte)',
     },
+    qualityOptions: {
+      allQualities: 'Toate calitățile',
+    },
   },
   // Bulgarian
   bg: {
@@ -760,6 +799,9 @@ export const translations: Translations = {
       sizeFirst: 'Размер на файла (първо най-големият)',
       dateFirst: 'Дата на добавяне (най-новата първа)',
       relevanceFirst: 'Релевантност (първо най-добрите съвпадения)',
+    },
+    qualityOptions: {
+      allQualities: 'Всички качества',
     },
   },
 };

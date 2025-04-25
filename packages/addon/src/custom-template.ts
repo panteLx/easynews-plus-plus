@@ -69,7 +69,25 @@ function landingTemplate(manifest: Manifest): string {
     } else if (field.key === 'uiLanguage' && translations.form.uiLanguage) {
       return { ...field, title: translations.form.uiLanguage };
     } else if (field.key === 'showQualities' && translations.form.showQualities) {
-      return { ...field, title: translations.form.showQualities };
+      // For showQualities field, translate the title and the "All Qualities" option
+      const translatedOptions: Record<string, string> = {};
+      if (field.options) {
+        // Copy all existing options
+        Object.entries(field.options).forEach(([key, value]) => {
+          // Check if this is the "All Qualities" option and translate it
+          if (key === '4k,1080p,720p,480p' && translations.qualityOptions.allQualities) {
+            translatedOptions[key] = translations.qualityOptions.allQualities;
+          } else {
+            // Keep other options as is
+            translatedOptions[key] = value as string;
+          }
+        });
+      }
+      return {
+        ...field,
+        title: translations.form.showQualities,
+        options: Object.keys(translatedOptions).length > 0 ? translatedOptions : field.options,
+      };
     } else if (field.key === 'maxResultsPerQuality' && translations.form.maxResultsPerQuality) {
       return { ...field, title: translations.form.maxResultsPerQuality };
     } else if (field.key === 'maxFileSize' && translations.form.maxFileSize) {
