@@ -33,7 +33,39 @@ function landingTemplate(manifest: Manifest): string {
     } else if (field.key === 'strictTitleMatching' && translations.form.strictTitleMatching) {
       return { ...field, title: translations.form.strictTitleMatching };
     } else if (field.key === 'sortingPreference' && translations.form.sortingMethod) {
-      return { ...field, title: translations.form.sortingMethod };
+      // For sorting preference field, translate both title and options
+      const translatedOptions: Record<string, string> = {};
+      if (field.options) {
+        if (
+          field.options['quality_first'] !== undefined &&
+          translations.sortingOptions?.qualityFirst
+        ) {
+          translatedOptions['quality_first'] = translations.sortingOptions.qualityFirst;
+        }
+        if (
+          field.options['language_first'] !== undefined &&
+          translations.sortingOptions?.languageFirst
+        ) {
+          translatedOptions['language_first'] = translations.sortingOptions.languageFirst;
+        }
+        if (field.options['size_first'] !== undefined && translations.sortingOptions?.sizeFirst) {
+          translatedOptions['size_first'] = translations.sortingOptions.sizeFirst;
+        }
+        if (field.options['date_first'] !== undefined && translations.sortingOptions?.dateFirst) {
+          translatedOptions['date_first'] = translations.sortingOptions.dateFirst;
+        }
+        if (
+          field.options['relevance_first'] !== undefined &&
+          translations.sortingOptions?.relevanceFirst
+        ) {
+          translatedOptions['relevance_first'] = translations.sortingOptions.relevanceFirst;
+        }
+      }
+      return {
+        ...field,
+        title: translations.form.sortingMethod,
+        options: Object.keys(translatedOptions).length > 0 ? translatedOptions : field.options,
+      };
     } else if (field.key === 'uiLanguage' && translations.form.uiLanguage) {
       return { ...field, title: translations.form.uiLanguage };
     } else if (field.key === 'showQualities' && translations.form.showQualities) {
@@ -94,46 +126,6 @@ function landingTemplate(manifest: Manifest): string {
         ...field,
         title: translations.form.preferredLanguage,
         options: Object.keys(translatedOptions).length > 0 ? translatedOptions : field.options,
-      };
-    } else if (field.key === 'sortingPreference' && translations.form.sortingMethod) {
-      // For sorting preference field, translate both title and options
-      const translatedOptions: Record<string, string> = {};
-      if (field.options) {
-        if (
-          field.options['quality_first'] !== undefined &&
-          translations.sortingOptions?.qualityFirst
-        ) {
-          translatedOptions['quality_first'] = translations.sortingOptions.qualityFirst;
-        }
-        if (
-          field.options['language_first'] !== undefined &&
-          translations.sortingOptions?.languageFirst
-        ) {
-          translatedOptions['language_first'] = translations.sortingOptions.languageFirst;
-        }
-        if (field.options['size_first'] !== undefined && translations.sortingOptions?.sizeFirst) {
-          translatedOptions['size_first'] = translations.sortingOptions.sizeFirst;
-        }
-        if (field.options['date_first'] !== undefined && translations.sortingOptions?.dateFirst) {
-          translatedOptions['date_first'] = translations.sortingOptions.dateFirst;
-        }
-        if (
-          field.options['relevance_first'] !== undefined &&
-          translations.sortingOptions?.relevanceFirst
-        ) {
-          translatedOptions['relevance_first'] = translations.sortingOptions.relevanceFirst;
-        }
-      }
-      return {
-        ...field,
-        title: translations.form.sortingMethod,
-        options: Object.keys(translatedOptions).length > 0 ? translatedOptions : field.options,
-      };
-    } else if (field.key === 'uiLanguage' && translations.form.uiLanguage) {
-      // For UI language selection field, just translate the title
-      return {
-        ...field,
-        title: translations.form.uiLanguage,
       };
     }
     return field;

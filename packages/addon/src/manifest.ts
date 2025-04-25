@@ -120,7 +120,6 @@ export const manifest: Manifest = {
       options: sortingOptions,
       default: 'quality_first',
     },
-
     {
       title: englishTranslations.form.showQualities,
       key: 'showQualities',
