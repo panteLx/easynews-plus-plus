@@ -3,7 +3,6 @@ import addonBuilder from 'stremio-addon-sdk/src/builder';
 import { catalog, manifest } from './manifest';
 import {
   buildSearchQuery,
-  capitalizeFirstLetter,
   createStreamPath,
   createStreamUrl,
   createThumbnailUrl,
@@ -14,19 +13,14 @@ import {
   getSize,
   getVersion,
   isBadVideo,
-  loadCustomTitles,
   logger,
-  LogLevel,
   logError,
   matchesTitle,
   getAlternativeTitles,
 } from './utils';
 import { EasynewsAPI, SearchOptions, EasynewsSearchResponse } from 'easynews-plus-plus-api';
 import { publicMetaProvider } from './meta';
-import { fromHumanReadable, toDirection, SortOption, SortOptionKey } from './sort-option';
 import { Stream } from './types';
-import * as path from 'path';
-import * as fs from 'fs';
 import customTitlesJson from '../../../custom-titles.json';
 
 // Extended configuration interface

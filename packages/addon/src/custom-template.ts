@@ -1,5 +1,5 @@
 import { Manifest } from 'stremio-addon-sdk';
-import { TranslationKeys, getTranslations, getUILanguage, ISO_TO_LANGUAGE } from './i18n';
+import { getTranslations, ISO_TO_LANGUAGE } from './i18n';
 
 function landingTemplate(manifest: Manifest): string {
   const configurationFields = manifest.config || [];

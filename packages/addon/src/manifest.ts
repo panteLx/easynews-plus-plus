@@ -5,8 +5,8 @@ import { version, description } from '../../../package.json';
 
 // Prepare catalog structure
 export const catalog: ManifestCatalog = {
-  id: 'easynews-catalogs',
-  name: 'Easynews Catalog',
+  id: 'easynews-plus-plus',
+  name: 'Easynews++',
   type: 'tv' as ContentType,
   extra: [{ name: 'search', isRequired: true }],
 };

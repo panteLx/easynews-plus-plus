@@ -1,5 +1,3 @@
-import { Stream as StremioStream } from 'stremio-addon-sdk';
-
 declare module 'stremio-addon-sdk' {
   interface Manifest {
     stremioAddonsConfig?: {

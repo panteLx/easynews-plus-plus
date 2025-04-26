@@ -3,7 +3,7 @@
  */
 
 // Define the supported languages
-export type Language =
+type Language =
   | 'en'
   | 'de'
   | 'es'
@@ -19,7 +19,7 @@ export type Language =
   | 'bg';
 
 // Key-value structure for translations
-export type TranslationKeys = {
+type TranslationKeys = {
   // Configuration page
   configPage: {
     title: string;
@@ -73,7 +73,7 @@ export type TranslationKeys = {
 };
 
 // Translation dictionary type
-export type Translations = Record<Language, TranslationKeys>;
+type Translations = Record<Language, TranslationKeys>;
 
 // Default language
 export const DEFAULT_LANGUAGE: Language = 'en';
@@ -98,7 +98,7 @@ export const ISO_TO_LANGUAGE: Record<string, Language> = {
 };
 
 // Language to ISO mapping (reverse of above)
-export const LANGUAGE_TO_ISO: Record<Language, string> = {
+const LANGUAGE_TO_ISO: Record<Language, string> = {
   en: 'eng',
   de: 'ger',
   es: 'spa',
@@ -115,7 +115,7 @@ export const LANGUAGE_TO_ISO: Record<Language, string> = {
 };
 
 // All supported languages with their display names
-export const SUPPORTED_LANGUAGES: Record<Language, string> = {
+const SUPPORTED_LANGUAGES: Record<Language, string> = {
   en: 'English',
   de: 'Deutsch (German)',
   es: 'Español (Spanish)',

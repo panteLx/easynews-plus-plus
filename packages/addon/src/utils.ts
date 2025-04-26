@@ -3,8 +3,6 @@ import { MetaProviderResponse } from './meta';
 import { ContentType } from 'stremio-addon-sdk';
 import { parse as parseTorrentTitle } from 'parse-torrent-title';
 import * as fs from 'fs';
-import * as path from 'path';
-import { readFileSync } from 'fs';
 
 // Import the custom titles JSON directly
 import customTitlesJson from '../../../custom-titles.json';
@@ -226,7 +224,15 @@ export function createThumbnailUrl(res: EasynewsSearchResponse, file: FileData) 
   return `${res.thumbURL}${idChars}/pr-${id}.jpg/th-${thumbnailSlug}.jpg`;
 }
 
+/**
+ * @param value String to extract digits from
+ * @returns The first sequence of digits found in the string or undefined
+ */
 export function extractDigits(value: string) {
+  if (!value) {
+    return undefined;
+  }
+
   const match = value.match(/\d+/);
 
   if (match) {
@@ -234,52 +240,6 @@ export function extractDigits(value: string) {
   }
 
   return undefined;
-}
-
-/**
- * @param filePath Path to the JSON file containing custom titles
- * @returns Custom titles from the file or the imported custom titles if file not found
- */
-export function loadCustomTitles(filePath: string): Record<string, string[]> {
-  try {
-    // Always have imported JSON available
-    logger.info('Using imported custom-titles.json as base');
-
-    // If we have a valid file path and filesystem access, try to read the file
-    if (filePath && fs.existsSync && fs.existsSync(filePath)) {
-      logger.info(`Loading custom titles from file: ${filePath}`);
-      const fileContent = fs.readFileSync(filePath, 'utf-8');
-      logger.info(`File content size: ${fileContent.length} bytes`);
-
-      // Try to parse the file content
-      try {
-        const titlesFromFile = JSON.parse(fileContent);
-        logger.info(`Parsed ${Object.keys(titlesFromFile).length} custom titles from file`);
-
-        // Log a sample of custom titles for debugging
-        const sampleKeys = Object.keys(titlesFromFile).slice(0, 3);
-        for (const key of sampleKeys) {
-          logger.info(`Sample custom title: "${key}" -> ${JSON.stringify(titlesFromFile[key])}`);
-        }
-
-        // Merge with built-in custom titles (file custom titles take precedence)
-        return {
-          ...customTitlesJson,
-          ...titlesFromFile,
-        };
-      } catch (parseError) {
-        logger.error(`Error parsing JSON in ${filePath}:`, parseError);
-        logger.error(`First 100 characters of file: ${fileContent.substring(0, 100)}...`);
-      }
-    } else if (filePath) {
-      logger.info(`File does not exist or filesystem access unavailable: ${filePath}`);
-    }
-  } catch (error) {
-    logger.info(`Error loading custom titles: ${error}`);
-  }
-
-  logger.info('Using imported custom-titles.json');
-  return customTitlesJson;
 }
 
 /**
