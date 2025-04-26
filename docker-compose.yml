@@ -1,0 +1,25 @@
+services:
+  easynews-plus-plus:
+    # Build the image from the Dockerfile
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+    # image: easynews-plus-plus
+
+    # Or use the pre-built image from GitHub Container Registry
+    image: ghcr.io/pantelx/easynews-plus-plus:latest # use main tag for the latest version
+
+    container_name: easynews-plus-plus
+    ports:
+      - '1337:1337'
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./custom-titles.json:/app/custom-titles.json
+    networks:
+      - easynews-network
+
+networks:
+  easynews-network:
+    driver: bridge
