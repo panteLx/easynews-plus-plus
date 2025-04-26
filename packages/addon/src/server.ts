@@ -37,9 +37,6 @@ function serveHTTP(addonInterface: AddonInterface, opts: ServerOptions = {}) {
 
   const app = express();
 
-  // Use the standard router from the SDK
-  app.use(getRouter(addonInterface));
-
   // Handle Cache-Control
   const cacheMaxAge = opts.cacheMaxAge || opts.cache;
   if (cacheMaxAge) {
@@ -49,6 +46,9 @@ function serveHTTP(addonInterface: AddonInterface, opts: ServerOptions = {}) {
       next();
     });
   }
+
+  // Use the standard router from the SDK
+  app.use(getRouter(addonInterface));
 
   // The important part: Use our custom template with internationalization
   const hasConfig = !!(addonInterface.manifest.config || []).length;
