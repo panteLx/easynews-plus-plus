@@ -124,4 +124,7 @@ function serveHTTP(addonInterface: AddonInterface, opts: ServerOptions = {}) {
 }
 
 // Start the server with the addon interface
-serveHTTP(addonInterface, { port: +(process.env.PORT ?? 1337) });
+serveHTTP(addonInterface, { port: +(process.env.PORT ?? 1337) }).catch(err => {
+  console.error('[server] failed to start:', err);
+  process.exitCode = 1;
+});
