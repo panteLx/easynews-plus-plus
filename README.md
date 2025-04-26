@@ -137,24 +137,18 @@ For optimal performance and privacy, you can self-host the addon. We offer multi
 > [!TIP]  
 > Consider adding custom/translated titles to custom-titles.json for enhanced functionality
 
-### 🐳 Docker Deployment
+### 🐳 Docker Compose Deployment
 
-Deploy using Docker for a containerized solution:
+Deploy using Docker Compose for a containerized solution:
 
 ```bash
 $ git clone https://github.com/pantelx/easynews-plus-plus.git && cd easynews-plus-plus
-$ docker build -t easynews-plus-plus .
-$ docker run -p 8080:1337 easynews-plus-plus
+$ docker-compose up -d
 ```
 
-Alternatively, you can use the pre-built Docker image from GitHub Container Registry:
+The docker-compose.yml file is configured to use the pre-built image by default, making it the easiest deployment option. To modify the configuration, edit the docker-compose.yml file before running `docker-compose up -d`.
 
-```bash
-$ docker pull ghcr.io/pantelx/easynews-plus-plus:latest
-$ docker run -p 8080:1337 ghcr.io/pantelx/easynews-plus-plus:latest
-```
-
-Verify the installation by visiting `http://localhost:8080/` in your browser.
+Verify the installation by visiting `http://localhost:1337/` in your browser.
 
 > [!NOTE]  
 > The Docker image is automatically built and published to GitHub Container Registry (ghcr.io) for each push to the main branch and for each new version tag. You can find all available tags on the [GitHub Packages page](https://github.com/pantelx/easynews-plus-plus/pkgs/container/easynews-plus-plus).
