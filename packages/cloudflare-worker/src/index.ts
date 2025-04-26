@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { getRouter } from 'hono-stremio';
 import { addonInterface, customTemplate } from 'easynews-plus-plus-addon';
-import { getTranslations, getUILanguage } from 'easynews-plus-plus-addon/dist/i18n';
+import { getUILanguage } from 'easynews-plus-plus-addon/dist/i18n';
 
 // Create the router with the default HTML
 const defaultHTML = customTemplate(addonInterface.manifest);

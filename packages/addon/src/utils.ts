@@ -3,8 +3,6 @@ import { MetaProviderResponse } from './meta';
 import { ContentType } from 'stremio-addon-sdk';
 import { parse as parseTorrentTitle } from 'parse-torrent-title';
 import * as fs from 'fs';
-import * as path from 'path';
-import { readFileSync } from 'fs';
 
 // Import the custom titles JSON directly
 import customTitlesJson from '../../../custom-titles.json';
