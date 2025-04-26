@@ -9,7 +9,7 @@ export type MetaProviderResponse = {
   episode?: string;
 };
 
-export async function imdbMetaProvider(id: string): Promise<MetaProviderResponse> {
+async function imdbMetaProvider(id: string): Promise<MetaProviderResponse> {
   var [tt, season, episode] = id.split(':');
 
   return fetch(`https://v2.sg.media-imdb.com/suggestion/t/${tt}.json`)
@@ -33,10 +33,7 @@ export async function imdbMetaProvider(id: string): Promise<MetaProviderResponse
     });
 }
 
-export async function cinemetaMetaProvider(
-  id: string,
-  type: string
-): Promise<MetaProviderResponse> {
+async function cinemetaMetaProvider(id: string, type: string): Promise<MetaProviderResponse> {
   var [tt, season, episode] = id.split(':');
 
   return fetch(`https://v3-cinemeta.strem.io/meta/${type}/${tt}.json`)
