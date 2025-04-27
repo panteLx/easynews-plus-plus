@@ -23,7 +23,7 @@ function loadEnv() {
 
     // Log the result of loading the environment config
     if (result.error) {
-      console.error('Error loading .env:', result.error);
+      console.warn('Error loading .env. Continuing with default values.');
     } else {
       console.log('Environment configuration loaded successfully');
     }
