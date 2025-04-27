@@ -142,13 +142,17 @@ For optimal performance and privacy, you can self-host the addon. We offer multi
 Deploy using Docker Compose for a containerized solution:
 
 ```bash
+# Clone the repository
 $ git clone https://github.com/pantelx/easynews-plus-plus.git && cd easynews-plus-plus
+# Copy the .env.example file to .env
+$ cp .env.example .env
+# Start the container
 $ docker-compose up -d
 ```
 
 The docker-compose.yml file is configured to use the pre-built image by default, making it the easiest deployment option. To modify the configuration, edit the docker-compose.yml file before running `docker-compose up -d`.
 
-Verify the installation by visiting `http://localhost:1337/` in your browser.
+Verify the installation by visiting `http://localhost:1337/` in your browser. To customize the port or other settings, edit the .env file before starting the container.
 
 > [!NOTE]  
 > The Docker image is automatically built and published to GitHub Container Registry (ghcr.io) for each push to the main branch and for each new version tag. You can find all available tags on the [GitHub Packages page](https://github.com/pantelx/easynews-plus-plus/pkgs/container/easynews-plus-plus).
@@ -168,15 +172,13 @@ $ npm -v
 # Clone and install
 $ git clone https://github.com/pantelx/easynews-plus-plus.git && cd easynews-plus-plus
 $ npm i
+# Copy the .env.example file to .env
+$ cp .env.example .env
 # Start in production mode
 $ npm run start
 ```
 
-Access the addon at `http://localhost:1337/`. Customize the port using the `PORT` environment variable:
-
-```bash
-$ PORT=8080 npm run start
-```
+Access the addon at `http://localhost:1337/`. Customize the port and other settings using the .env file.
 
 ### ☁️ Cloud Deployment
 
@@ -185,8 +187,13 @@ $ PORT=8080 npm run start
 Deploy to Cloudflare's global edge network for optimal performance:
 
 ```bash
+# Clone the repository
 $ git clone https://github.com/pantelx/easynews-plus-plus.git && cd easynews-plus-plus
+# Install dependencies
 $ npm i
+# Copy the .env.example file to .env
+$ cp .env.example .env
+# Deploy to Cloudflare
 $ npm run deploy:cf
 # Preview changes (if enabled in Cloudflare dashboard)
 $ npm run preview:cf
@@ -195,8 +202,13 @@ $ npm run preview:cf
 #### Beamup Deployment
 
 ```bash
+# Clone the repository
 $ git clone https://github.com/pantelx/easynews-plus-plus.git && cd easynews-plus-plus
+# Install dependencies
 $ npm i
+# Copy the .env.example file to .env
+$ cp .env.example .env
+# Deploy to Beamup
 $ npm run deploy:beamup
 ```
 
@@ -205,9 +217,12 @@ $ npm run deploy:beamup
 ### 💻 Development Setup
 
 ```bash
-$ git clone https://github.com/pantelx/easynews-plus-plus.git
-$ cd easynews-plus-plus
+# Clone the repository
+$ git clone https://github.com/pantelx/easynews-plus-plus.git && cd easynews-plus-plus
+# Install dependencies
 $ npm i
+# Copy the .env.example file to .env
+$ cp .env.example .env
 ```
 
 Development modes:
@@ -244,6 +259,17 @@ $ npm run release
 ### What is Easynews?
 
 Easynews is a premium Usenet provider offering a web-based Usenet browser. It enables users to search, preview, and download files from Usenet newsgroups without requiring a newsreader. Known for its user-friendly interface and fast download speeds, Easynews serves as an alternative to debrid services (Real-Debrid, Premiumize, AllDebrid, etc.). An active Easynews subscription is required to use this addon.
+
+### How do I configure the addon server?
+
+You can configure the addon server using environment variables:
+
+1. **Port Configuration**: Change the default port (1337) by setting the `PORT` environment variable
+2. **Logging Level**: Adjust the verbosity of logs with the `EASYNEWS_LOG_LEVEL` variable
+
+The easiest way to configure these settings is by copying the `.env.example` file to `.env` in the project root.
+
+For Docker deployments, the docker-compose.yml file is already configured to use the `.env` file automatically.
 
 ### How does the caching system work?
 

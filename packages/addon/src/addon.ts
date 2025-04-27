@@ -11,7 +11,6 @@ import {
   getPostTitle,
   getQuality,
   getSize,
-  getVersion,
   isBadVideo,
   logger,
   logError,
@@ -42,9 +41,6 @@ type ValidPosterShape = 'square' | 'regular' | 'landscape';
 
 const builder = new addonBuilder(manifest);
 const prefix = `${catalog.id}:`;
-
-// Log addon initialization
-logger.info(`Addon initializing - version: ${getVersion()}, log level: ${logger.getLevelName()}`);
 
 // In-memory request cache to reduce API calls and improve response times
 const requestCache = new Map<string, { data: any; timestamp: number }>();

@@ -1,11 +1,12 @@
 import express, { Request, Response, NextFunction } from 'express';
 import { AddonInterface } from 'stremio-addon-sdk';
+import path from 'path';
 // Import getRouter manually since TypeScript definitions are incomplete
 // @ts-ignore
 import getRouter from 'stremio-addon-sdk/src/getRouter';
-import * as path from 'path';
 import customTemplate from './custom-template';
 import { addonInterface } from './addon';
+import { logger, getVersion } from './utils';
 
 type ServerOptions = {
   port?: number;
@@ -116,7 +117,7 @@ function serveHTTP(addonInterface: AddonInterface, opts: ServerOptions = {}) {
       const addressInfo = server.address();
       const port = typeof addressInfo === 'object' ? addressInfo?.port : null;
       const url = `http://127.0.0.1:${port}/manifest.json`;
-      console.log('HTTP addon accessible at:', url);
+      console.log(`[server] HTTP addon accessible at: ${url}`);
       resolve({ url, server });
     });
     server.on('error', reject);
@@ -128,3 +129,8 @@ serveHTTP(addonInterface, { port: +(process.env.PORT ?? 1337) }).catch(err => {
   console.error('[server] failed to start:', err);
   process.exitCode = 1;
 });
+
+// Log environment configuration
+console.log(`[server] PORT: ${process.env.PORT || 1337}`);
+console.log(`[server] LOG_LEVEL: ${logger.getLevelName()}`);
+console.log(`[server] VERSION: ${getVersion()}`);
