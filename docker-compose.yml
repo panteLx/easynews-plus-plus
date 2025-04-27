@@ -17,6 +17,7 @@ services:
       - .env
     volumes:
       - ./custom-titles.json:/app/custom-titles.json
+      - ./.env:/app/.env
     networks:
       - easynews-network
 

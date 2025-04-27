@@ -6,8 +6,6 @@ import {
   getQuality,
   extractDigits,
   capitalizeFirstLetter,
-  parseLogLevel,
-  LogLevel,
   createStreamUrl,
   createStreamPath,
   getFileExtension,
@@ -350,37 +348,6 @@ describe('capitalizeFirstLetter', () => {
   it('handles strings with non-letter first characters', () => {
     expect(capitalizeFirstLetter('123abc')).toBe('123abc');
     expect(capitalizeFirstLetter(' hello')).toBe(' hello');
-  });
-});
-
-describe('parseLogLevel', () => {
-  it('parses valid log levels', () => {
-    expect(parseLogLevel('ERROR')).toBe(LogLevel.ERROR);
-    expect(parseLogLevel('WARN')).toBe(LogLevel.WARN);
-    expect(parseLogLevel('INFO')).toBe(LogLevel.INFO);
-    expect(parseLogLevel('DEBUG')).toBe(LogLevel.DEBUG);
-    expect(parseLogLevel('TRACE')).toBe(LogLevel.TRACE);
-  });
-
-  it('handles case-insensitive log levels', () => {
-    expect(parseLogLevel('error')).toBe(LogLevel.ERROR);
-    expect(parseLogLevel('warn')).toBe(LogLevel.WARN);
-    expect(parseLogLevel('info')).toBe(LogLevel.INFO);
-    expect(parseLogLevel('debug')).toBe(LogLevel.DEBUG);
-    expect(parseLogLevel('trace')).toBe(LogLevel.TRACE);
-  });
-
-  it('returns INFO level for undefined input', () => {
-    expect(parseLogLevel(undefined)).toBe(LogLevel.INFO);
-  });
-
-  it('returns INFO level for invalid input', () => {
-    expect(parseLogLevel('INVALID')).toBe(LogLevel.INFO);
-  });
-
-  it('returns INFO level for mixed case input', () => {
-    expect(parseLogLevel('InFo')).toBe(LogLevel.INFO);
-    expect(parseLogLevel('dEbUg')).toBe(LogLevel.DEBUG);
   });
 });
 

@@ -4,6 +4,8 @@ import { ContentType } from 'stremio-addon-sdk';
 import { parse as parseTorrentTitle } from 'parse-torrent-title';
 import path from 'path';
 import dotenv from 'dotenv';
+import * as winston from 'winston';
+
 // Import the custom titles JSON directly
 import customTitlesJson from '../../../custom-titles.json';
 
@@ -21,6 +23,27 @@ function loadEnv() {
 }
 
 loadEnv();
+
+// Add interface to declare the function with properties
+interface TypeFunction {
+  (type?: string): string;
+  currentType: string;
+}
+
+// Implement the function with proper typing
+export const getType: TypeFunction = function (type?: string): string {
+  // Store the module type in a variable that persists between calls
+  if (type) {
+    getType.currentType = type;
+  }
+  return getType.currentType || 'Easynews++';
+};
+
+// Initialize the property
+getType.currentType = '';
+
+// Initialize with 'utils' as the default type for this module
+getType('utils');
 
 export function isBadVideo(file: FileData) {
   const duration = file['14'] ?? '';
@@ -389,61 +412,6 @@ export function getVersion(): string {
 }
 
 /**
- * Log levels for configuration
- */
-export enum LogLevel {
-  NONE = -1, // No logging at all
-  ERROR = 0, // Critical errors that prevent operation
-  WARN = 1, // Warnings about potential issues
-  INFO = 2, // General operational information
-  DEBUG = 3, // Detailed information for debugging
-  TRACE = 4, // Very detailed tracing information
-}
-
-/**
- * Parse a string log level to enum value
- * @param level The string log level to parse
- * @returns The LogLevel enum value
- */
-export function parseLogLevel(level: string | undefined): LogLevel {
-  if (!level) return LogLevel.INFO;
-
-  switch (level.toLowerCase()) {
-    case 'none':
-      return LogLevel.NONE;
-    case 'error':
-      return LogLevel.ERROR;
-    case 'warn':
-    case 'warning':
-      return LogLevel.WARN;
-    case 'info':
-      return LogLevel.INFO;
-    case 'debug':
-      return LogLevel.DEBUG;
-    case 'trace':
-      return LogLevel.TRACE;
-    default:
-      // Try to parse as number
-      const numLevel = parseInt(level, 10);
-      if (!isNaN(numLevel) && numLevel >= LogLevel.NONE && numLevel <= LogLevel.TRACE) {
-        return numLevel;
-      }
-      return LogLevel.INFO;
-  }
-}
-
-/**
- * Get initial log level from environment or default to INFO
- * @returns The initial log level to use
- */
-function getInitialLogLevel(): LogLevel {
-  if (typeof process !== 'undefined' && process.env) {
-    return parseLogLevel(process.env.EASYNEWS_LOG_LEVEL);
-  }
-  return LogLevel.INFO;
-}
-
-/**
  * Format a timestamp for logging
  * @returns Formatted timestamp [HH:MM:SS]
  */
@@ -453,123 +421,34 @@ function getTimestamp(): string {
 }
 
 /**
- * Logger module for consistent logging across the addon
+ * Logger using Winston directly
  *
- * Log levels can be set via:
- * 1. Environment variable: EASYNEWS_LOG_LEVEL (none, error, warn, info, debug, trace)
- * 2. AddonConfig.logLevel in the configuration
- * 3. Programmatically via logger.setLevel()
+ * Log levels can be set via environment variable: EASYNEWS_LOG_LEVEL
+ * Valid values: error, warn, info, debug, silly, or silent
  */
-export const logger = {
-  /**
-   * Current log level
-   */
-  level: getInitialLogLevel(),
+// Create and export Winston logger directly
+export const logger = winston.createLogger({
+  level: process.env.EASYNEWS_LOG_LEVEL?.toLowerCase() || 'info',
+  format: winston.format.combine(
+    winston.format.colorize(),
+    winston.format.printf(info => {
+      // Handle multiple arguments passed to the logger
+      const splat = info[Symbol.for('splat')] || [];
+      let message = info.message;
 
-  /**
-   * Get log level name from current level
-   * @returns The name of the current log level
-   */
-  getLevelName: (): string => {
-    switch (logger.level) {
-      case LogLevel.NONE:
-        return 'NONE';
-      case LogLevel.ERROR:
-        return 'ERROR';
-      case LogLevel.WARN:
-        return 'WARN';
-      case LogLevel.INFO:
-        return 'INFO';
-      case LogLevel.DEBUG:
-        return 'DEBUG';
-      case LogLevel.TRACE:
-        return 'TRACE';
-      default:
-        return `UNKNOWN(${logger.level})`;
-    }
-  },
+      // If there are additional arguments, format them and add to the message
+      if (splat && Array.isArray(splat) && splat.length > 0) {
+        const args = splat
+          .map((arg: any) => (typeof arg === 'object' ? JSON.stringify(arg) : arg))
+          .join(' ');
+        message = `${message} ${args}`;
+      }
 
-  /**
-   * Set the logging level
-   * @param level The log level to set
-   */
-  setLevel: (level: LogLevel | string) => {
-    if (typeof level === 'string') {
-      logger.level = parseLogLevel(level);
-    } else {
-      logger.level = level;
-    }
-
-    // Log the level change at the level that will be visible
-    if (logger.level >= LogLevel.DEBUG) {
-      console.debug(
-        `${logger.formatPrefix()} [DEBUG] Log level changed to: ${logger.getLevelName()}`
-      );
-    }
-  },
-
-  /**
-   * Format a log prefix with version and timestamp
-   */
-  formatPrefix: () => {
-    return `[Easynews++ v${getVersion()}]${logger.level >= LogLevel.DEBUG ? getTimestamp() : ''}`;
-  },
-
-  /**
-   * Log trace messages (most detailed level)
-   * @param message The message to log
-   * @param optionalParams Additional parameters to log
-   */
-  trace: (message: string, ...optionalParams: any[]) => {
-    if (logger.level >= LogLevel.TRACE) {
-      console.debug(`${logger.formatPrefix()} [TRACE] ${message}`, ...optionalParams);
-    }
-  },
-
-  /**
-   * Log debug messages
-   * @param message The message to log
-   * @param optionalParams Additional parameters to log
-   */
-  debug: (message: string, ...optionalParams: any[]) => {
-    if (logger.level >= LogLevel.DEBUG) {
-      console.debug(`${logger.formatPrefix()} [DEBUG] ${message}`, ...optionalParams);
-    }
-  },
-
-  /**
-   * Log informational messages
-   * @param message The message to log
-   * @param optionalParams Additional parameters to log
-   */
-  info: (message: string, ...optionalParams: any[]) => {
-    if (logger.level >= LogLevel.INFO) {
-      console.log(`${logger.formatPrefix()} ${message}`, ...optionalParams);
-    }
-  },
-
-  /**
-   * Log warning messages
-   * @param message The message to log
-   * @param optionalParams Additional parameters to log
-   */
-  warn: (message: string, ...optionalParams: any[]) => {
-    if (logger.level >= LogLevel.WARN) {
-      console.warn(`${logger.formatPrefix()} [WARN] ${message}`, ...optionalParams);
-    }
-  },
-
-  /**
-   * Log error messages
-   * @param message The message to log
-   * @param optionalParams Additional parameters to log
-   */
-  error: (message: string, ...optionalParams: any[]) => {
-    if (logger.level >= LogLevel.ERROR) {
-      console.error(`${logger.formatPrefix()} [ERROR] ${message}`, ...optionalParams);
-    }
-  },
-};
+      return `[${getType()} - v${getVersion()}] ${info.level}: ${message}`;
+    })
+  ),
+  transports: [new winston.transports.Console()],
+});
 
 export function logError(message: { message: string; error: unknown; context: unknown }) {
   logger.error(`Error: ${message.message}`, message);

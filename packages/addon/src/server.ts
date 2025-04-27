@@ -6,7 +6,7 @@ import path from 'path';
 import getRouter from 'stremio-addon-sdk/src/getRouter';
 import customTemplate from './custom-template';
 import { addonInterface } from './addon';
-import { logger, getVersion } from './utils';
+import { logger, getVersion, getType } from './utils';
 
 type ServerOptions = {
   port?: number;
@@ -23,7 +23,7 @@ function createManifestWithLanguage(addonInterface: AddonInterface, lang: string
   if (manifest.config) {
     const uiLangFieldIndex = manifest.config.findIndex((field: any) => field.key === 'uiLanguage');
     if (uiLangFieldIndex >= 0 && lang) {
-      console.log(`Setting language in manifest to: ${lang}`);
+      logger.debug(`Setting language in manifest to: ${lang}`);
       manifest.config[uiLangFieldIndex].default = lang;
     }
   }
@@ -79,7 +79,7 @@ function serveHTTP(addonInterface: AddonInterface, opts: ServerOptions = {}) {
 
       // Get language from query parameter
       const lang = (req.query.lang as string) || '';
-      console.log(`Express server: Received request with lang=${lang}`);
+      logger.debug(`Express server: Received request with lang=${lang}`);
 
       // Generate HTML with the selected language
       let tempManifest;
@@ -105,7 +105,7 @@ function serveHTTP(addonInterface: AddonInterface, opts: ServerOptions = {}) {
       if (!fs.existsSync(location)) throw new Error('directory to serve does not exist');
       app.use(opts.static, express.static(location));
     } catch (e) {
-      console.error('Error setting up static directory:', e);
+      logger.error('Error setting up static directory:', e);
     }
   }
 
@@ -117,7 +117,7 @@ function serveHTTP(addonInterface: AddonInterface, opts: ServerOptions = {}) {
       const addressInfo = server.address();
       const port = typeof addressInfo === 'object' ? addressInfo?.port : null;
       const url = `http://127.0.0.1:${port}/manifest.json`;
-      console.log(`[server] HTTP addon accessible at: ${url}`);
+      logger.info(`Addon accessible at: ${url}`);
       resolve({ url, server });
     });
     server.on('error', reject);
@@ -126,11 +126,13 @@ function serveHTTP(addonInterface: AddonInterface, opts: ServerOptions = {}) {
 
 // Start the server with the addon interface
 serveHTTP(addonInterface, { port: +(process.env.PORT ?? 1337) }).catch(err => {
-  console.error('[server] failed to start:', err);
+  logger.error('Server failed to start:', err);
   process.exitCode = 1;
 });
 
+getType('server');
+
 // Log environment configuration
-console.log(`[server] PORT: ${process.env.PORT || 1337}`);
-console.log(`[server] LOG_LEVEL: ${logger.getLevelName()}`);
-console.log(`[server] VERSION: ${getVersion()}`);
+logger.info(`PORT: ${process.env.PORT || 1337}`);
+logger.info(`LOG_LEVEL: ${logger.level}`);
+logger.info(`VERSION: ${getVersion()}`);
