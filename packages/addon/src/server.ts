@@ -1,9 +1,23 @@
+// Load environment variables from .env file
+import dotenv from 'dotenv';
+import path from 'path';
+
+// Load environment variables from env file in project root
+const configPath = path.resolve('../../.env');
+const result = dotenv.config({ path: configPath });
+
+// Log the result of loading the environment config
+if (result.error) {
+  console.error('Error loading .env:', result.error);
+} else {
+  console.log('Environment configuration loaded successfully');
+}
+
 import express, { Request, Response, NextFunction } from 'express';
 import { AddonInterface } from 'stremio-addon-sdk';
 // Import getRouter manually since TypeScript definitions are incomplete
 // @ts-ignore
 import getRouter from 'stremio-addon-sdk/src/getRouter';
-import * as path from 'path';
 import customTemplate from './custom-template';
 import { addonInterface } from './addon';
 
@@ -128,3 +142,7 @@ serveHTTP(addonInterface, { port: +(process.env.PORT ?? 1337) }).catch(err => {
   console.error('[server] failed to start:', err);
   process.exitCode = 1;
 });
+
+// Log environment configuration
+console.log(`[server] PORT: ${process.env.PORT || 1337}`);
+console.log(`[server] EASYNEWS_LOG_LEVEL: ${process.env.EASYNEWS_LOG_LEVEL || 'INFO (default)'}`);
