@@ -10,3 +10,4 @@ head_sampling_rate = 1
 [vars]
 PORT = "1337"
 EASYNEWS_LOG_LEVEL = "debug"
+CLOUDFLARE = "true"
