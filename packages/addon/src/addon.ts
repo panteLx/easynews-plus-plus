@@ -16,7 +16,6 @@ import {
   logError,
   matchesTitle,
   getAlternativeTitles,
-  getType,
 } from './utils';
 import { EasynewsAPI, SearchOptions, EasynewsSearchResponse } from 'easynews-plus-plus-api';
 import { publicMetaProvider } from './meta';
@@ -35,9 +34,6 @@ interface AddonConfig {
   maxFileSize?: string; // Max file size in GB
   [key: string]: any;
 }
-
-// Set type for logger
-getType('addon');
 
 // Definiere ValidPosterShape als Workaround für fehlendes PosterShape-Type
 type ValidPosterShape = 'square' | 'regular' | 'landscape';

@@ -6,7 +6,7 @@ import path from 'path';
 import getRouter from 'stremio-addon-sdk/src/getRouter';
 import customTemplate from './custom-template';
 import { addonInterface } from './addon';
-import { logger, getVersion, getType } from './utils';
+import { logger, getVersion } from './utils';
 
 type ServerOptions = {
   port?: number;
@@ -129,8 +129,6 @@ serveHTTP(addonInterface, { port: +(process.env.PORT ?? 1337) }).catch(err => {
   logger.error('Server failed to start:', err);
   process.exitCode = 1;
 });
-
-getType('server');
 
 // Log environment configuration
 logger.info(`PORT: ${process.env.PORT || 1337}`);

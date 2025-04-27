@@ -1,6 +1,6 @@
 import { Manifest } from 'stremio-addon-sdk';
 import { getTranslations, ISO_TO_LANGUAGE } from './i18n';
-import { logger, getType } from './utils';
+import { logger } from './utils';
 
 function landingTemplate(manifest: Manifest): string {
   const configurationFields = manifest.config || [];
@@ -14,9 +14,6 @@ function landingTemplate(manifest: Manifest): string {
 
   // Get translations based on the default UI language
   const translations = getTranslations(defaultUILanguage);
-
-  // Get the type to use in the logger
-  getType('custom-template');
 
   // For debugging
   logger.debug(`Using UI language: ${defaultUILanguage}, translations found: ${!!translations}`);
