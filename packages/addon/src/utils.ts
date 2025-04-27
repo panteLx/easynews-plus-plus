@@ -10,19 +10,32 @@ import * as winston from 'winston';
 import customTitlesJson from '../../../custom-titles.json';
 
 function loadEnv() {
-  // Load environment variables from env file in project root
-  const configPath = path.resolve('../../.env');
-  const result = dotenv.config({ path: configPath });
+  // Skip .env loading for Cloudflare Workers environment
+  if (process.env.CLOUDFLARE === 'true') {
+    console.log('Cloudflare environment detected, skipping .env file loading');
+    return;
+  }
 
-  // Log the result of loading the environment config
-  if (result.error) {
-    console.error('Error loading .env:', result.error);
-  } else {
-    console.log('Environment configuration loaded successfully');
+  try {
+    // Load environment variables from env file in project root
+    const configPath = path.resolve('../../.env');
+    const result = dotenv.config({ path: configPath });
+
+    // Log the result of loading the environment config
+    if (result.error) {
+      console.error('Error loading .env:', result.error);
+    } else {
+      console.log('Environment configuration loaded successfully');
+    }
+  } catch (error) {
+    console.error('Error while trying to load .env file:', error);
   }
 }
 
-loadEnv();
+// Only load .env in non-Cloudflare environments
+if (typeof process !== 'undefined' && !process.env.CLOUDFLARE) {
+  loadEnv();
+}
 
 // Add interface to declare the function with properties
 interface TypeFunction {
@@ -421,34 +434,105 @@ function getTimestamp(): string {
 }
 
 /**
- * Logger using Winston directly
+ * Simple logger implementation for Cloudflare environment
+ */
+class CloudflareLogger {
+  level: string;
+
+  constructor(level: string = 'info') {
+    this.level = level.toLowerCase();
+  }
+
+  private shouldLog(level: string): boolean {
+    const levels = { error: 0, warn: 1, info: 2, debug: 3, silly: 4 };
+    return (
+      levels[level as keyof typeof levels] <= levels[this.level as keyof typeof levels] || false
+    );
+  }
+
+  private formatMessage(level: string, message: string, ...args: any[]): string {
+    let formattedMessage = `[${getType()} - v${getVersion()}] ${level.toUpperCase()}: ${message}`;
+
+    if (args.length > 0) {
+      const formattedArgs = args
+        .map(arg => (typeof arg === 'object' ? JSON.stringify(arg) : arg))
+        .join(' ');
+      formattedMessage = `${formattedMessage} ${formattedArgs}`;
+    }
+
+    return formattedMessage;
+  }
+
+  error(message: string, ...args: any[]): void {
+    if (this.shouldLog('error')) {
+      console.error(this.formatMessage('error', message, ...args));
+    }
+  }
+
+  warn(message: string, ...args: any[]): void {
+    if (this.shouldLog('warn')) {
+      console.warn(this.formatMessage('warn', message, ...args));
+    }
+  }
+
+  info(message: string, ...args: any[]): void {
+    if (this.shouldLog('info')) {
+      console.log(this.formatMessage('info', message, ...args));
+    }
+  }
+
+  debug(message: string, ...args: any[]): void {
+    if (this.shouldLog('debug')) {
+      console.log(this.formatMessage('debug', message, ...args));
+    }
+  }
+
+  silly(message: string, ...args: any[]): void {
+    if (this.shouldLog('silly')) {
+      console.log(this.formatMessage('silly', message, ...args));
+    }
+  }
+}
+
+/**
+ * Logger using Winston directly or simple console logger for Cloudflare
  *
  * Log levels can be set via environment variable: EASYNEWS_LOG_LEVEL
  * Valid values: error, warn, info, debug, silly, or silent
  */
-// Create and export Winston logger directly
-export const logger = winston.createLogger({
-  level: process.env.EASYNEWS_LOG_LEVEL?.toLowerCase() || 'info',
-  format: winston.format.combine(
-    winston.format.colorize(),
-    winston.format.printf(info => {
-      // Handle multiple arguments passed to the logger
-      const splat = info[Symbol.for('splat')] || [];
-      let message = info.message;
+// Create and export the appropriate logger
+export const logger = (() => {
+  const logLevel = process.env.EASYNEWS_LOG_LEVEL?.toLowerCase() || 'info';
 
-      // If there are additional arguments, format them and add to the message
-      if (splat && Array.isArray(splat) && splat.length > 0) {
-        const args = splat
-          .map((arg: any) => (typeof arg === 'object' ? JSON.stringify(arg) : arg))
-          .join(' ');
-        message = `${message} ${args}`;
-      }
+  // Use simple logger for Cloudflare environment
+  if (process.env.CLOUDFLARE === 'true') {
+    return new CloudflareLogger(logLevel);
+  }
 
-      return `[${getType()} - v${getVersion()}] ${info.level}: ${message}`;
-    })
-  ),
-  transports: [new winston.transports.Console()],
-});
+  // Use Winston for all other environments
+  return winston.createLogger({
+    level: logLevel,
+    format: winston.format.combine(
+      winston.format.colorize(),
+      winston.format.printf(info => {
+        // Handle multiple arguments passed to the logger
+        const splat = info[Symbol.for('splat')] || [];
+        let message = info.message;
+
+        // If there are additional arguments, format them and add to the message
+        if (splat && Array.isArray(splat) && splat.length > 0) {
+          const args = splat
+            .map((arg: any) => (typeof arg === 'object' ? JSON.stringify(arg) : arg))
+            .join(' ');
+          message = `${message} ${args}`;
+        }
+
+        return `[${getType()} - v${getVersion()}] ${info.level}: ${message}`;
+      })
+    ),
+    transports: [new winston.transports.Console()],
+  });
+})();
 
 export function logError(message: { message: string; error: unknown; context: unknown }) {
   logger.error(`Error: ${message.message}`, message);
