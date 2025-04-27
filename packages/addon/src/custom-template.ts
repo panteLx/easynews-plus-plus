@@ -1,5 +1,6 @@
 import { Manifest } from 'stremio-addon-sdk';
 import { getTranslations, ISO_TO_LANGUAGE } from './i18n';
+import { logger, getType } from './utils';
 
 function landingTemplate(manifest: Manifest): string {
   const configurationFields = manifest.config || [];
@@ -14,9 +15,12 @@ function landingTemplate(manifest: Manifest): string {
   // Get translations based on the default UI language
   const translations = getTranslations(defaultUILanguage);
 
+  // Get the type to use in the logger
+  getType('custom-template');
+
   // For debugging
-  console.log(`Using UI language: ${defaultUILanguage}, translations found: ${!!translations}`);
-  console.log(`Translations loaded:`, JSON.stringify(translations).substring(0, 200) + '...');
+  logger.debug(`Using UI language: ${defaultUILanguage}, translations found: ${!!translations}`);
+  logger.debug(`Translations loaded:`, JSON.stringify(translations).substring(0, 200) + '...');
 
   // Add a timestamp parameter to prevent caching
   const cacheBreaker = Date.now();

@@ -16,6 +16,7 @@ import {
   logError,
   matchesTitle,
   getAlternativeTitles,
+  getType,
 } from './utils';
 import { EasynewsAPI, SearchOptions, EasynewsSearchResponse } from 'easynews-plus-plus-api';
 import { publicMetaProvider } from './meta';
@@ -29,12 +30,14 @@ interface AddonConfig {
   strictTitleMatching?: string;
   preferredLanguage?: string;
   sortingPreference?: string;
-  logLevel?: string; // Add log level configuration option
   showQualities?: string; // Comma-separated list of qualities to show
   maxResultsPerQuality?: string; // Max results per quality
   maxFileSize?: string; // Max file size in GB
   [key: string]: any;
 }
+
+// Set type for logger
+getType('addon');
 
 // Definiere ValidPosterShape als Workaround für fehlendes PosterShape-Type
 type ValidPosterShape = 'square' | 'regular' | 'landscape';
@@ -69,7 +72,7 @@ let loadedPath = '';
 
 try {
   // Always use the imported JSON by default
-  logger.info('Loading custom titles from imported custom-titles.json');
+  logger.debug('Loading custom titles from imported custom-titles.json');
   titlesFromFile = customTitlesJson;
   loadedPath = 'imported';
 
@@ -81,10 +84,10 @@ try {
     // Log a few examples to verify they're loaded correctly
     const examples = Object.entries(titlesFromFile).slice(0, 3);
     for (const [original, customTitles] of examples) {
-      logger.info(`Example custom title: "${original}" -> "${customTitles.join('", "')}"`);
+      logger.debug(`Example custom title: "${original}" -> "${customTitles.join('", "')}"`);
     }
   } else {
-    logger.info(
+    logger.warn(
       'No custom titles were loaded from the file. The file might be empty or have invalid format.'
     );
   }
@@ -120,15 +123,10 @@ builder.defineCatalogHandler(async ({ extra: { search } }) => {
 
 builder.defineMetaHandler(
   async ({ id, type, config }: { id: string; type: ContentType; config: AddonConfig }) => {
-    const { username, password, logLevel } = config;
+    const { username, password } = config;
 
     // For language filtering in the catalog
     const preferredLang = config.preferredLanguage || '';
-
-    // Configure logger based on config
-    if (logLevel) {
-      logger.setLevel(logLevel);
-    }
 
     if (!id.startsWith(catalog.id)) {
       return { meta: null as unknown as MetaDetail };
@@ -231,17 +229,11 @@ builder.defineStreamHandler(
       strictTitleMatching,
       preferredLanguage,
       sortingPreference,
-      logLevel,
       showQualities,
       maxResultsPerQuality,
       maxFileSize,
       ...options
     } = config;
-
-    // Configure logger based on config
-    if (logLevel) {
-      logger.setLevel(logLevel);
-    }
 
     if (!id.startsWith('tt')) {
       return {
@@ -254,7 +246,7 @@ builder.defineStreamHandler(
     const cacheKey = `${id}:v3:user=${username}:strict=${strictTitleMatching === 'on' || strictTitleMatching === 'true'}:lang=${preferredLanguage || ''}:sort=${sortingPreference}:qualities=${showQualities || ''}:maxPerQuality=${maxResultsPerQuality || ''}:maxSize=${maxFileSize || ''}`;
 
     // const cacheKey = `${id}:v3:strict=${strictTitleMatching === 'on' || strictTitleMatching === 'true'}:lang=${preferredLanguage || ''}:sort=${sortingPreference}:qualities=${showQualities || ''}:maxPerQuality=${maxResultsPerQuality || ''}:maxSize=${maxFileSize || ''}`;
-    logger.info(`Cache key: ${cacheKey}`);
+    logger.debug(`Cache key: ${cacheKey}`);
     const cached = getFromCache<{ streams: Stream[] }>(cacheKey);
 
     if (cached) {
@@ -309,7 +301,7 @@ builder.defineStreamHandler(
       // Use custom titles from custom-titles.json
       const customTitles = { ...titlesFromFile };
 
-      logger.info(
+      logger.debug(
         `Using ${Object.keys(customTitles).length} custom titles from custom-titles.json`
       );
 
@@ -363,7 +355,7 @@ builder.defineStreamHandler(
       sortOptions.sort3Direction = '-'; // Descending
 
       // Log the API sorting parameters
-      logger.info(
+      logger.debug(
         `API Sorting: ${sortOptions.sort1} (${sortOptions.sort1Direction}), ${sortOptions.sort2} (${sortOptions.sort2Direction}), ${sortOptions.sort3} (${sortOptions.sort3Direction})`
       );
 
@@ -393,14 +385,14 @@ builder.defineStreamHandler(
 
       const api = new EasynewsAPI({ username, password });
 
-      logger.info(`Getting alternative titles for: ${meta.name}`);
+      logger.debug(`Getting alternative titles for: ${meta.name}`);
 
       // Initialize with the original title
       let allTitles = [meta.name];
 
       // Add any direct custom titles found in customTitles
       if (customTitles[meta.name] && customTitles[meta.name].length > 0) {
-        logger.info(
+        logger.debug(
           `Adding direct custom titles for "${meta.name}": "${customTitles[meta.name].join('", "')}"`
         );
         allTitles = [...allTitles, ...customTitles[meta.name]];
@@ -408,7 +400,9 @@ builder.defineStreamHandler(
 
       // Add any alternative names from meta (if available)
       if (meta.alternativeNames && meta.alternativeNames.length > 0) {
-        logger.info(`Adding ${meta.alternativeNames.length} alternative names from metadata`);
+        logger.debug(
+          `Adding ${meta.alternativeNames.length} alternative names from metadata (${meta.alternativeNames.join(', ')})`
+        );
         // Filter out duplicates
         const newAlternatives = meta.alternativeNames.filter(alt => !allTitles.includes(alt));
         allTitles = [...allTitles, ...newAlternatives];
@@ -424,7 +418,7 @@ builder.defineStreamHandler(
         allTitles = [...allTitles, ...additionalTitles];
       }
 
-      logger.info(`Will search for ${allTitles.length} titles: ${allTitles.join(', ')}`);
+      logger.debug(`Will search for ${allTitles.length} titles: ${allTitles.join(', ')}`);
 
       // Store all search results here
       const allSearchResults: {
@@ -439,7 +433,7 @@ builder.defineStreamHandler(
 
         const titleMeta = { ...meta, name: titleVariant, year: undefined };
         const query = buildSearchQuery(type, titleMeta);
-        logger.info(`Searching without year for: "${query}"`);
+        logger.debug(`Searching without year for: "${query}"`);
 
         try {
           const res = await api.search({
@@ -449,7 +443,7 @@ builder.defineStreamHandler(
           });
 
           const resultCount = res?.data?.length || 0;
-          logger.info(`Found ${resultCount} results for "${query}"`);
+          logger.info(`Found ${resultCount} results for "${query}" without year`);
 
           if (resultCount > 0) {
             allSearchResults.push({ query, result: res });
@@ -458,7 +452,7 @@ builder.defineStreamHandler(
             const examples = res.data.slice(0, 2);
             for (const file of examples) {
               const title = getPostTitle(file);
-              logger.info(`Example result: "${title}" (${file['4'] || 'unknown size'})`);
+              logger.debug(`Example result: "${title}" (${file['4'] || 'unknown size'})`);
             }
           }
         } catch (error) {
@@ -477,7 +471,7 @@ builder.defineStreamHandler(
 
           const titleMeta = { ...meta, name: titleVariant, year: meta.year };
           const query = buildSearchQuery(type, titleMeta);
-          logger.info(`Searching with year for: "${query}"`);
+          logger.debug(`Searching with year for: "${query}"`);
 
           try {
             const res = await api.search({
@@ -487,7 +481,7 @@ builder.defineStreamHandler(
             });
 
             const resultCount = res?.data?.length || 0;
-            logger.info(`Found ${resultCount} results for "${query}"`);
+            logger.info(`Found ${resultCount} results for "${query}" with year`);
 
             if (resultCount > 0) {
               allSearchResults.push({ query, result: res });
@@ -496,7 +490,7 @@ builder.defineStreamHandler(
               const examples = res.data.slice(0, 2);
               for (const file of examples) {
                 const title = getPostTitle(file);
-                logger.info(`Example result: "${title}" (${file['4'] || 'unknown size'})`);
+                logger.debug(`Example result: "${title}" (${file['4'] || 'unknown size'})`);
               }
             }
           } catch (error) {
@@ -591,7 +585,7 @@ builder.defineStreamHandler(
 
       // Sort streams based on user preference
       if (sortingPreference === 'language_first' && preferredLang) {
-        logger.info(`Applying language-first sorting for language: ${preferredLang}`);
+        logger.debug(`Applying language-first sorting for language: ${preferredLang}`);
 
         // Special handling for language-first sorting
         // First, separate streams by language
@@ -789,7 +783,7 @@ builder.defineStreamHandler(
       // After all streams have been collected, filter and limit them based on user settings
       if (streams.length > 0) {
         const originalCount = streams.length;
-        logger.info(`Starting filters with ${originalCount} streams`);
+        logger.debug(`Starting filters with ${originalCount} streams`);
 
         // Filter streams by quality
         const defaultQualitySet = ['4k', '1080p', '720p', '480p'];
@@ -814,8 +808,8 @@ builder.defineStreamHandler(
             }
           });
 
-          logger.info(`Filtering for qualities: ${qualityFilters.join(', ')}`);
-          logger.info(`Accepted quality terms: ${allowedQualityTerms.join(', ')}`);
+          logger.debug(`Filtering for qualities: ${qualityFilters.join(', ')}`);
+          logger.debug(`Accepted quality terms: ${allowedQualityTerms.join(', ')}`);
 
           if (allowedQualityTerms.length > 0) {
             const filteredStreams = streams.filter(stream => {
@@ -827,7 +821,7 @@ builder.defineStreamHandler(
             // Only update if we found at least one match
             if (filteredStreams.length > 0) {
               streams = filteredStreams;
-              logger.info(`After quality filtering: ${streams.length} streams remain`);
+              logger.debug(`After quality filtering: ${streams.length} streams remain`);
             } else {
               logger.warn(`Quality filtering would remove all streams - keeping original results`);
             }
@@ -858,7 +852,7 @@ builder.defineStreamHandler(
           // Only update if we found at least one match
           if (filteredStreams.length > 0) {
             streams = filteredStreams;
-            logger.info(`After max file size filtering: ${streams.length} streams remain`);
+            logger.debug(`After max file size filtering: ${streams.length} streams remain`);
           } else {
             logger.warn(`File size filtering would remove all streams - keeping original results`);
           }
@@ -891,7 +885,7 @@ builder.defineStreamHandler(
 
           // Log the distribution of streams by quality
           Object.entries(streamsByQuality).forEach(([quality, streams]) => {
-            logger.info(`Quality ${quality}: ${streams.length} streams`);
+            logger.debug(`Quality ${quality}: ${streams.length} streams`);
           });
 
           // Apply limits per quality category and rebuild streams array
@@ -902,7 +896,7 @@ builder.defineStreamHandler(
             limitedStreams.push(...limitedQualityStreams);
 
             if (limitedQualityStreams.length < qualityStreams.length) {
-              logger.info(
+              logger.debug(
                 `Quality ${quality}: Limited from ${qualityStreams.length} to ${limitedQualityStreams.length} streams`
               );
             }
@@ -910,7 +904,9 @@ builder.defineStreamHandler(
 
           if (limitedStreams.length > 0) {
             streams = limitedStreams;
-            logger.info(`After applying max results per quality: ${streams.length} streams remain`);
+            logger.debug(
+              `After applying max results per quality: ${streams.length} streams remain`
+            );
           } else {
             logger.warn(`Per-quality limiting would remove all streams - keeping original results`);
           }
@@ -970,9 +966,9 @@ function mapStream({
 
   // Log language information for debugging
   if (file.alangs) {
-    logger.info(`Stream "${title}" has languages: ${JSON.stringify(file.alangs)}`);
+    logger.debug(`Stream "${title}" has languages: ${JSON.stringify(file.alangs)}`);
   } else {
-    logger.info(`Stream "${title}" has no language information`);
+    logger.debug(`Stream "${title}" has no language information`);
   }
 
   // Show language information in the description if available
