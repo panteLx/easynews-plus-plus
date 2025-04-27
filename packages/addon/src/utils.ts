@@ -2,27 +2,59 @@ import { EasynewsSearchResponse, FileData } from 'easynews-plus-plus-api';
 import { MetaProviderResponse } from './meta';
 import { ContentType } from 'stremio-addon-sdk';
 import { parse as parseTorrentTitle } from 'parse-torrent-title';
-import * as fs from 'fs';
-
+import path from 'path';
+import dotenv from 'dotenv';
 // Import the custom titles JSON directly
 import customTitlesJson from '../../../custom-titles.json';
 
+function loadEnv() {
+  // Load environment variables from env file in project root
+  const configPath = path.resolve('../../.env');
+  const result = dotenv.config({ path: configPath });
+
+  // Log the result of loading the environment config
+  if (result.error) {
+    console.error('Error loading .env:', result.error);
+  } else {
+    console.log('Environment configuration loaded successfully');
+  }
+}
+
+loadEnv();
+
 export function isBadVideo(file: FileData) {
   const duration = file['14'] ?? '';
+  const title = getPostTitle(file);
 
-  return (
-    // <= 5 minutes in duration
-    duration.match(/^\d+s/) ||
-    duration.match('^[0-5]m') ||
-    // password protected
-    file.passwd ||
-    // malicious
-    file.virus ||
-    // not a video
-    file.type.toUpperCase() !== 'VIDEO' ||
-    // very small file size (likely a sample or broken file, < 20MB)
-    (file.rawSize && file.rawSize < 20 * 1024 * 1024)
-  );
+  // Check each condition and log the reason if it fails
+  if (duration.match(/^\d+s/)) {
+    logger.info(`Bad video: "${title}": Duration too short (${duration})`);
+    return true;
+  }
+  if (duration.match('^[0-5]m')) {
+    logger.info(`Bad video: "${title}": Duration too short (${duration})`);
+    return true;
+  }
+  if (file.passwd) {
+    logger.info(`Bad video: "${title}": Password protected`);
+    return true;
+  }
+  if (file.virus) {
+    logger.info(`Bad video: "${title}": Contains virus`);
+    return true;
+  }
+  if (file.type.toUpperCase() !== 'VIDEO') {
+    logger.info(`Bad video: "${title}": Not a video file (type: ${file.type})`);
+    return true;
+  }
+  if (file.rawSize && file.rawSize < 20 * 1024 * 1024) {
+    logger.info(
+      `Bad video: "${title}": File too small (${Math.round(file.rawSize / 1024 / 1024)}MB)`
+    );
+    return true;
+  }
+
+  return false;
 }
 
 /**
