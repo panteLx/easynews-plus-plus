@@ -43,21 +43,6 @@ interface TypeFunction {
   currentType: string;
 }
 
-// Implement the function with proper typing
-export const getType: TypeFunction = function (type?: string): string {
-  // Store the module type in a variable that persists between calls
-  if (type) {
-    getType.currentType = type;
-  }
-  return getType.currentType || 'Easynews++';
-};
-
-// Initialize the property
-getType.currentType = '';
-
-// Initialize with 'utils' as the default type for this module
-getType('utils');
-
 export function isBadVideo(file: FileData) {
   const duration = file['14'] ?? '';
   const title = getPostTitle(file);
@@ -451,7 +436,7 @@ class CloudflareLogger {
   }
 
   private formatMessage(level: string, message: string, ...args: any[]): string {
-    let formattedMessage = `[${getType()} - v${getVersion()}] ${level.toUpperCase()}: ${message}`;
+    let formattedMessage = `[v${getVersion()}] ${level.toUpperCase()}: ${message}`;
 
     if (args.length > 0) {
       const formattedArgs = args
@@ -527,7 +512,7 @@ export const logger = (() => {
           message = `${message} ${args}`;
         }
 
-        return `[${getType()} - v${getVersion()}] ${info.level}: ${message}`;
+        return `[v${getVersion()}] ${info.level}: ${message}`;
       })
     ),
     transports: [new winston.transports.Console()],
