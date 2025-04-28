@@ -740,7 +740,7 @@ function landingTemplate(manifest: Manifest): string {
       opacity: 0.5;
     }
     
-    .sponsor-button {
+    .support-dev-btn {
       background-color: #FFDD00;
       color: #000000;
       display: inline-flex;
@@ -749,11 +749,11 @@ function landingTemplate(manifest: Manifest): string {
       font-weight: 600;
     }
     
-    .sponsor-button:hover {
+    .support-dev-btn:hover {
       background-color:rgb(255, 187, 0);
     }
     
-    .sponsor-link {
+    .support-link {
       text-decoration: none;
     }
     
@@ -800,8 +800,8 @@ function landingTemplate(manifest: Manifest): string {
         <div class="header-content">
           <div class="header-title-row">
             <h1 class="title">${manifest.name || manifest.id}</h1>
-            <a href="https://buymeacoffee.com/pantel" target="_blank" rel="noopener noreferrer" class="sponsor-link">
-              <button type="button" class="sponsor-button">
+            <a href="https://www.buymeacoffee.com/pantel?utm_source=addon&ref=dev_support" target="_blank" rel="noopener noreferrer" class="support-link">
+              <button type="button" class="support-dev-btn">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
                   <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
