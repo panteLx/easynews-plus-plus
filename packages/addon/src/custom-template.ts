@@ -159,6 +159,8 @@ function landingTemplate(manifest: Manifest): string {
   <link rel="icon" type="image/png" href="${manifest.logo}">
   <title>${manifest.name || manifest.id} - ${translations.configPage.title}</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    
     * {
       box-sizing: border-box;
       margin: 0;
@@ -166,34 +168,75 @@ function landingTemplate(manifest: Manifest): string {
     }
     
     :root {
-      --background: hsl(240 10% 3.9%);
-      --foreground: hsl(0 0% 98%);
-      --card: hsl(240 10% 5.9%);
-      --card-foreground: hsl(0 0% 98%);
-      --border: hsl(240 3.7% 15.9%);
-      --input: hsl(240 3.7% 15.9%);
-      --primary: hsl(217 91% 60%);
-      --primary-foreground: hsl(0 0% 98%);
-      --secondary: hsl(240 5.9% 10%);
-      --secondary-foreground: hsl(0 0% 98%);
-      --accent: hsl(240 3.7% 15.9%);
-      --accent-foreground: hsl(0 0% 98%);
-      --ring: hsl(217 91% 60%);
-      --radius: 0.5rem;
+      /* Shadcn-inspired color palette with dark theme */
+      --background: hsl(224, 71%, 4%);
+      --foreground: hsl(213, 31%, 91%);
+      
+      --muted: hsl(223, 47%, 11%);
+      --muted-foreground: hsl(215, 16%, 70%);
+      
+      --card: hsl(222, 47%, 7%);
+      --card-foreground: hsl(213, 31%, 91%);
+      
+      --popover: hsl(224, 71%, 4%);
+      --popover-foreground: hsl(215, 20%, 65%);
+      
+      --border: hsl(216, 34%, 17%);
+      --input: hsl(216, 34%, 17%);
+      
+      --primary: hsl(210, 100%, 50%);
+      --primary-foreground: hsl(0, 0%, 98%);
+      
+      --secondary: hsl(222, 47%, 11%);
+      --secondary-foreground: hsl(210, 40%, 98%);
+      
+      --accent: hsl(210, 40%, 20%);
+      --accent-foreground: hsl(210, 40%, 98%);
+      
+      --destructive: hsl(0, 63%, 31%);
+      --destructive-foreground: hsl(210, 40%, 98%);
+      
+      --ring: hsl(212.7, 26.8%, 83.9%);
+      
+      /* Typography */
       --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      
+      /* Measurements */
+      --radius: 0.5rem;
+    }
+    
+    /* Modern scrollbar for browsers that support it */
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: var(--muted);
+      border-radius: 6px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: hsl(215, 20%, 30%);
+      border-radius: 6px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: hsl(215, 20%, 40%);
     }
     
     @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     
     body {
       font-family: var(--font-sans);
       background-color: var(--background);
       color: var(--foreground);
-      line-height: 1.6;
+      line-height: 1.7;
       animation: fadeIn 0.3s ease-in-out;
+      letter-spacing: -0.011rem;
     }
     
     .background-container {
@@ -202,42 +245,65 @@ function landingTemplate(manifest: Manifest): string {
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(135deg, #121212, #292929);
-      opacity: 0.15;
+      background: radial-gradient(ellipse at top, hsl(224, 71%, 6%), transparent),
+                  radial-gradient(ellipse at bottom, hsl(224, 40%, 3%), transparent);
+      opacity: 0.7;
       z-index: -1;
     }
     
     .container {
       max-width: 700px;
-      margin: 2rem auto;
+      margin: 2.5rem auto;
       padding: 2rem;
     }
     
     .card {
       background-color: var(--card);
       border-radius: var(--radius);
-      box-shadow: 0 10px 30px -15px rgba(0, 0, 0, 0.7);
-      padding: 2rem;
+      box-shadow: 0 4px 28px -5px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+      padding: 2.25rem;
       margin-bottom: 2rem;
       border: 1px solid var(--border);
+      animation: fadeIn 0.4s ease-out;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
     
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 0.3rem;
+      background: linear-gradient(90deg, var(--primary), hsl(250, 100%, 60%));
+      opacity: 0.8;
+    }
     
     .header {
       display: flex;
-      align-items: center;
-      gap: 1.5rem;
-      margin-bottom: 2rem;
+      align-items: flex-start;
+      gap: 1.75rem;
+      margin-bottom: 2.5rem;
       border-bottom: 1px solid var(--border);
-      padding-bottom: 1.5rem;
+      padding-bottom: 2rem;
     }
     
     .logo {
       width: 80px;
       height: 80px;
-      border-radius: var(--radius);
+      border-radius: calc(var(--radius) * 0.8);
       object-fit: cover;
       border: 1px solid var(--border);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .logo:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
     }
     
     .title {
@@ -245,15 +311,18 @@ function landingTemplate(manifest: Manifest): string {
       margin-bottom: 0.5rem;
       font-weight: 600;
       line-height: 1.2;
+      font-size: 1.75rem;
+      letter-spacing: -0.025em;
     }
     
     .description {
-      color: hsl(240 5% 65%);
+      color: var(--muted-foreground);
       margin-bottom: 0.5rem;
+      font-size: 0.95rem;
     }
     
     .form-group {
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.75rem;
     }
     
     label {
@@ -269,23 +338,30 @@ function landingTemplate(manifest: Manifest): string {
     input[type="number"],
     select {
       width: 100%;
-      padding: 0.75rem;
+      padding: 0.75rem 0.9rem;
       font-size: 0.95rem;
       border: 1px solid var(--input);
       border-radius: var(--radius);
-      background-color: hsl(240 5.9% 8%);
+      background-color: var(--secondary);
       color: var(--foreground);
       margin-top: 0.2rem;
       outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      transition: all 0.15s ease;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
     }
     
     input[type="text"]:focus,
     input[type="password"]:focus,
     input[type="number"]:focus,
     select:focus {
-      border-color: var(--ring);
-      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(66, 153, 255, 0.15);
+    }
+    
+    input[type="text"]::placeholder,
+    input[type="password"]::placeholder,
+    input[type="number"]::placeholder {
+      color: var(--muted-foreground);
     }
     
     /* Custom checkbox styles */
@@ -295,15 +371,15 @@ function landingTemplate(manifest: Manifest): string {
       position: relative;
       margin: 0.3rem 0;
       width: 100%;
-      background-color: hsl(240 5.9% 8%);
+      background-color: var(--secondary);
       border-radius: var(--radius);
       border: 1px solid var(--input);
-      padding: 0.75rem;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      padding: 0.85rem 1rem;
+      transition: all 0.15s ease;
     }
     
     .checkbox-wrapper:hover {
-      border-color: var(--ring);
+      border-color: var(--primary);
     }
     
     .checkbox-label {
@@ -327,11 +403,11 @@ function landingTemplate(manifest: Manifest): string {
     .checkmark {
       position: relative;
       display: inline-block;
-      flex: 0 0 18px;
-      width: 18px;
-      height: 18px;
+      flex: 0 0 20px;
+      width: 20px;
+      height: 20px;
       margin-right: 12px;
-      background-color: transparent;
+      background-color: var(--secondary);
       border: 1px solid var(--border);
       border-radius: 4px;
       transition: all 0.15s ease-in-out;
@@ -344,6 +420,7 @@ function landingTemplate(manifest: Manifest): string {
     
     .checkbox-label:hover input ~ .checkmark {
       border-color: var(--primary);
+      background-color: var(--accent);
     }
     
     .checkbox-label input:checked ~ .checkmark {
@@ -357,8 +434,8 @@ function landingTemplate(manifest: Manifest): string {
       display: none;
       left: 6px;
       top: 2px;
-      width: 4px;
-      height: 9px;
+      width: 5px;
+      height: 10px;
       border: solid white;
       border-width: 0 2px 2px 0;
       transform: rotate(45deg);
@@ -371,8 +448,8 @@ function landingTemplate(manifest: Manifest): string {
     /* Side-by-side fields */
     .form-row {
       display: flex;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
+      gap: 1.25rem;
+      margin-bottom: 1.75rem;
     }
     
     .form-col {
@@ -382,10 +459,11 @@ function landingTemplate(manifest: Manifest): string {
     a {
       text-decoration: none;
       color: var(--primary);
+      transition: color 0.15s ease;
     }
     
     a:hover {
-      color: hsl(240, 100%, 50%);
+      color: hsl(210, 100%, 65%);
     }
 
     button {
@@ -395,32 +473,53 @@ function landingTemplate(manifest: Manifest): string {
       background-color: var(--primary);
       color: var(--primary-foreground);
       border: none;
-      padding: 0.6rem 1.2rem;
+      padding: 0.7rem 1.2rem;
       height: 40px;
       font-size: 0.95rem;
+      font-weight: 500;
       border-radius: var(--radius);
       cursor: pointer;
-      transition: all 0.2s;
-      font-weight: 500;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      transition: all 0.15s ease;
+      box-shadow: 0 2px 8px rgba(0, 30, 60, 0.25);
+      position: relative;
+      overflow: hidden;
       white-space: nowrap;
     }
     
     button:hover {
-      background-color: hsl(240, 100%, 50%);
+      background-color: hsl(210, 100.00%, 25.10%);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 30, 60, 0.3);
     }
     
     button:active {
       transform: translateY(1px);
+      box-shadow: 0 1px 4px rgba(0, 30, 60, 0.2);
+    }
+    
+    button::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+    
+    button:hover::after {
+      opacity: 1;
     }
     
     .button-group {
       display: flex;
       justify-content: center;
-      gap: 1rem;
-      margin-top: 2rem;
+      gap: 1.25rem;
+      margin-top: 2.5rem;
       border-top: 1px solid var(--border);
-      padding-top: 2rem;
+      padding-top: 2.5rem;
     }
     
     .select-wrapper {
@@ -459,7 +558,7 @@ function landingTemplate(manifest: Manifest): string {
     }
     
     .version {
-      color: hsl(240 5% 55%);
+      color: var(--muted-foreground);
       text-align: center;
       font-size: 0.85rem;
       margin-top: 1rem;
@@ -470,7 +569,7 @@ function landingTemplate(manifest: Manifest): string {
       margin-right: auto;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
     }
     
     .copy-button::before {
@@ -484,24 +583,24 @@ function landingTemplate(manifest: Manifest): string {
     }
     
     .copy-button:hover {
-      background-color: hsl(240 5.2% 18%);
+      background-color: var(--accent);
     }
     
     .tooltip {
       position: absolute;
-      background-color: var(--card);
-      color: var(--card-foreground);
-      padding: 6px 12px;
+      background-color: var(--popover);
+      color: var(--popover-foreground);
+      padding: 8px 16px;
       border-radius: var(--radius);
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       opacity: 0;
-      transition: opacity 0.3s;
+      transition: all 0.2s ease;
       pointer-events: none;
       bottom: 100%;
       left: 50%;
-      transform: translateX(-50%);
+      transform: translateX(-50%) translateY(8px);
       margin-bottom: 10px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
       border: 1px solid var(--border);
     }
     
@@ -523,7 +622,7 @@ function landingTemplate(manifest: Manifest): string {
     #installLink button {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
     }
     
     #installLink button::before {
@@ -538,23 +637,23 @@ function landingTemplate(manifest: Manifest): string {
     
     @media (max-width: 768px) {
       .container {
-        padding: 1rem;
+        padding: 1.25rem;
         margin: 1rem auto;
       }
       
       .card {
-        padding: 1.5rem;
+        padding: 1.75rem;
       }
       
       .header {
         flex-direction: column;
         text-align: center;
-        gap: 1rem;
+        gap: 1.25rem;
       }
       
       .header-title-row {
         flex-direction: column;
-        gap: 0.8rem;
+        gap: 1rem;
       }
       
       .header a button {
@@ -563,9 +662,8 @@ function landingTemplate(manifest: Manifest): string {
       
       .button-group {
         flex-direction: column;
-        gap: 0.75rem;
+        gap: 1rem;
         width: 100%;
-        border-top: 1px solid var(--border);
       }
       
       .button-group button {
@@ -582,7 +680,7 @@ function landingTemplate(manifest: Manifest): string {
       }
       
       .form-group {
-        margin-bottom: 1.25rem;
+        margin-bottom: 1.5rem;
       }
       
       input[type="text"],
@@ -602,36 +700,44 @@ function landingTemplate(manifest: Manifest): string {
       
       .form-row {
         flex-direction: column;
-        gap: 1.25rem;
+        gap: 1.5rem;
+      }
+
+      .logo {
+        display: none;
       }
     }
 
     .social-links {
       display: flex;
       justify-content: center;
-      gap: 1rem;
-      margin-top: 1rem;
+      gap: 1.25rem;
+      margin-top: 1.5rem;
     }
 
     .social-link {
-      color: hsl(240 5% 55%);
-      transition: color 0.2s;
+      color: var(--muted-foreground);
+      transition: all 0.15s ease;
+      opacity: 0.75;
     }
 
     .social-link:hover {
       color: var(--primary);
+      opacity: 1;
+      transform: translateY(-2px);
     }
 
     .social-link svg {
-      width: 24px;
-      height: 24px;
+      width: 22px;
+      height: 22px;
     }
 
     .border {
       border-bottom: 1px solid var(--border);
-      padding-bottom: 1rem;
-      max-width: 20%;
-      margin: 0 auto;
+      // padding-bottom: 1rem;
+      max-width: 15%;
+      margin: 1.25rem auto;
+      opacity: 0.5;
     }
     
     .sponsor-button {
@@ -639,11 +745,12 @@ function landingTemplate(manifest: Manifest): string {
       color: #000000;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
+      font-weight: 600;
     }
     
     .sponsor-button:hover {
-      background-color:rgb(255, 196, 0);
+      background-color:rgb(255, 187, 0);
     }
     
     .sponsor-link {
@@ -660,7 +767,27 @@ function landingTemplate(manifest: Manifest): string {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+    
+    /* Add subtle hover effects to inputs */
+    input[type="text"]:hover,
+    input[type="password"]:hover,
+    input[type="number"]:hover,
+    select:hover {
+      border-color: var(--primary);
+    }
+    
+
+    /* Add subtle animations */
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+      70% { box-shadow: 0 0 0 13px rgba(59, 130, 246, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+    }
+    
+    button:hover {
+      animation: pulse 1.5s infinite;
     }
   </style>
 </head>
