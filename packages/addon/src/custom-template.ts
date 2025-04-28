@@ -384,8 +384,13 @@ function landingTemplate(manifest: Manifest): string {
     
     a {
       text-decoration: none;
+      color: var(--primary);
     }
     
+    a:hover {
+      color: hsl(240, 100%, 50%);
+    }
+
     button {
       display: inline-flex;
       align-items: center;
@@ -405,7 +410,7 @@ function landingTemplate(manifest: Manifest): string {
     }
     
     button:hover {
-      background-color: hsl(217 91% 55%);
+      background-color: hsl(240, 100%, 50%);
     }
     
     button:active {
@@ -550,6 +555,15 @@ function landingTemplate(manifest: Manifest): string {
         gap: 1rem;
       }
       
+      .header > div > div {
+        flex-direction: column;
+        gap: 0.8rem;
+      }
+      
+      .header a button {
+        width: 100%;
+      }
+      
       .button-group {
         flex-direction: column;
         gap: 0.75rem;
@@ -630,9 +644,23 @@ function landingTemplate(manifest: Manifest): string {
     <div class="card">
       <div class="header">
         ${manifest.logo ? `<img class="logo" src="${manifest.logo}" alt="${manifest.name || manifest.id} logo">` : ''}
-        <div>
-          <h1 class="title">${manifest.name || manifest.id}</h1>
-          <p class="description">${translations.configPage.description || translations.configPage.title}</p>
+        <div style="display: flex; flex-direction: column; flex: 1;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <h1 class="title">${manifest.name || manifest.id}</h1>
+            <a href="https://buymeacoffee.com/pantel" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
+              <button type="button" style="background-color: #FFDD00; color: #000000; display: inline-flex; align-items: center; gap: 6px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+                  <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+                  <line x1="6" y1="1" x2="6" y2="4"></line>
+                  <line x1="10" y1="1" x2="10" y2="4"></line>
+                  <line x1="14" y1="1" x2="14" y2="4"></line>
+                </svg>
+                ${translations.configPage.supportDevelopment}
+              </button>
+            </a>
+          </div>
+          <p class="description">${translations.configPage.description}</p>
         </div>
       </div>
       
