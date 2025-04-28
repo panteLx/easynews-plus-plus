@@ -360,11 +360,11 @@ builder.defineStreamHandler(
 
       // Check if we have a custom title for this title directly
       if (customTitles[meta.name]) {
-        logger.info(
+        logger.debug(
           `Direct custom title found for "${meta.name}": "${customTitles[meta.name].join('", "')}"`
         );
       } else {
-        logger.info(`No direct custom title found for "${meta.name}", checking partial matches`);
+        logger.debug(`No direct custom title found for "${meta.name}", checking partial matches`);
 
         // Look for partial matches in title keys
         for (const [key, values] of Object.entries(customTitles)) {
@@ -372,7 +372,7 @@ builder.defineStreamHandler(
             meta.name.toLowerCase().includes(key.toLowerCase()) ||
             key.toLowerCase().includes(meta.name.toLowerCase())
           ) {
-            logger.info(
+            logger.debug(
               `Possible title match: "${meta.name}" ~ "${key}" -> "${values.join('", "')}"`
             );
           }
@@ -410,7 +410,7 @@ builder.defineStreamHandler(
       );
 
       if (additionalTitles.length > 0) {
-        logger.info(`Adding ${additionalTitles.length} additional titles from partial matches`);
+        logger.debug(`Adding ${additionalTitles.length} additional titles from partial matches`);
         allTitles = [...allTitles, ...additionalTitles];
       }
 
@@ -439,7 +439,7 @@ builder.defineStreamHandler(
           });
 
           const resultCount = res?.data?.length || 0;
-          logger.info(`Found ${resultCount} results for "${query}" without year`);
+          logger.debug(`Found ${resultCount} results for "${query}" without year`);
 
           if (resultCount > 0) {
             allSearchResults.push({ query, result: res });
@@ -459,7 +459,7 @@ builder.defineStreamHandler(
 
       // If we get no or few results, try with year included for more specificity
       if (allSearchResults.length === 0 && meta.year !== undefined) {
-        logger.info(`No results found without year, trying with year: ${meta.year}`);
+        logger.debug(`No results found without year, trying with year: ${meta.year}`);
 
         for (const titleVariant of allTitles) {
           // Skip empty titles
@@ -477,7 +477,7 @@ builder.defineStreamHandler(
             });
 
             const resultCount = res?.data?.length || 0;
-            logger.info(`Found ${resultCount} results for "${query}" with year`);
+            logger.debug(`Found ${resultCount} results for "${query}" with year`);
 
             if (resultCount > 0) {
               allSearchResults.push({ query, result: res });
@@ -542,6 +542,7 @@ builder.defineStreamHandler(
 
             // Use strictTitleMatching setting if enabled for series
             if (!queries.some(q => matchesTitle(title, q, useStrictMatching))) {
+              logger.debug(`Rejected series by title matching: "${title}"`);
               continue;
             }
           }
@@ -558,6 +559,7 @@ builder.defineStreamHandler(
           });
 
           if (!matchesAnyVariant) {
+            logger.debug(`Rejected ${type} by title matching: "${title}"`);
             continue;
           }
 
@@ -601,7 +603,7 @@ builder.defineStreamHandler(
           }
         }
 
-        logger.info(
+        logger.debug(
           `Found ${preferredLangStreams.length} streams with preferred language and ${otherStreams.length} other streams`
         );
 
@@ -911,12 +913,27 @@ builder.defineStreamHandler(
         logger.info(`Filtering complete: ${originalCount} streams → ${streams.length} streams`);
       }
 
-      // Limit to top 25 streams to prevent overwhelming the player
-      // No need to slice here since we're already limiting results at the API level
       const result = {
         streams,
         ...getCacheOptions(streams.length),
       };
+
+      // Create quality summary
+      if (streams.length > 0) {
+        const qualitySummary: Record<string, number> = {};
+        streams.forEach(stream => {
+          const quality = stream.name?.split('\n')[1] || 'Unknown';
+          qualitySummary[quality] = (qualitySummary[quality] || 0) + 1;
+        });
+
+        const qualitySummaryStr = Object.entries(qualitySummary)
+          .map(([quality, count]) => `${quality}: ${count}`)
+          .join(', ');
+
+        logger.info(`Found ${streams.length} streams total for ${id} (${qualitySummaryStr})`);
+      } else {
+        logger.info(`Found 0 streams total for ${id}`);
+      }
 
       // Cache the result
       setCache(cacheKey, result);
@@ -924,7 +941,7 @@ builder.defineStreamHandler(
       return result;
     } catch (error) {
       logError({
-        message: 'failed to handle stream',
+        message: `failed to handle stream: ${error}`,
         error,
         context: { resource: 'stream', id, type },
       });

@@ -49,27 +49,27 @@ export function isBadVideo(file: FileData) {
 
   // Check each condition and log the reason if it fails
   if (duration.match(/^\d+s/)) {
-    logger.info(`Bad video: "${title}": Duration too short (${duration})`);
+    logger.debug(`Bad video: "${title}": Duration too short (${duration})`);
     return true;
   }
   if (duration.match('^[0-5]m')) {
-    logger.info(`Bad video: "${title}": Duration too short (${duration})`);
+    logger.debug(`Bad video: "${title}": Duration too short (${duration})`);
     return true;
   }
   if (file.passwd) {
-    logger.info(`Bad video: "${title}": Password protected`);
+    logger.debug(`Bad video: "${title}": Password protected`);
     return true;
   }
   if (file.virus) {
-    logger.info(`Bad video: "${title}": Contains virus`);
+    logger.debug(`Bad video: "${title}": Contains virus`);
     return true;
   }
   if (file.type.toUpperCase() !== 'VIDEO') {
-    logger.info(`Bad video: "${title}": Not a video file (type: ${file.type})`);
+    logger.debug(`Bad video: "${title}": Not a video file (type: ${file.type})`);
     return true;
   }
   if (file.rawSize && file.rawSize < 20 * 1024 * 1024) {
-    logger.info(
+    logger.debug(
       `Bad video: "${title}": File too small (${Math.round(file.rawSize / 1024 / 1024)}MB)`
     );
     return true;
@@ -365,9 +365,9 @@ export function getAlternativeTitles(
 
   // Log whether we found any matches
   if (foundMatch) {
-    logger.info(`Found ${alternatives.length - 1} alternative titles for "${title}"`);
+    logger.debug(`Found ${alternatives.length - 1} alternative titles for "${title}"`);
   } else {
-    logger.info(`No alternative titles found for "${title}"`);
+    logger.debug(`No alternative titles found for "${title}"`);
   }
 
   return alternatives;
