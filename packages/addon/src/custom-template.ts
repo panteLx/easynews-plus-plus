@@ -4,9 +4,6 @@ import { logger } from './utils';
 
 function landingTemplate(manifest: Manifest): string {
   const configurationFields = manifest.config || [];
-  const backgroundImageStyle = manifest.background
-    ? `background-image: url(${manifest.background}); background-size: cover; background-position: center;`
-    : '';
 
   // Find UI language field to determine which language to use
   const uiLanguageField = configurationFields.find((field: any) => field.key === 'uiLanguage');
@@ -205,8 +202,8 @@ function landingTemplate(manifest: Manifest): string {
       left: 0;
       width: 100%;
       height: 100%;
-      ${backgroundImageStyle}
-      opacity: 0.08;
+      background: linear-gradient(135deg, #121212, #292929);
+      opacity: 0.15;
       z-index: -1;
     }
     
@@ -555,7 +552,7 @@ function landingTemplate(manifest: Manifest): string {
         gap: 1rem;
       }
       
-      .header > div > div {
+      .header-title-row {
         flex-direction: column;
         gap: 0.8rem;
       }
@@ -636,6 +633,35 @@ function landingTemplate(manifest: Manifest): string {
       max-width: 20%;
       margin: 0 auto;
     }
+    
+    .sponsor-button {
+      background-color: #FFDD00;
+      color: #000000;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .sponsor-button:hover {
+      background-color:rgb(255, 196, 0);
+    }
+    
+    .sponsor-link {
+      text-decoration: none;
+    }
+    
+    .header-content {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    
+    .header-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
   </style>
 </head>
 <body>
@@ -644,11 +670,11 @@ function landingTemplate(manifest: Manifest): string {
     <div class="card">
       <div class="header">
         ${manifest.logo ? `<img class="logo" src="${manifest.logo}" alt="${manifest.name || manifest.id} logo">` : ''}
-        <div style="display: flex; flex-direction: column; flex: 1;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+        <div class="header-content">
+          <div class="header-title-row">
             <h1 class="title">${manifest.name || manifest.id}</h1>
-            <a href="https://buymeacoffee.com/pantel" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
-              <button type="button" style="background-color: #FFDD00; color: #000000; display: inline-flex; align-items: center; gap: 6px;">
+            <a href="https://buymeacoffee.com/pantel" target="_blank" rel="noopener noreferrer" class="sponsor-link">
+              <button type="button" class="sponsor-button">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
                   <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
