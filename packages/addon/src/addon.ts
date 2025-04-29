@@ -35,11 +35,7 @@ interface AddonConfig {
   [key: string]: any;
 }
 
-// Define ValidPosterShape as a workaround for missing PosterShape type
-type ValidPosterShape = 'square' | 'regular' | 'landscape';
-
 const builder = new addonBuilder(manifest);
-const prefix = `${catalog.id}:`;
 
 // In-memory request cache to reduce API calls and improve response times
 const requestCache = new Map<string, { data: any; timestamp: number }>();
@@ -98,123 +94,6 @@ import customTemplate from './custom-template';
 
 // Export landing HTML for Cloudflare Worker
 export const landingHTML = customTemplate(manifest);
-
-builder.defineCatalogHandler(async ({ extra: { search } }) => {
-  return {
-    metas: [
-      {
-        id: `${prefix}${encodeURIComponent(search)}`,
-        name: search,
-        type: 'tv',
-        logo: manifest.logo,
-        background: manifest.background,
-        posterShape: 'square',
-        poster: manifest.logo,
-        description: `Provides search results from Easynews for '${search}'`,
-      },
-    ],
-    cacheMaxAge: 3600 * 24 * 30, // The returned data is static so it may be cached for a long time (30 days).
-  };
-});
-
-builder.defineMetaHandler(
-  async ({ id, type, config }: { id: string; type: ContentType; config: AddonConfig }) => {
-    const { username, password } = config;
-
-    // For language filtering in the catalog
-    const preferredLang = config.preferredLanguage || '';
-
-    if (!id.startsWith(catalog.id)) {
-      return { meta: null as unknown as MetaDetail };
-    }
-
-    // Make sure credentials are provided
-    if (!username || !password) {
-      logError({
-        message: 'Missing credentials',
-        error: new Error('Username and password are required'),
-        context: { resource: 'meta', id, type },
-      });
-      return { meta: null as unknown as MetaDetail };
-    }
-
-    try {
-      const search = decodeURIComponent(id.replace(prefix, ''));
-
-      // Check cache for this search
-      const cacheKey = `meta:${search}:${username}`;
-      const cachedResult = getFromCache<{ meta: MetaDetail } & Cache>(cacheKey);
-      if (cachedResult) {
-        return cachedResult;
-      }
-
-      const videos: MetaVideo[] = [];
-
-      const api = new EasynewsAPI({ username, password });
-      const res = await api.searchAll({
-        query: search,
-      });
-
-      for (const file of res?.data ?? []) {
-        const title = getPostTitle(file);
-
-        if (isBadVideo(file) || !matchesTitle(title, search, false)) {
-          continue;
-        }
-
-        videos.push({
-          id: `${prefix}${file.sig}`,
-          released: new Date(file['5']).toISOString(),
-          title,
-          overview: file['6'],
-          thumbnail: createThumbnailUrl(res, file),
-          streams: [
-            mapStream({
-              username,
-              password,
-              title,
-              fullResolution: file.fullres,
-              fileExtension: getFileExtension(file),
-              duration: getDuration(file),
-              size: getSize(file),
-              url: `${createStreamUrl(res, username, password)}/${createStreamPath(file)}`,
-              videoSize: file.rawSize,
-              file,
-              preferredLang: '',
-            }),
-          ],
-        });
-      }
-
-      const result = {
-        meta: {
-          id,
-          name: search,
-          type: 'tv' as ContentType,
-          logo: manifest.logo,
-          background: manifest.background,
-          poster: manifest.logo,
-          posterShape: 'square' as ValidPosterShape,
-          description: `Provides search results from Easynews for '${search}'`,
-          videos,
-        },
-        ...getCacheOptions(videos.length),
-      };
-
-      // Cache the result
-      setCache(cacheKey, result);
-
-      return result;
-    } catch (error) {
-      logError({
-        message: 'failed to handle meta',
-        error,
-        context: { resource: 'meta', id, type },
-      });
-      return { meta: null as unknown as MetaDetail };
-    }
-  }
-);
 
 builder.defineStreamHandler(
   async ({ id, type, config }: { id: string; type: ContentType; config: AddonConfig }) => {
