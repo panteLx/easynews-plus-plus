@@ -44,7 +44,7 @@
 - Language filtering with preferred audio language prioritization
 - Improved quality detection from complex file names
 - Enhanced subtitle fetching reliability
-- Configurable strict title matching (disabled by default)
+- Configurable strict title matching (enabled by default)
 
 ### 🌐 Custom Title Management
 
@@ -291,7 +291,7 @@ The title matching system uses several advanced techniques:
 3. Special character handling (spaces, punctuation, accents)
 4. Configurable strict matching option for exact results
 
-When strict matching is enabled, only exact title matches are returned. When disabled (default), the addon uses smart matching to find related content.
+When strict matching is enabled, only exact title matches are returned. When disabled, the addon uses smart matching to find related content. By default, strict matching is enabled.
 
 ### How does the custom title system work?
 
@@ -342,20 +342,23 @@ The addon offers multiple sorting methods that can be selected in the configurat
 2. **Language First**: Prioritizes content with your preferred language, then sorts by quality and size.
 3. **Size First**: Sorts primarily by file size (largest first), then quality, then language.
 4. **Date First**: Prioritizes newest content first, with secondary sorting by quality and language.
-5. **Relevance First**: Sorts by API relevance score, which typically finds the best matches to your search terms.
+
+**All options use the same relevance-first API search, then sort results locally**
 
 You can select your preferred sorting method in the addon configuration page. For optimal language prioritization, the "Language First" option works best when you've also set your preferred language.
 
 ### Why is there a 50-stream limit?
 
-The addon limits results to the top 50 highest quality streams to:
+~~The addon limits results to the top 50 highest quality streams to:~~
 
-1. Prevent media player overload
-2. Optimize performance and response times
-3. Focus on quality over quantity
-4. Streamline the user experience
+~~1. Prevent media player overload~~
+~~2. Optimize performance and response times~~
+~~3. Focus on quality over quantity~~
+~~4. Streamline the user experience~~
 
-After quality sorting, the top 50 streams will represent the best available options, making additional results unnecessary.
+~~After quality sorting, the top 50 streams will represent the best available options, making additional results unnecessary.~~
+
+This limit was removed in version 2.4.0.
 
 ### How does the language filter work?
 

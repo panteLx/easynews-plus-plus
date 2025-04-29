@@ -35,8 +35,10 @@ type TranslationKeys = {
     username: string;
     password: string;
     strictTitleMatching: string;
+    strictTitleMatchingHint: string;
     preferredLanguage: string;
     sortingMethod: string;
+    sortingMethodHint: string;
     uiLanguage: string;
     showQualities: string;
     maxResultsPerQuality: string;
@@ -66,7 +68,6 @@ type TranslationKeys = {
     languageFirst: string;
     sizeFirst: string;
     dateFirst: string;
-    relevanceFirst: string;
   };
   qualityOptions: {
     allQualities: string;
@@ -172,10 +173,13 @@ export const translations: Translations = {
     form: {
       username: 'Username',
       password: 'Password',
-      strictTitleMatching:
-        "Strict Title Matching (to filter out results that don't exactly match the movie or series title)",
+      strictTitleMatching: 'Strict Title Matching',
+      strictTitleMatchingHint:
+        "Recommended: Filters out results that don't exactly match the movie or series title",
       preferredLanguage: 'Preferred Audio Language',
       sortingMethod: 'Sorting Method',
+      sortingMethodHint:
+        'All options use the same relevance-first API search, then sort results locally',
       uiLanguage: 'UI Language',
       showQualities: 'Qualities to show in streams list',
       maxResultsPerQuality: 'Max results per quality',
@@ -203,7 +207,6 @@ export const translations: Translations = {
       languageFirst: 'Preferred Language, then Quality',
       sizeFirst: 'File Size (largest first)',
       dateFirst: 'Date Added (newest first)',
-      relevanceFirst: 'Relevance (best matches first)',
     },
     qualityOptions: {
       allQualities: 'All Qualities',
@@ -224,10 +227,13 @@ export const translations: Translations = {
     form: {
       username: 'Benutzername',
       password: 'Passwort',
-      strictTitleMatching:
-        'Strikte Titelübereinstimmung (um Ergebnisse herauszufiltern, die nicht exakt mit dem Film- oder Serientitel übereinstimmen)',
+      strictTitleMatching: 'Strikte Titelübereinstimmung',
+      strictTitleMatchingHint:
+        'Empfohlen: Filtert Ergebnisse heraus, die nicht exakt mit dem Film- oder Serientitel übereinstimmen',
       preferredLanguage: 'Bevorzugte Audiosprache',
       sortingMethod: 'Sortiermethode',
+      sortingMethodHint:
+        'Alle Optionen verwenden die gleiche relevanz-basierte API-Suche und sortieren die Ergebnisse dann lokal',
       uiLanguage: 'UI-Sprache',
       showQualities: 'Anzuzeigende Qualitäten in der Streamliste',
       maxResultsPerQuality: 'Maximale Ergebnisse pro Qualität',
@@ -255,7 +261,6 @@ export const translations: Translations = {
       languageFirst: 'Bevorzugte Sprache, dann Qualität',
       sizeFirst: 'Dateigröße (größte zuerst)',
       dateFirst: 'Hinzugefügt am (neueste zuerst)',
-      relevanceFirst: 'Relevanz (beste Treffer zuerst)',
     },
     qualityOptions: {
       allQualities: 'Alle Qualitäten',
@@ -276,10 +281,13 @@ export const translations: Translations = {
     form: {
       username: 'Nombre de usuario',
       password: 'Contraseña',
-      strictTitleMatching:
-        'Coincidencia estricta de títulos (para filtrar resultados que no coincidan exactamente con el título de la película o serie)',
+      strictTitleMatching: 'Coincidencia estricta de títulos',
+      strictTitleMatchingHint:
+        'Recomendado: Filtra resultados que no coincidan exactamente con el título de la película o serie',
       preferredLanguage: 'Idioma de audio preferido',
       sortingMethod: 'Método de clasificación',
+      sortingMethodHint:
+        'Todas las opciones utilizan la misma búsqueda API basada en relevancia y luego ordenan los resultados localmente',
       uiLanguage: 'Idioma de la interfaz de usuario',
       showQualities: 'Calidades a mostrar en la lista de streams',
       maxResultsPerQuality: 'Máx. resultados por calidad',
@@ -307,7 +315,6 @@ export const translations: Translations = {
       languageFirst: 'Idioma preferido, luego calidad',
       sizeFirst: 'Tamaño de archivo (más grande primero)',
       dateFirst: 'Fecha de adición (más recientes primero)',
-      relevanceFirst: 'Relevancia (mejores coincidencias primero)',
     },
     qualityOptions: {
       allQualities: 'Todas las calidades',
@@ -328,10 +335,13 @@ export const translations: Translations = {
     form: {
       username: "Nom d'utilisateur",
       password: 'Mot de passe',
-      strictTitleMatching:
-        'Correspondance stricte des titres (pour filtrer les résultats qui ne correspondent pas exactement au titre du film ou de la série)',
+      strictTitleMatching: 'Correspondance stricte des titres',
+      strictTitleMatchingHint:
+        'Recommandé: Filtre les résultats qui ne correspondent pas exactement au titre du film ou de la série',
       preferredLanguage: 'Langue audio préférée',
       sortingMethod: 'Méthode de tri',
+      sortingMethodHint:
+        'Toutes les options utilisent la même recherche API basée sur la pertinence puis trient les résultats localement',
       uiLanguage: "Langue de l'interface",
       showQualities: 'Qualités à afficher dans la liste des streams',
       maxResultsPerQuality: 'Résultats max. par qualité',
@@ -359,7 +369,6 @@ export const translations: Translations = {
       languageFirst: 'Langue préférée, puis qualité',
       sizeFirst: "Taille du fichier (plus grand d'abord)",
       dateFirst: "Date d'ajout (plus récent d'abord)",
-      relevanceFirst: "Pertinence (meilleures correspondances d'abord)",
     },
     qualityOptions: {
       allQualities: 'Toutes les qualités',
@@ -380,10 +389,13 @@ export const translations: Translations = {
     form: {
       username: 'Nome utente',
       password: 'Password',
-      strictTitleMatching:
-        'Corrispondenza esatta dei titoli (per filtrare i risultati che non corrispondono esattamente al titolo del film o della serie)',
+      strictTitleMatching: 'Corrispondenza esatta dei titoli',
+      strictTitleMatchingHint:
+        'Consigliato: Filtra i risultati che non corrispondono esattamente al titolo del film o della serie',
       preferredLanguage: 'Lingua audio preferita',
       sortingMethod: 'Metodo di ordinamento',
+      sortingMethodHint:
+        'Tutte le opzioni utilizzano la stessa ricerca API basata sulla rilevanza e poi ordinano i risultati localmente',
       uiLanguage: "Lingua dell'interfaccia utente",
       showQualities: 'Calità da mostrare nella lista degli stream',
       maxResultsPerQuality: 'Risultati max. per calità',
@@ -396,7 +408,7 @@ export const translations: Translations = {
       german: 'Tedesco (Deutsch)',
       spanish: 'Spagnolo (Español)',
       french: 'Francese (Français)',
-      italian: 'Italiano (Italian)',
+      italian: 'Italiano (Italiano)',
       japanese: 'Giapponese (日本語)',
       portuguese: 'Portoghese (Português)',
       russian: 'Russo (Русский)',
@@ -411,7 +423,6 @@ export const translations: Translations = {
       languageFirst: 'Lingua preferita, poi qualità',
       sizeFirst: 'Dimensione file (i più grandi prima)',
       dateFirst: 'Data di aggiunta (i più recenti prima)',
-      relevanceFirst: 'Rilevanza (migliori corrispondenze prima)',
     },
     qualityOptions: {
       allQualities: 'Tutte le qualità',
@@ -432,10 +443,13 @@ export const translations: Translations = {
     form: {
       username: 'ユーザー名',
       password: 'パスワード',
-      strictTitleMatching:
-        '厳密なタイトル一致（映画やシリーズのタイトルに正確に一致しない結果をフィルタリング）',
+      strictTitleMatching: '厳密なタイトル一致',
+      strictTitleMatchingHint:
+        '推奨：映画やシリーズのタイトルに正確に一致しない結果をフィルタリングします',
       preferredLanguage: '優先する音声言語',
       sortingMethod: '並べ替え方法',
+      sortingMethodHint:
+        'すべてのオプションは同じ関連性ベースのAPI検索を使用し、結果をローカルで並べ替えます',
       uiLanguage: 'UI言語',
       showQualities: 'ストリームリストに表示する画質',
       maxResultsPerQuality: '画質ごとの最大結果数',
@@ -463,7 +477,6 @@ export const translations: Translations = {
       languageFirst: '優先言語、次に画質',
       sizeFirst: 'ファイルサイズ（最大優先）',
       dateFirst: '追加日（最新優先）',
-      relevanceFirst: '関連性（最良の一致優先）',
     },
     qualityOptions: {
       allQualities: 'すべての画質',
@@ -484,10 +497,13 @@ export const translations: Translations = {
     form: {
       username: 'Nome de usuário',
       password: 'Senha',
-      strictTitleMatching:
-        'Correspondência estrita de títulos (para filtrar resultados que não correspondam exatamente ao título do filme ou série)',
+      strictTitleMatching: 'Correspondência estrita de títulos',
+      strictTitleMatchingHint:
+        'Recomendado: Filtra resultados que não correspondam exatamente ao título do filme ou série',
       preferredLanguage: 'Idioma de áudio preferido',
       sortingMethod: 'Método de classificação',
+      sortingMethodHint:
+        'Todas as opções usam a mesma pesquisa API baseada em relevância e depois classificam os resultados localmente',
       uiLanguage: 'Idioma da interface de usuário',
       showQualities: 'Qualidades a serem exibidas na lista de streams',
       maxResultsPerQuality: 'Máx. resultados por qualidade',
@@ -502,7 +518,7 @@ export const translations: Translations = {
       french: 'Francês (Français)',
       italian: 'Italiano (Italiano)',
       japanese: 'Japonês (日本語)',
-      portuguese: 'Português (Portuguese)',
+      portuguese: 'Português (Português)',
       russian: 'Russo (Русский)',
       korean: 'Coreano (한국어)',
       chinese: 'Chinês (中文)',
@@ -515,7 +531,6 @@ export const translations: Translations = {
       languageFirst: 'Idioma preferido, depois qualidade',
       sizeFirst: 'Tamanho do arquivo (maiores primeiro)',
       dateFirst: 'Data de adição (mais recentes primeiro)',
-      relevanceFirst: 'Relevância (melhores correspondências primeiro)',
     },
     qualityOptions: {
       allQualities: 'Todas as qualidades',
@@ -536,10 +551,13 @@ export const translations: Translations = {
     form: {
       username: 'Имя пользователя',
       password: 'Пароль',
-      strictTitleMatching:
-        'Строгое соответствие названия (для фильтрации результатов, которые не точно соответствуют названию фильма или сериала)',
+      strictTitleMatching: 'Строгое соответствие названия',
+      strictTitleMatchingHint:
+        'Рекомендуется: Фильтрует результаты, которые не точно соответствуют названию фильма или сериала',
       preferredLanguage: 'Предпочтительный язык аудио',
       sortingMethod: 'Метод сортировки',
+      sortingMethodHint:
+        'Все варианты используют один и тот же поиск по API на основе релевантности, а затем сортируют результаты локально',
       uiLanguage: 'Язык интерфейса',
       showQualities: 'Качество для отображения в списке потоков',
       maxResultsPerQuality: 'Максимальное количество результатов на качество',
@@ -567,7 +585,6 @@ export const translations: Translations = {
       languageFirst: 'Предпочтительный язык, затем качество',
       sizeFirst: 'Размер файла (сначала наибольшие)',
       dateFirst: 'Дата добавления (сначала новейшие)',
-      relevanceFirst: 'Релевантность (сначала лучшие совпадения)',
     },
     qualityOptions: {
       allQualities: 'Все качества',
@@ -588,10 +605,13 @@ export const translations: Translations = {
     form: {
       username: '사용자 이름',
       password: '비밀번호',
-      strictTitleMatching:
-        '엄격한 제목 일치 (영화나 시리즈 제목과 정확히 일치하지 않는 결과 필터링)',
+      strictTitleMatching: '엄격한 제목 일치',
+      strictTitleMatchingHint:
+        '권장: 영화나 시리즈 제목과 정확히 일치하지 않는 결과를 필터링합니다',
       preferredLanguage: '선호하는 오디오 언어',
       sortingMethod: '정렬 방법',
+      sortingMethodHint:
+        '모든 옵션은 동일한 관련성 기반 API 검색을 사용한 다음 결과를 로컬에서 정렬합니다',
       uiLanguage: 'UI 언어',
       showQualities: '스트림 목록에 표시할 화질',
       maxResultsPerQuality: '화질당 최대 결과 수',
@@ -605,7 +625,7 @@ export const translations: Translations = {
       spanish: '스페인어 (Español)',
       french: '프랑스어 (Français)',
       italian: '이탈리아어 (Italiano)',
-      japanese: '일본어 (日本語)',
+      japanese: '일본어 (Japanese)',
       portuguese: '포르투갈어 (Português)',
       russian: '러시아어 (Русский)',
       korean: '한국어 (Korean)',
@@ -619,7 +639,6 @@ export const translations: Translations = {
       languageFirst: '선호 언어, 그다음 화질',
       sizeFirst: '파일 크기 (큰 것 우선)',
       dateFirst: '추가된 날짜 (최신 우선)',
-      relevanceFirst: '관련성 (가장 일치하는 것 우선)',
     },
     qualityOptions: {
       allQualities: '모든 화질',
@@ -640,9 +659,11 @@ export const translations: Translations = {
     form: {
       username: '用户名',
       password: '密码',
-      strictTitleMatching: '严格标题匹配（过滤掉与电影或剧集标题不完全匹配的结果）',
+      strictTitleMatching: '严格标题匹配',
+      strictTitleMatchingHint: '推荐：过滤掉与电影或剧集标题不完全匹配的结果',
       preferredLanguage: '首选音频语言',
       sortingMethod: '排序方法',
+      sortingMethodHint: '所有选项都使用相同的基于相关性的API搜索，然后在本地对结果进行排序',
       uiLanguage: 'UI 语言',
       showQualities: '在流列表中显示的画质',
       maxResultsPerQuality: '每个画质的最多结果数',
@@ -670,7 +691,6 @@ export const translations: Translations = {
       languageFirst: '首选语言，然后是质量',
       sizeFirst: '文件大小（最大优先）',
       dateFirst: '添加日期（最新优先）',
-      relevanceFirst: '相关性（最佳匹配优先）',
     },
     qualityOptions: {
       allQualities: '所有画质',
@@ -691,10 +711,13 @@ export const translations: Translations = {
     form: {
       username: 'Gebruikersnaam',
       password: 'Wachtwoord',
-      strictTitleMatching:
-        'Stricte titelovereenkomst (om resultaten te filteren die niet exact overeenkomen met de film- of serie-titel)',
+      strictTitleMatching: 'Stricte titelovereenkomst',
+      strictTitleMatchingHint:
+        'Aanbevolen: Filtert resultaten die niet exact overeenkomen met de film- of serie-titel',
       preferredLanguage: 'Voorgestelde audiolanguage',
       sortingMethod: 'Sorteermethode',
+      sortingMethodHint:
+        'Alle opties gebruiken dezelfde relevantie-gebaseerde API-zoekopdracht en sorteren vervolgens de resultaten lokaal',
       uiLanguage: 'Gebruikersinterface-taal',
       showQualities: 'Kwaliteiten om weer te geven in de streamlijst',
       maxResultsPerQuality: 'Maximale resultaten per kwaliteit',
@@ -722,7 +745,6 @@ export const translations: Translations = {
       languageFirst: 'Voorgestelde taal, dan kwaliteit',
       sizeFirst: 'Bestandsgrootte (grootste eerst)',
       dateFirst: 'Datum toegevoegd (nieuwste eerst)',
-      relevanceFirst: 'Relevantie (beste overeenkomsten eerst)',
     },
     qualityOptions: {
       allQualities: 'Alle kwaliteiten',
@@ -743,10 +765,13 @@ export const translations: Translations = {
     form: {
       username: 'Nume utilizator',
       password: 'Parolă',
-      strictTitleMatching:
-        'Potrivire strictă a titlului (pentru filtrarea rezultatelor care nu se potrivesc exact cu titlul filmului sau serialului)',
+      strictTitleMatching: 'Potrivire strictă a titlului',
+      strictTitleMatchingHint:
+        'Recomandat: Filtrează rezultatele care nu se potrivesc exact cu titlul filmului sau serialului',
       preferredLanguage: 'Limbă audio preferată',
       sortingMethod: 'Metodă de sortare',
+      sortingMethodHint:
+        'Toate opțiunile folosesc aceeași căutare API bazată pe relevanță și apoi sortează rezultatele local',
       uiLanguage: 'Limbă interfacă',
       showQualities: 'Calități pentru afișare în lista de streamuri',
       maxResultsPerQuality: 'Rezultate maxime pe calitate',
@@ -774,7 +799,6 @@ export const translations: Translations = {
       languageFirst: 'Limbă preferată, apoi calitate',
       sizeFirst: 'Mărimea fișierului (cele mai mari înainte)',
       dateFirst: 'Data adăugării (cele mai recente înainte)',
-      relevanceFirst: 'Relevantă (cele mai bune potriviri înainte)',
     },
     qualityOptions: {
       allQualities: 'Toate calitățile',
@@ -795,10 +819,13 @@ export const translations: Translations = {
     form: {
       username: 'Потребителско име',
       password: 'Парола',
-      strictTitleMatching:
-        'Строго съответствие на заглавието (за филтриране на резултати, които не съвпадат точно със заглавието на филма или сериала)',
+      strictTitleMatching: 'Строго съответствие на заглавието',
+      strictTitleMatchingHint:
+        'Препоръчително: Филтрира резултати, които не съвпадат точно със заглавието на филма или сериала',
       preferredLanguage: 'Предпочитан аудио език',
       sortingMethod: 'Метод на сортиране',
+      sortingMethodHint:
+        'Всички опции използват едно и също търсене на API базирано на релевантност и след това сортират резултатите локално',
       uiLanguage: 'Език на потребителския интерфейс',
       showQualities: 'Качество за показване в списъка с потоци',
       maxResultsPerQuality: 'Максимален брой резултати на качество',
@@ -826,7 +853,6 @@ export const translations: Translations = {
       languageFirst: 'Предпочитан език, след това качество',
       sizeFirst: 'Размер на файла (първо най-големият)',
       dateFirst: 'Дата на добавяне (най-новата първа)',
-      relevanceFirst: 'Релевантност (първо най-добрите съвпадения)',
     },
     qualityOptions: {
       allQualities: 'Всички качества',

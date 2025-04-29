@@ -29,7 +29,11 @@ function landingTemplate(manifest: Manifest): string {
     } else if (field.key === 'password' && translations.form.password) {
       return { ...field, title: 'Easynews ' + translations.form.password };
     } else if (field.key === 'strictTitleMatching' && translations.form.strictTitleMatching) {
-      return { ...field, title: translations.form.strictTitleMatching };
+      return {
+        ...field,
+        title: translations.form.strictTitleMatching,
+        hint: translations.form.strictTitleMatchingHint,
+      };
     } else if (field.key === 'sortingPreference' && translations.form.sortingMethod) {
       // For sorting preference field, translate both title and options
       const translatedOptions: Record<string, string> = {};
@@ -52,16 +56,11 @@ function landingTemplate(manifest: Manifest): string {
         if (field.options['date_first'] !== undefined && translations.sortingOptions?.dateFirst) {
           translatedOptions['date_first'] = translations.sortingOptions.dateFirst;
         }
-        if (
-          field.options['relevance_first'] !== undefined &&
-          translations.sortingOptions?.relevanceFirst
-        ) {
-          translatedOptions['relevance_first'] = translations.sortingOptions.relevanceFirst;
-        }
       }
       return {
         ...field,
         title: translations.form.sortingMethod,
+        hint: translations.form.sortingMethodHint,
         options: Object.keys(translatedOptions).length > 0 ? translatedOptions : field.options,
       };
     } else if (field.key === 'uiLanguage' && translations.form.uiLanguage) {
@@ -203,6 +202,15 @@ function landingTemplate(manifest: Manifest): string {
       
       /* Measurements */
       --radius: 0.5rem;
+    }
+    
+    .form-hint {
+      font-size: 0.8em;
+      font-weight: normal;
+      color: var(--muted-foreground);
+      font-style: italic;
+      display: block;
+      margin-top: 0.2rem;
     }
     
     /* Modern scrollbar for browsers that support it */
@@ -387,7 +395,7 @@ function landingTemplate(manifest: Manifest): string {
       align-items: center;
       cursor: pointer;
       user-select: none;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       width: 100%;
       margin-bottom: 0rem;
     }
@@ -827,14 +835,15 @@ function landingTemplate(manifest: Manifest): string {
                 <label class="checkbox-label">
                   <input type="${field.type}" name="${field.key}" ${field.default === 'true' ? 'checked' : ''}>
                   <span class="checkmark"></span>
-                  <span class="checkbox-title">${field.title}</span>
+                  <span class="checkbox-title">${field.title}
+                  ${field.hint ? `<span class="form-hint">(${field.hint})</span></span>` : '</span>'}
                 </label>
               </div>
             </div>`;
             } else if (field.type === 'select') {
               return `
             <div class="form-group">
-              <label for="${field.key}">${field.title}</label>
+              <label for="${field.key}">${field.title}${field.hint ? `<span class="form-hint">(${field.hint})</span>` : ''}</label>
               <div class="select-wrapper">
                 <select name="${field.key}" id="${field.key}">
                   ${Object.entries(field.options || {})
@@ -861,25 +870,25 @@ function landingTemplate(manifest: Manifest): string {
                   return `
             <div class="form-row">
               <div class="form-col">
-                <label for="maxResultsPerQuality">${maxResultsField.title}</label>
+                <label for="maxResultsPerQuality">${maxResultsField.title}${maxResultsField.hint ? `<span class="form-hint">(${maxResultsField.hint})</span>` : ''}</label>
                 <input type="${maxResultsField.type}" placeholder="${translations.form.noLimit}" name="maxResultsPerQuality" id="maxResultsPerQuality" ${maxResultsField.required ? 'required' : ''}>
               </div>
               <div class="form-col">
-                <label for="${field.key}">${field.title}</label>
+                <label for="${field.key}">${field.title}${field.hint ? `<span class="form-hint">(${field.hint})</span>` : ''}</label>
                 <input type="${field.type}" placeholder="${translations.form.noLimit}" name="${field.key}" id="${field.key}" ${field.required ? 'required' : ''}>
               </div>
             </div>`;
                 } else {
                   return `
             <div class="form-group">
-              <label for="${field.key}">${field.title}</label>
+              <label for="${field.key}">${field.title}${field.hint ? `<span class="form-hint">(${field.hint})</span>` : ''}</label>
               <input type="${field.type}" placeholder="${translations.form.noLimit}" name="${field.key}" id="${field.key}" ${field.required ? 'required' : ''}>
             </div>`;
                 }
               } else {
                 return `
             <div class="form-group">
-              <label for="${field.key}">${field.title}</label>
+              <label for="${field.key}">${field.title}${field.hint ? `<span class="form-hint">(${field.hint})</span>` : ''}</label>
               <input type="${field.type}" name="${field.key}" id="${field.key}" ${field.required ? 'required' : ''}>
             </div>`;
               }

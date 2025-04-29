@@ -55,7 +55,7 @@ export class EasynewsAPI {
   async search({
     query,
     pageNr = 1,
-    maxResults = 50,
+    maxResults = 250,
     sort1 = 'dsize',
     sort1Direction = '-',
     sort2 = 'relevance',
@@ -148,15 +148,35 @@ export class EasynewsAPI {
       returned: 0,
       unfilteredResults: 0,
     };
+
+    // Set constants for result limits
+    const TOTAL_MAX_RESULTS = 500; // Maximum total results to return
+    const MAX_PAGES = 10; // Safety limit on number of page requests
+    const MAX_RESULTS_PER_PAGE = 250; // Maximum results per page Easynews API supports
+
     let pageNr = 1;
-    const maxPages = 5; // Limit to prevent excessive API calls
     let pageCount = 0;
-    // Get the maxResults if specified, otherwise use a high number
-    const maxResults = options.maxResults || 100;
 
     try {
-      while (pageCount < maxPages) {
-        const pageResult = await this.search({ ...options, pageNr });
+      while (pageCount < MAX_PAGES) {
+        // Calculate optimal page size for each request
+        // For first page, request maximum supported size
+        // For subsequent pages, request either the maximum or what's left to reach TOTAL_MAX_RESULTS
+        const remainingResults = TOTAL_MAX_RESULTS - data.length;
+        const optimalPageSize =
+          pageNr === 1 ? MAX_RESULTS_PER_PAGE : Math.min(MAX_RESULTS_PER_PAGE, remainingResults);
+
+        // If we've already reached our limit, stop fetching
+        if (remainingResults <= 0) {
+          break;
+        }
+
+        const pageResult = await this.search({
+          ...options,
+          pageNr,
+          maxResults: optimalPageSize,
+        });
+
         res = pageResult;
         pageCount++;
 
@@ -174,10 +194,10 @@ export class EasynewsAPI {
 
         data.push(...newData);
 
-        // Stop if we've reached the requested maximum results
-        if (data.length >= maxResults) {
-          // Trim the array to exactly maxResults
-          data.length = maxResults;
+        // Stop if we've reached our total limit
+        if (data.length >= TOTAL_MAX_RESULTS) {
+          // Trim the array to exactly TOTAL_MAX_RESULTS
+          data.length = TOTAL_MAX_RESULTS;
           break;
         }
 

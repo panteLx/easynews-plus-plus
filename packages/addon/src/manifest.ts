@@ -30,7 +30,7 @@ const sortingOptions = {
   language_first: englishTranslations.sortingOptions.languageFirst,
   size_first: englishTranslations.sortingOptions.sizeFirst,
   date_first: englishTranslations.sortingOptions.dateFirst,
-  relevance_first: englishTranslations.sortingOptions.relevanceFirst,
+  default: 'quality_first',
 } as any;
 
 // Create UI language options
@@ -98,7 +98,7 @@ export const manifest: Manifest = {
       title: englishTranslations.form.strictTitleMatching,
       key: 'strictTitleMatching',
       type: 'checkbox',
-      default: 'false',
+      default: 'true',
     },
     {
       title: englishTranslations.form.preferredLanguage,

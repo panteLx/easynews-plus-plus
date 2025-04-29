@@ -179,44 +179,16 @@ builder.defineStreamHandler(
         query: '', // Will be set for each search later
       };
 
-      // Automatically set API sorting parameters based on sorting preference
-      switch (sortingPreference) {
-        case 'size_first':
-          sortOptions.sort1 = 'dsize'; // Size
-          sortOptions.sort1Direction = '-'; // Descending
-          sortOptions.sort2 = 'relevance';
-          sortOptions.sort2Direction = '-';
-          break;
-        case 'date_first':
-          sortOptions.sort1 = 'dtime'; // DateTime
-          sortOptions.sort1Direction = '-'; // Descending
-          sortOptions.sort2 = 'dsize';
-          sortOptions.sort2Direction = '-';
-          break;
-        case 'relevance_first':
-          sortOptions.sort1 = 'relevance'; // Relevance
-          sortOptions.sort1Direction = '-'; // Descending
-          sortOptions.sort2 = 'dsize';
-          sortOptions.sort2Direction = '-';
-          break;
-        case 'language_first':
-          // For language prioritization, relevance usually works best with the API
-          sortOptions.sort1 = 'relevance';
-          sortOptions.sort1Direction = '-';
-          sortOptions.sort2 = 'dsize';
-          sortOptions.sort2Direction = '-';
-          break;
-        case 'quality_first':
-        default:
-          // For quality prioritization, size is a good proxy for quality
-          sortOptions.sort1 = 'dsize'; // Size
-          sortOptions.sort1Direction = '-'; // Descending
-          sortOptions.sort2 = 'relevance';
-          sortOptions.sort2Direction = '-';
-          break;
-      }
+      // Set consistent API sorting parameters regardless of user sorting preference
+      // This ensures we always get the same raw results
+      // We'll handle user sorting preferences after fetching all results
 
-      // Set a reasonable third sort option for all cases
+      // Use parameters that give us the most complete results
+      sortOptions.sort1 = 'relevance'; // Use relevance as primary sort
+      sortOptions.sort1Direction = '-'; // Descending
+      sortOptions.sort2 = 'dsize'; // Then size
+      sortOptions.sort2Direction = '-'; // Descending
+      // Set a consistent third sort option
       sortOptions.sort3 = 'dtime'; // DateTime
       sortOptions.sort3Direction = '-'; // Descending
 
@@ -305,7 +277,6 @@ builder.defineStreamHandler(
           const res = await api.search({
             ...sortOptions,
             query,
-            maxResults: 50, // Limit results directly from the API
           });
 
           const resultCount = res?.data?.length || 0;
@@ -327,9 +298,16 @@ builder.defineStreamHandler(
         }
       }
 
-      // If we get no or few results, try with year included for more specificity
-      if (allSearchResults.length === 0 && meta.year !== undefined) {
-        logger.debug(`No results found without year, trying with year: ${meta.year}`);
+      // If meta.year is defined, also search with year included (regardless of whether we found results without year)
+      if (meta.year !== undefined) {
+        // If we already found results without year, log that we're still searching with year
+        if (allSearchResults.length > 0) {
+          logger.debug(
+            `Found ${allSearchResults.length} results without year, also trying with year: ${meta.year}`
+          );
+        } else {
+          logger.debug(`No results found without year, trying with year: ${meta.year}`);
+        }
 
         for (const titleVariant of allTitles) {
           // Skip empty titles
@@ -343,7 +321,6 @@ builder.defineStreamHandler(
             const res = await api.search({
               ...sortOptions,
               query,
-              maxResults: 50, // Limit results directly from the API
             });
 
             const resultCount = res?.data?.length || 0;
@@ -424,8 +401,8 @@ builder.defineStreamHandler(
               ...meta,
               name: titleVariant,
             });
-            // For movies, always use strictTitleMatching if enabled, otherwise default to movie behavior
-            return matchesTitle(title, variantQuery, type === 'movie' || useStrictMatching);
+            // For movies, only use strictTitleMatching if enabled by user, just like for series
+            return matchesTitle(title, variantQuery, useStrictMatching);
           });
 
           if (!matchesAnyVariant) {
@@ -485,13 +462,32 @@ builder.defineStreamHandler(
           const aQuality = a.name?.includes('\n') ? a.name.split('\n')[1] : '';
           const bQuality = b.name?.includes('\n') ? b.name.split('\n')[1] : '';
 
-          // Get quality scores
+          // Get quality scores with improved 4K detection
           const getQualityScore = (quality: string): number => {
-            if (quality?.includes('4K') || quality?.includes('2160p') || quality?.includes('UHD'))
+            if (!quality) return 0;
+
+            // Standardize the quality string for comparison
+            const q = quality.toUpperCase();
+
+            // Check for 4K indicators (multiple ways to indicate 4K)
+            if (
+              q.includes('4K') ||
+              q.includes('2160P') ||
+              q.includes('UHD') ||
+              q.includes('2160') ||
+              q.includes('ULTRA HD')
+            )
               return 4;
-            if (quality?.includes('1080p')) return 3;
-            if (quality?.includes('720p')) return 2;
-            if (quality?.includes('480p')) return 1;
+
+            // Check for 1080p
+            if (q.includes('1080P') || q.includes('1080')) return 3;
+
+            // Check for 720p
+            if (q.includes('720P') || q.includes('720')) return 2;
+
+            // Check for 480p/SD
+            if (q.includes('480P') || q.includes('480') || q.includes('SD')) return 1;
+
             return 0;
           };
           const aScore = getQualityScore(aQuality);
@@ -548,13 +544,32 @@ builder.defineStreamHandler(
           const aQuality = a.name?.includes('\n') ? a.name.split('\n')[1] : '';
           const bQuality = b.name?.includes('\n') ? b.name.split('\n')[1] : '';
 
-          // Get quality scores
+          // Get quality scores with improved 4K detection
           const getQualityScore = (quality: string): number => {
-            if (quality?.includes('4K') || quality?.includes('2160p') || quality?.includes('UHD'))
+            if (!quality) return 0;
+
+            // Standardize the quality string for comparison
+            const q = quality.toUpperCase();
+
+            // Check for 4K indicators (multiple ways to indicate 4K)
+            if (
+              q.includes('4K') ||
+              q.includes('2160P') ||
+              q.includes('UHD') ||
+              q.includes('2160') ||
+              q.includes('ULTRA HD')
+            )
               return 4;
-            if (quality?.includes('1080p')) return 3;
-            if (quality?.includes('720p')) return 2;
-            if (quality?.includes('480p')) return 1;
+
+            // Check for 1080p
+            if (q.includes('1080P') || q.includes('1080')) return 3;
+
+            // Check for 720p
+            if (q.includes('720P') || q.includes('720')) return 2;
+
+            // Check for 480p/SD
+            if (q.includes('480P') || q.includes('480') || q.includes('SD')) return 1;
+
             return 0;
           };
           const aScore = getQualityScore(aQuality);
@@ -606,30 +621,27 @@ builder.defineStreamHandler(
               return 0;
 
             case 'date_first':
-              // We don't sort heavily by date locally - the API already did that
-              // Just do minimal local sorting for quality/language
+              // Sort by date first using the file's date info
+              const aDate = aFile?.['5'] ? new Date(aFile['5']).getTime() : 0;
+              const bDate = bFile?.['5'] ? new Date(bFile['5']).getTime() : 0;
+              if (aDate !== bDate) {
+                // Higher date value (more recent) comes first - descending order
+                return bDate - aDate;
+              }
+              // Then quality
               if (aScore !== bScore) {
                 return bScore - aScore;
               }
+              // Then language
               if (aHasPreferredLang !== bHasPreferredLang) {
                 return aHasPreferredLang ? -1 : 1;
               }
-              return 0;
-
-            case 'relevance_first':
-              // For relevance, we primarily rely on the API sorting
-              // Just minimal quality and language adjustments
-              if (aScore !== bScore) {
-                return bScore - aScore;
-              }
-              if (aHasPreferredLang !== bHasPreferredLang) {
-                return aHasPreferredLang ? -1 : 1;
-              }
-              return 0;
+              // Then size
+              return compareSize();
 
             case 'lang_first':
             case 'language_first':
-              // Quality first, then language, then size
+              // Language first, then quality, then size
               if (aHasPreferredLang !== bHasPreferredLang) {
                 return aHasPreferredLang ? -1 : 1;
               }
@@ -641,20 +653,24 @@ builder.defineStreamHandler(
             case 'quality_first':
             default:
               // Quality first (default), then language, then size
+              // Make sure the quality score comparison is working
               if (aScore !== bScore) {
+                // Higher quality score first - ensure descending order
                 return bScore - aScore;
               }
+              // Then language
               if (aHasPreferredLang !== bHasPreferredLang) {
                 return aHasPreferredLang ? -1 : 1;
               }
+              // Then size
               return compareSize();
           }
         });
       }
 
-      // After all streams have been collected, filter and limit them based on user settings
+      // After all streams have been collected, first filter and limit them based on user settings
+      const originalCount = streams.length;
       if (streams.length > 0) {
-        const originalCount = streams.length;
         logger.debug(`Starting filters with ${originalCount} streams`);
 
         // Filter streams by quality
@@ -790,12 +806,242 @@ builder.defineStreamHandler(
         logger.info(`Filtering complete: ${originalCount} streams → ${streams.length} streams`);
       }
 
-      const result = {
-        streams,
-        ...getCacheOptions(streams.length),
-      };
+      // Now sort the filtered streams based on user preference
+      if (sortingPreference === 'language_first' && preferredLang) {
+        logger.debug(`Applying language-first sorting for language: ${preferredLang}`);
 
-      // Create quality summary
+        // Special handling for language-first sorting
+        // First, separate streams by language
+        const preferredLangStreams: Stream[] = [];
+        const otherStreams: Stream[] = [];
+
+        // Split streams into two groups
+        for (const stream of streams) {
+          const file = (stream as any)._temp?.file;
+          const hasPreferredLang =
+            file?.alangs && Array.isArray(file.alangs) && file.alangs.includes(preferredLang);
+
+          if (hasPreferredLang) {
+            preferredLangStreams.push(stream);
+          } else {
+            otherStreams.push(stream);
+          }
+        }
+
+        logger.debug(
+          `Sorting: ${preferredLangStreams.length} streams with preferred language and ${otherStreams.length} other streams`
+        );
+
+        // Sort each group by quality and size
+        const sortByQualityAndSize = (a: Stream, b: Stream) => {
+          // Extract quality info
+          const aDesc = a.description?.split('\n') || [];
+          const bDesc = b.description?.split('\n') || [];
+          const aQuality = a.name?.includes('\n') ? a.name.split('\n')[1] : '';
+          const bQuality = b.name?.includes('\n') ? b.name.split('\n')[1] : '';
+
+          // Get quality scores with improved 4K detection
+          const getQualityScore = (quality: string): number => {
+            if (!quality) return 0;
+
+            // Standardize the quality string for comparison
+            const q = quality.toUpperCase();
+
+            // Check for 4K indicators (multiple ways to indicate 4K)
+            if (
+              q.includes('4K') ||
+              q.includes('2160P') ||
+              q.includes('UHD') ||
+              q.includes('2160') ||
+              q.includes('ULTRA HD')
+            )
+              return 4;
+
+            // Check for 1080p
+            if (q.includes('1080P') || q.includes('1080')) return 3;
+
+            // Check for 720p
+            if (q.includes('720P') || q.includes('720')) return 2;
+
+            // Check for 480p/SD
+            if (q.includes('480P') || q.includes('480') || q.includes('SD')) return 1;
+
+            return 0;
+          };
+          const aScore = getQualityScore(aQuality);
+          const bScore = getQualityScore(bQuality);
+
+          // Compare quality scores
+          if (aScore !== bScore) {
+            return bScore - aScore;
+          }
+
+          // Compare sizes
+          const aSize = aDesc.length > 2 ? aDesc[2] : '';
+          const bSize = bDesc.length > 2 ? bDesc[2] : '';
+
+          if (aSize.includes('GB') && bSize.includes('GB')) {
+            const aGB = parseFloat(aSize.match(/[\d.]+/)?.[0] || '0');
+            const bGB = parseFloat(bSize.match(/[\d.]+/)?.[0] || '0');
+            if (aGB > bGB) return -1;
+            if (aGB < bGB) return 1;
+          }
+
+          if (aSize.includes('GB') && bSize.includes('MB')) return -1;
+          if (aSize.includes('MB') && bSize.includes('GB')) return 1;
+
+          if (aSize.includes('MB') && bSize.includes('MB')) {
+            const aMB = parseFloat(aSize.match(/[\d.]+/)?.[0] || '0');
+            const bMB = parseFloat(bSize.match(/[\d.]+/)?.[0] || '0');
+            if (aMB > bMB) return -1;
+            if (aMB < bMB) return 1;
+          }
+
+          return 0;
+        };
+
+        // Sort each group independently
+        preferredLangStreams.sort(sortByQualityAndSize);
+        otherStreams.sort(sortByQualityAndSize);
+
+        // Replace streams array with the concatenated sorted groups
+        streams.length = 0;
+        streams.push(...preferredLangStreams, ...otherStreams);
+      } else {
+        // Original sorting for other preferences
+        streams.sort((a, b) => {
+          // Extract stream data
+          const aFile = (a as any)._temp?.file;
+          const bFile = (b as any)._temp?.file;
+          const aHasPreferredLang = preferredLang && aFile?.alangs?.includes(preferredLang);
+          const bHasPreferredLang = preferredLang && bFile?.alangs?.includes(preferredLang);
+
+          // Extract quality info
+          const aDesc = a.description?.split('\n') || [];
+          const bDesc = b.description?.split('\n') || [];
+          const aQuality = a.name?.includes('\n') ? a.name.split('\n')[1] : '';
+          const bQuality = b.name?.includes('\n') ? b.name.split('\n')[1] : '';
+
+          // Get quality scores with improved 4K detection
+          const getQualityScore = (quality: string): number => {
+            if (!quality) return 0;
+
+            // Standardize the quality string for comparison
+            const q = quality.toUpperCase();
+
+            // Check for 4K indicators (multiple ways to indicate 4K)
+            if (
+              q.includes('4K') ||
+              q.includes('2160P') ||
+              q.includes('UHD') ||
+              q.includes('2160') ||
+              q.includes('ULTRA HD')
+            )
+              return 4;
+
+            // Check for 1080p
+            if (q.includes('1080P') || q.includes('1080')) return 3;
+
+            // Check for 720p
+            if (q.includes('720P') || q.includes('720')) return 2;
+
+            // Check for 480p/SD
+            if (q.includes('480P') || q.includes('480') || q.includes('SD')) return 1;
+
+            return 0;
+          };
+          const aScore = getQualityScore(aQuality);
+          const bScore = getQualityScore(bQuality);
+
+          // Size comparison logic
+          const compareSize = () => {
+            const aSize = aDesc.length > 2 ? aDesc[2] : '';
+            const bSize = bDesc.length > 2 ? bDesc[2] : '';
+
+            if (aSize.includes('GB') && bSize.includes('GB')) {
+              const aGB = parseFloat(aSize.match(/[\d.]+/)?.[0] || '0');
+              const bGB = parseFloat(bSize.match(/[\d.]+/)?.[0] || '0');
+              if (aGB > bGB) return -1;
+              if (aGB < bGB) return 1;
+            }
+
+            if (aSize.includes('GB') && bSize.includes('MB')) return -1;
+            if (aSize.includes('MB') && bSize.includes('GB')) return 1;
+
+            if (aSize.includes('MB') && bSize.includes('MB')) {
+              const aMB = parseFloat(aSize.match(/[\d.]+/)?.[0] || '0');
+              const bMB = parseFloat(bSize.match(/[\d.]+/)?.[0] || '0');
+              if (aMB > bMB) return -1;
+              if (aMB < bMB) return 1;
+            }
+
+            return 0;
+          };
+
+          // Apply sorting based on user preference
+          switch (sortingPreference) {
+            case 'size_first':
+              // Size first, then quality, then language
+              const sizeCompare = compareSize();
+              if (sizeCompare !== 0) {
+                return sizeCompare;
+              }
+              if (aScore !== bScore) {
+                return bScore - aScore;
+              }
+              if (aHasPreferredLang !== bHasPreferredLang) {
+                return aHasPreferredLang ? -1 : 1;
+              }
+              return 0;
+
+            case 'date_first':
+              // Sort by date first using the file's date info
+              const aDate = aFile?.['5'] ? new Date(aFile['5']).getTime() : 0;
+              const bDate = bFile?.['5'] ? new Date(bFile['5']).getTime() : 0;
+              if (aDate !== bDate) {
+                // Higher date value (more recent) comes first - descending order
+                return bDate - aDate;
+              }
+              // Then quality
+              if (aScore !== bScore) {
+                return bScore - aScore;
+              }
+              // Then language
+              if (aHasPreferredLang !== bHasPreferredLang) {
+                return aHasPreferredLang ? -1 : 1;
+              }
+              // Then size
+              return compareSize();
+
+            case 'lang_first':
+            case 'language_first':
+              // Language first, then quality, then size
+              if (aHasPreferredLang !== bHasPreferredLang) {
+                return aHasPreferredLang ? -1 : 1;
+              }
+              if (aScore !== bScore) {
+                return bScore - aScore;
+              }
+              return compareSize();
+
+            case 'quality_first':
+            default:
+              // Quality first (default), then language, then size
+              // Make sure the quality score comparison is working
+              if (aScore !== bScore) {
+                // Higher quality score first - ensure descending order
+                return bScore - aScore;
+              }
+              // Then language
+              if (aHasPreferredLang !== bHasPreferredLang) {
+                return aHasPreferredLang ? -1 : 1;
+              }
+              // Then size
+              return compareSize();
+          }
+        });
+      }
+
       if (streams.length > 0) {
         const qualitySummary: Record<string, number> = {};
         streams.forEach(stream => {
@@ -813,9 +1059,9 @@ builder.defineStreamHandler(
       }
 
       // Cache the result
-      setCache(cacheKey, result);
+      setCache(cacheKey, { streams, ...getCacheOptions(streams.length) });
 
-      return result;
+      return { streams };
     } catch (error) {
       logError({
         message: `failed to handle stream: ${error}`,
