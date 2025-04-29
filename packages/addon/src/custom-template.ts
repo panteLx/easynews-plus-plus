@@ -29,7 +29,10 @@ function landingTemplate(manifest: Manifest): string {
     } else if (field.key === 'password' && translations.form.password) {
       return { ...field, title: 'Easynews ' + translations.form.password };
     } else if (field.key === 'strictTitleMatching' && translations.form.strictTitleMatching) {
-      return { ...field, title: translations.form.strictTitleMatching };
+      return {
+        ...field,
+        title: `${translations.form.strictTitleMatching} <span class="form-hint">(${translations.form.strictTitleMatchingHint})</span>`,
+      };
     } else if (field.key === 'sortingPreference' && translations.form.sortingMethod) {
       // For sorting preference field, translate both title and options
       const translatedOptions: Record<string, string> = {};
@@ -52,16 +55,10 @@ function landingTemplate(manifest: Manifest): string {
         if (field.options['date_first'] !== undefined && translations.sortingOptions?.dateFirst) {
           translatedOptions['date_first'] = translations.sortingOptions.dateFirst;
         }
-        if (
-          field.options['relevance_first'] !== undefined &&
-          translations.sortingOptions?.relevanceFirst
-        ) {
-          translatedOptions['relevance_first'] = translations.sortingOptions.relevanceFirst;
-        }
       }
       return {
         ...field,
-        title: translations.form.sortingMethod,
+        title: `${translations.form.sortingMethod} <span class="form-hint">(${translations.form.sortingMethodHint})</span>`,
         options: Object.keys(translatedOptions).length > 0 ? translatedOptions : field.options,
       };
     } else if (field.key === 'uiLanguage' && translations.form.uiLanguage) {
@@ -203,6 +200,15 @@ function landingTemplate(manifest: Manifest): string {
       
       /* Measurements */
       --radius: 0.5rem;
+    }
+    
+    .form-hint {
+      font-size: 0.8em;
+      font-weight: normal;
+      color: var(--muted-foreground);
+      font-style: italic;
+      display: block;
+      margin-top: 0.2rem;
     }
     
     /* Modern scrollbar for browsers that support it */
@@ -387,7 +393,7 @@ function landingTemplate(manifest: Manifest): string {
       align-items: center;
       cursor: pointer;
       user-select: none;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       width: 100%;
       margin-bottom: 0rem;
     }
