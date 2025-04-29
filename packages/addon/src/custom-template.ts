@@ -31,7 +31,8 @@ function landingTemplate(manifest: Manifest): string {
     } else if (field.key === 'strictTitleMatching' && translations.form.strictTitleMatching) {
       return {
         ...field,
-        title: `${translations.form.strictTitleMatching} <span class="form-hint">(${translations.form.strictTitleMatchingHint})</span>`,
+        title: translations.form.strictTitleMatching,
+        hint: translations.form.strictTitleMatchingHint,
       };
     } else if (field.key === 'sortingPreference' && translations.form.sortingMethod) {
       // For sorting preference field, translate both title and options
@@ -58,7 +59,8 @@ function landingTemplate(manifest: Manifest): string {
       }
       return {
         ...field,
-        title: `${translations.form.sortingMethod} <span class="form-hint">(${translations.form.sortingMethodHint})</span>`,
+        title: translations.form.sortingMethod,
+        hint: translations.form.sortingMethodHint,
         options: Object.keys(translatedOptions).length > 0 ? translatedOptions : field.options,
       };
     } else if (field.key === 'uiLanguage' && translations.form.uiLanguage) {
@@ -833,14 +835,15 @@ function landingTemplate(manifest: Manifest): string {
                 <label class="checkbox-label">
                   <input type="${field.type}" name="${field.key}" ${field.default === 'true' ? 'checked' : ''}>
                   <span class="checkmark"></span>
-                  <span class="checkbox-title">${field.title}</span>
+                  <span class="checkbox-title">${field.title}
+                  ${field.hint ? `<span class="form-hint">(${field.hint})</span></span>` : '</span>'}
                 </label>
               </div>
             </div>`;
             } else if (field.type === 'select') {
               return `
             <div class="form-group">
-              <label for="${field.key}">${field.title}</label>
+              <label for="${field.key}">${field.title}${field.hint ? `<span class="form-hint">(${field.hint})</span>` : ''}</label>
               <div class="select-wrapper">
                 <select name="${field.key}" id="${field.key}">
                   ${Object.entries(field.options || {})
@@ -867,25 +870,25 @@ function landingTemplate(manifest: Manifest): string {
                   return `
             <div class="form-row">
               <div class="form-col">
-                <label for="maxResultsPerQuality">${maxResultsField.title}</label>
+                <label for="maxResultsPerQuality">${maxResultsField.title}${maxResultsField.hint ? `<span class="form-hint">(${maxResultsField.hint})</span>` : ''}</label>
                 <input type="${maxResultsField.type}" placeholder="${translations.form.noLimit}" name="maxResultsPerQuality" id="maxResultsPerQuality" ${maxResultsField.required ? 'required' : ''}>
               </div>
               <div class="form-col">
-                <label for="${field.key}">${field.title}</label>
+                <label for="${field.key}">${field.title}${field.hint ? `<span class="form-hint">(${field.hint})</span>` : ''}</label>
                 <input type="${field.type}" placeholder="${translations.form.noLimit}" name="${field.key}" id="${field.key}" ${field.required ? 'required' : ''}>
               </div>
             </div>`;
                 } else {
                   return `
             <div class="form-group">
-              <label for="${field.key}">${field.title}</label>
+              <label for="${field.key}">${field.title}${field.hint ? `<span class="form-hint">(${field.hint})</span>` : ''}</label>
               <input type="${field.type}" placeholder="${translations.form.noLimit}" name="${field.key}" id="${field.key}" ${field.required ? 'required' : ''}>
             </div>`;
                 }
               } else {
                 return `
             <div class="form-group">
-              <label for="${field.key}">${field.title}</label>
+              <label for="${field.key}">${field.title}${field.hint ? `<span class="form-hint">(${field.hint})</span>` : ''}</label>
               <input type="${field.type}" name="${field.key}" id="${field.key}" ${field.required ? 'required' : ''}>
             </div>`;
               }
