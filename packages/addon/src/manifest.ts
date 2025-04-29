@@ -1,15 +1,7 @@
-import { Manifest, ManifestCatalog, ContentType } from 'stremio-addon-sdk';
+import { Manifest, ContentType } from 'stremio-addon-sdk';
 import { translations, DEFAULT_LANGUAGE } from './i18n';
 
 import { version, description } from '../../../package.json';
-
-// Prepare catalog structure
-export const catalog: ManifestCatalog = {
-  id: 'easynews-plus-plus',
-  name: 'Easynews++',
-  type: 'tv' as ContentType,
-  extra: [{ name: 'search', isRequired: true }],
-};
 
 // Get the English translations for the initial setup
 const englishTranslations = translations[DEFAULT_LANGUAGE];
@@ -76,13 +68,9 @@ export const manifest: Manifest = {
   id: 'community.easynews-plus-plus',
   version,
   description,
-  catalogs: [catalog],
-  resources: [
-    'catalog',
-    { name: 'meta', types: ['tv'], idPrefixes: [catalog.id] },
-    { name: 'stream', types: ['movie', 'series'], idPrefixes: ['tt'] },
-  ],
-  types: ['movie', 'series', 'tv'],
+  catalogs: [],
+  resources: [{ name: 'stream', types: ['movie', 'series'], idPrefixes: ['tt'] }],
+  types: ['movie', 'series'],
   name: 'Easynews++',
   background: 'https://i.imgur.com/QPPXf5T.jpeg',
   logo: 'https://pbs.twimg.com/profile_images/479627852757733376/8v9zH7Yo_400x400.jpeg',

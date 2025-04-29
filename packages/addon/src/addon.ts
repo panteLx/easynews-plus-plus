@@ -1,11 +1,10 @@
-import { Cache, ContentType, MetaDetail, MetaVideo } from 'stremio-addon-sdk';
+import { Cache, ContentType } from 'stremio-addon-sdk';
 import addonBuilder from 'stremio-addon-sdk/src/builder';
-import { catalog, manifest } from './manifest';
+import { manifest } from './manifest';
 import {
   buildSearchQuery,
   createStreamPath,
   createStreamUrl,
-  createThumbnailUrl,
   getDuration,
   getFileExtension,
   getPostTitle,
@@ -35,11 +34,7 @@ interface AddonConfig {
   [key: string]: any;
 }
 
-// Definiere ValidPosterShape als Workaround für fehlendes PosterShape-Type
-type ValidPosterShape = 'square' | 'regular' | 'landscape';
-
 const builder = new addonBuilder(manifest);
-const prefix = `${catalog.id}:`;
 
 // In-memory request cache to reduce API calls and improve response times
 const requestCache = new Map<string, { data: any; timestamp: number }>();
@@ -99,124 +94,6 @@ import customTemplate from './custom-template';
 // Export landing HTML for Cloudflare Worker
 export const landingHTML = customTemplate(manifest);
 
-builder.defineCatalogHandler(async ({ extra: { search } }) => {
-  return {
-    metas: [
-      {
-        id: `${prefix}${encodeURIComponent(search)}`,
-        name: search,
-        type: 'tv',
-        logo: manifest.logo,
-        background: manifest.background,
-        posterShape: 'square',
-        poster: manifest.logo,
-        description: `Provides search results from Easynews for '${search}'`,
-      },
-    ],
-    cacheMaxAge: 3600 * 24 * 30, // The returned data is static so it may be cached for a long time (30 days).
-  };
-});
-
-builder.defineMetaHandler(
-  async ({ id, type, config }: { id: string; type: ContentType; config: AddonConfig }) => {
-    const { username, password } = config;
-
-    // For language filtering in the catalog
-    const preferredLang = config.preferredLanguage || '';
-
-    if (!id.startsWith(catalog.id)) {
-      return { meta: null as unknown as MetaDetail };
-    }
-
-    // Make sure credentials are provided
-    if (!username || !password) {
-      logError({
-        message: 'Missing credentials',
-        error: new Error('Username and password are required'),
-        context: { resource: 'meta', id, type },
-      });
-      return { meta: null as unknown as MetaDetail };
-    }
-
-    try {
-      const search = decodeURIComponent(id.replace(prefix, ''));
-
-      // Check cache for this search
-      const cacheKey = `meta:${search}:${username}`;
-      const cachedResult = getFromCache<{ meta: MetaDetail } & Cache>(cacheKey);
-      if (cachedResult) {
-        return cachedResult;
-      }
-
-      const videos: MetaVideo[] = [];
-
-      const api = new EasynewsAPI({ username, password });
-      const res = await api.searchAll({
-        query: search,
-        maxResults: 50, // Limit results directly from the API
-      });
-
-      for (const file of res?.data ?? []) {
-        const title = getPostTitle(file);
-
-        if (isBadVideo(file) || !matchesTitle(title, search, false)) {
-          continue;
-        }
-
-        videos.push({
-          id: `${prefix}${file.sig}`,
-          released: new Date(file['5']).toISOString(),
-          title,
-          overview: file['6'],
-          thumbnail: createThumbnailUrl(res, file),
-          streams: [
-            mapStream({
-              username,
-              password,
-              title,
-              fullResolution: file.fullres,
-              fileExtension: getFileExtension(file),
-              duration: getDuration(file),
-              size: getSize(file),
-              url: `${createStreamUrl(res, username, password)}/${createStreamPath(file)}`,
-              videoSize: file.rawSize,
-              file,
-              preferredLang: '',
-            }),
-          ],
-        });
-      }
-
-      const result = {
-        meta: {
-          id,
-          name: search,
-          type: 'tv' as ContentType,
-          logo: manifest.logo,
-          background: manifest.background,
-          poster: manifest.logo,
-          posterShape: 'square' as ValidPosterShape,
-          description: `Provides search results from Easynews for '${search}'`,
-          videos,
-        },
-        ...getCacheOptions(videos.length),
-      };
-
-      // Cache the result
-      setCache(cacheKey, result);
-
-      return result;
-    } catch (error) {
-      logError({
-        message: 'failed to handle meta',
-        error,
-        context: { resource: 'meta', id, type },
-      });
-      return { meta: null as unknown as MetaDetail };
-    }
-  }
-);
-
 builder.defineStreamHandler(
   async ({ id, type, config }: { id: string; type: ContentType; config: AddonConfig }) => {
     const {
@@ -241,7 +118,6 @@ builder.defineStreamHandler(
     // users with different settings get different cache results
     const cacheKey = `${id}:v3:user=${username}:strict=${strictTitleMatching === 'on' || strictTitleMatching === 'true'}:lang=${preferredLanguage || ''}:sort=${sortingPreference}:qualities=${showQualities || ''}:maxPerQuality=${maxResultsPerQuality || ''}:maxSize=${maxFileSize || ''}`;
 
-    // const cacheKey = `${id}:v3:strict=${strictTitleMatching === 'on' || strictTitleMatching === 'true'}:lang=${preferredLanguage || ''}:sort=${sortingPreference}:qualities=${showQualities || ''}:maxPerQuality=${maxResultsPerQuality || ''}:maxSize=${maxFileSize || ''}`;
     logger.debug(`Cache key: ${cacheKey}`);
     const cached = getFromCache<{ streams: Stream[] }>(cacheKey);
 
@@ -263,10 +139,6 @@ builder.defineStreamHandler(
       logger.info(`Preferred language: ${preferredLang ? preferredLang : 'No preference'}`);
 
       // Parse quality filters
-      // const qualityFilters = showQualities
-      //   ? showQualities.split(',').map(q => q.trim())
-      //   : ['4k', '1080p', '720p', '480p'];
-
       const qualityFilters = showQualities
         ? showQualities
             .split(',')
@@ -277,7 +149,6 @@ builder.defineStreamHandler(
       logger.info(`Quality filters: ${qualityFilters.join(', ')}`);
 
       // Parse max results per quality (0 = no limit)
-      // const maxResultsPerQualityValue = parseInt(maxResultsPerQuality || '0');
       let maxResultsPerQualityValue = parseInt(maxResultsPerQuality ?? '0', 10);
       if (Number.isNaN(maxResultsPerQualityValue) || maxResultsPerQualityValue < 0) {
         maxResultsPerQualityValue = 0;
@@ -287,7 +158,6 @@ builder.defineStreamHandler(
       );
 
       // Parse max file size (0 = no limit)
-      // const maxFileSizeGB = parseFloat(maxFileSize || '0');
       let maxFileSizeGB = parseFloat(maxFileSize ?? '0');
       if (Number.isNaN(maxFileSizeGB) || maxFileSizeGB < 0) {
         maxFileSizeGB = 0;
