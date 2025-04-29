@@ -565,19 +565,23 @@ builder.defineStreamHandler(
             const aSize = aDesc.length > 2 ? aDesc[2] : '';
             const bSize = bDesc.length > 2 ? bDesc[2] : '';
 
-            if (aSize.includes('GB') && bSize.includes('GB')) {
-              const aGB = parseFloat(aSize.match(/[\d.]+/)?.[0] || '0');
-              const bGB = parseFloat(bSize.match(/[\d.]+/)?.[0] || '0');
+            // Extract only the size part (before any date information)
+            const aSizePart = aSize.split('📅')[0].trim();
+            const bSizePart = bSize.split('📅')[0].trim();
+
+            if (aSizePart.includes('GB') && bSizePart.includes('GB')) {
+              const aGB = parseFloat(aSizePart.match(/[\d.]+/)?.[0] || '0');
+              const bGB = parseFloat(bSizePart.match(/[\d.]+/)?.[0] || '0');
               if (aGB > bGB) return -1;
               if (aGB < bGB) return 1;
             }
 
-            if (aSize.includes('GB') && bSize.includes('MB')) return -1;
-            if (aSize.includes('MB') && bSize.includes('GB')) return 1;
+            if (aSizePart.includes('GB') && bSizePart.includes('MB')) return -1;
+            if (aSizePart.includes('MB') && bSizePart.includes('GB')) return 1;
 
-            if (aSize.includes('MB') && bSize.includes('MB')) {
-              const aMB = parseFloat(aSize.match(/[\d.]+/)?.[0] || '0');
-              const bMB = parseFloat(bSize.match(/[\d.]+/)?.[0] || '0');
+            if (aSizePart.includes('MB') && bSizePart.includes('MB')) {
+              const aMB = parseFloat(aSizePart.match(/[\d.]+/)?.[0] || '0');
+              const bMB = parseFloat(bSizePart.match(/[\d.]+/)?.[0] || '0');
               if (aMB > bMB) return -1;
               if (aMB < bMB) return 1;
             }
@@ -704,13 +708,16 @@ builder.defineStreamHandler(
 
             if (!sizeLine) return true; // Keep if we can't determine size
 
-            if (sizeLine.includes('GB')) {
-              const sizeGB = parseFloat(sizeLine.match(/[\d.]+/)?.[0] || '0');
+            // Extract only the size part (before any date information)
+            const sizePart = sizeLine.split('📅')[0].trim();
+
+            if (sizePart.includes('GB')) {
+              const sizeGB = parseFloat(sizePart.match(/[\d.]+/)?.[0] || '0');
               return sizeGB <= maxFileSizeGB;
             }
 
-            if (sizeLine.includes('MB')) {
-              const sizeMB = parseFloat(sizeLine.match(/[\d.]+/)?.[0] || '0');
+            if (sizePart.includes('MB')) {
+              const sizeMB = parseFloat(sizePart.match(/[\d.]+/)?.[0] || '0');
               return sizeMB / 1024 <= maxFileSizeGB;
             }
 
@@ -854,6 +861,9 @@ function mapStream({
     logger.debug(`Stream "${title}" has no language information`);
   }
 
+  // Calculate days since upload
+  const publishDate = getPublishDate(file.ts);
+
   // Show language information in the description if available
   const languageInfo = file.alangs?.length
     ? `🌐 ${file.alangs.join(', ')}${preferredLang && file.alangs.includes(preferredLang) ? ' ⭐' : ''}`
@@ -864,7 +874,7 @@ function mapStream({
     description: [
       `${title}${fileExtension}`,
       `🕛 ${duration ?? 'unknown duration'}`,
-      `📦 ${size ?? 'unknown size'}`,
+      `📦 ${size ?? 'unknown size'} ${publishDate}`,
       languageInfo,
     ].join('\n'),
     url: url,
@@ -877,6 +887,24 @@ function mapStream({
   };
 
   return stream;
+}
+
+/**
+ * Calculate a human-readable publish date from timestamp
+ * @param timestamp Unix timestamp in seconds
+ * @returns Formatted date string or empty string if timestamp is invalid
+ */
+function getPublishDate(timestamp: number): string {
+  if (!timestamp) return '';
+
+  const uploadDate = new Date(timestamp * 1000);
+  const now = new Date();
+
+  // Calculate days difference
+  const diffTime = Math.abs(now.getTime() - uploadDate.getTime());
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  return `📅 ${diffDays}d`;
 }
 
 function getCacheOptions(itemsLength: number): Partial<Cache> {
