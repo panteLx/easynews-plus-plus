@@ -1098,10 +1098,12 @@ function mapStream({
   file: any;
   preferredLang: string;
 }): Stream {
+  logger.debug(`Mapping stream: "${title}" (${fileExtension}, ${size}, ${duration})`);
+
   const quality = getQuality(title, fullResolution);
 
   // Log language information for debugging
-  if (file.alangs) {
+  if (file.alangs && file.alangs.length > 0) {
     logger.debug(`Stream "${title}" has languages: ${JSON.stringify(file.alangs)}`);
   } else {
     logger.debug(`Stream "${title}" has no language information`);

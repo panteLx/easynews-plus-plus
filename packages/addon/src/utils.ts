@@ -47,6 +47,8 @@ export function isBadVideo(file: FileData) {
   const duration = file['14'] ?? '';
   const title = getPostTitle(file);
 
+  logger.debug(`Checking if video is bad: "${title}" (duration: ${duration}, type: ${file.type})`);
+
   // Check each condition and log the reason if it fails
   if (duration.match(/^\d+s/)) {
     logger.debug(`Bad video: "${title}": Duration too short (${duration})`);
@@ -75,6 +77,7 @@ export function isBadVideo(file: FileData) {
     return true;
   }
 
+  logger.debug(`Video passed quality checks: "${title}"`);
   return false;
 }
 
@@ -83,20 +86,21 @@ export function isBadVideo(file: FileData) {
  * Handles special characters, accented letters, and common separators.
  */
 export function sanitizeTitle(title: string) {
-  return (
-    title
-      // replace common symbols with words
-      .replaceAll('&', 'and')
-      // replace common separators (., _, -, whitespace) with a single space
-      .replace(/[\.\-_:\s]+/g, ' ')
-      // handle brackets and parentheses - replace with space
-      .replace(/[\[\]\(\){}]/g, ' ')
-      // remove non-alphanumeric characters except for accented characters
-      .replace(/[^\w\sÀ-ÿ]/g, '')
-      // to lowercase + remove spaces at the beginning and end
-      .toLowerCase()
-      .trim()
-  );
+  logger.debug(`Sanitizing title: "${title}"`);
+  const result = title
+    // replace common symbols with words
+    .replaceAll('&', 'and')
+    // replace common separators (., _, -, whitespace) with a single space
+    .replace(/[\.\-_:\s]+/g, ' ')
+    // handle brackets and parentheses - replace with space
+    .replace(/[\[\]\(\){}]/g, ' ')
+    // remove non-alphanumeric characters except for accented characters
+    .replace(/[^\w\sÀ-ÿ]/g, '')
+    // to lowercase + remove spaces at the beginning and end
+    .toLowerCase()
+    .trim();
+  logger.debug(`Sanitized result: "${result}"`);
+  return result;
 }
 
 /**
@@ -107,23 +111,28 @@ export function sanitizeTitle(title: string) {
  * @returns Whether the title matches the query
  */
 export function matchesTitle(title: string, query: string, strict: boolean) {
+  logger.debug(`Matching title: "${title}" against query: "${query}" (strict: ${strict})`);
+
   const sanitizedQuery = sanitizeTitle(query);
   const sanitizedTitle = sanitizeTitle(title);
 
   // Extract the main title part for comparison (excluding episode info)
   const mainQueryPart = sanitizedQuery.split(/s\d+e\d+/i)[0].trim();
   const isSeriesQuery = /s\d+e\d+/i.test(sanitizedQuery);
+  logger.debug(`Main query part: "${mainQueryPart}", is series query: ${isSeriesQuery}`);
 
   // For strict mode, we require an exact title match or proper prefix match
   if (strict) {
     // For series with season/episode pattern like S01E01
     const seasonEpisodePattern = /s\d+e\d+/i;
     const hasSeasonEpisodePattern = seasonEpisodePattern.test(sanitizedQuery);
+    logger.debug(`Strict mode - has season/episode pattern: ${hasSeasonEpisodePattern}`);
 
     if (hasSeasonEpisodePattern) {
       // 1. Check if the title STARTS with the main part of the query (not just contains it)
       // This catches cases like "the.state.s01e01" but excludes "how.the.states.got.their.shapes.s01e01"
       if (!sanitizedTitle.startsWith(mainQueryPart)) {
+        logger.debug(`Strict mode - title doesn't start with main query part, rejecting`);
         return false;
       }
 
@@ -131,18 +140,22 @@ export function matchesTitle(title: string, query: string, strict: boolean) {
       const seMatch = sanitizedQuery.match(seasonEpisodePattern);
       if (seMatch && seMatch[0]) {
         const pattern = seMatch[0].toLowerCase();
-        return sanitizedTitle.includes(pattern);
+        const result = sanitizedTitle.includes(pattern);
+        logger.debug(`Strict mode - checking for pattern "${pattern}" in title: ${result}`);
+        return result;
       }
     }
 
     // For movies or other non-series content
     const { title: parsedTitle, year } = parseTorrentTitle(title);
+    logger.debug(`Strict mode - parsed title: "${parsedTitle}", year: ${year}`);
 
     if (parsedTitle) {
       const sanitizedParsedTitle = sanitizeTitle(parsedTitle);
 
       // Check for exact match, or match with year
       if (sanitizedParsedTitle === sanitizedQuery) {
+        logger.debug(`Strict mode - exact match found`);
         return true;
       }
 
@@ -150,18 +163,21 @@ export function matchesTitle(title: string, query: string, strict: boolean) {
       const queryYearMatch = sanitizedQuery.match(/\b(\d{4})\b/);
       if (queryYearMatch && year) {
         const queryYear = queryYearMatch[1];
-        return (
+        const result =
           sanitizedParsedTitle.replace(queryYear, '').trim() ===
-            sanitizedQuery.replace(queryYear, '').trim() && year.toString() === queryYear
-        );
+            sanitizedQuery.replace(queryYear, '').trim() && year.toString() === queryYear;
+        logger.debug(`Strict mode - matching with year ${queryYear}: ${result}`);
+        return result;
       }
     }
 
     // If we're in strict mode and haven't matched by now, return false
+    logger.debug(`Strict mode - no match found`);
     return false;
   }
 
   // Non-strict mode below (original behavior)
+  logger.debug(`Non-strict mode matching`);
 
   // For series with season/episode pattern like S01E01
   const seasonEpisodePattern = /s\d+e\d+/i;
@@ -172,7 +188,9 @@ export function matchesTitle(title: string, query: string, strict: boolean) {
     const seMatch = sanitizedQuery.match(seasonEpisodePattern);
     if (seMatch && seMatch[0]) {
       const pattern = seMatch[0].toLowerCase();
-      return sanitizedTitle.includes(pattern);
+      const result = sanitizedTitle.includes(pattern);
+      logger.debug(`Non-strict mode - checking for pattern "${pattern}" in title: ${result}`);
+      return result;
     }
   }
 
@@ -183,6 +201,7 @@ export function matchesTitle(title: string, query: string, strict: boolean) {
     if (word.length <= 2) return true;
     return sanitizedTitle.includes(word);
   });
+  logger.debug(`Non-strict mode - all words match: ${allWordsMatch}`);
 
   // For multiple word queries, ensure the title contains the full phrase
   // or at least a high percentage of matching words
@@ -196,10 +215,14 @@ export function matchesTitle(title: string, query: string, strict: boolean) {
     const significantWords = queryWords.filter(word => word.length > 2).length;
     if (significantWords > 0) {
       const matchRatio = matchingWords / significantWords;
+      logger.debug(
+        `Non-strict mode - match ratio: ${matchRatio.toFixed(2)} (${matchingWords}/${significantWords})`
+      );
       return matchRatio >= 0.7;
     }
   }
 
+  logger.debug(`Non-strict mode final result: ${allWordsMatch}`);
   return allWordsMatch;
 }
 
@@ -208,9 +231,14 @@ export function createStreamUrl(
   username: string,
   password: string
 ) {
+  logger.debug(`Creating stream URL with farm: ${dlFarm}, port: ${dlPort}`);
   // For streaming, we can still use the username:password@ format in the URL
   // as it will be handled by media players, not the fetch API
-  return `${downURL.replace('https://', `https://${username}:${password}@`)}/${dlFarm}/${dlPort}`;
+  const url = `${downURL.replace('https://', `https://${username}:${password}@`)}/${dlFarm}/${dlPort}`;
+  logger.debug(
+    `Stream URL created: ${url.substring(0, url.indexOf('@') + 1)}***/${dlFarm}/${dlPort}`
+  );
+  return url;
 }
 
 export function createStreamPath(file: FileData) {
@@ -218,7 +246,9 @@ export function createStreamPath(file: FileData) {
   const postTitle = file['10'] ?? '';
   const ext = file['11'] ?? '';
 
-  return `${postHash}${ext}/${postTitle}${ext}`;
+  const path = `${postHash}${ext}/${postTitle}${ext}`;
+  logger.debug(`Created stream path: ${path.substring(0, 50)}${path.length > 50 ? '...' : ''}`);
+  return path;
 }
 
 export function getFileExtension(file: FileData) {
@@ -241,6 +271,7 @@ export function getSize(file: FileData) {
  * Extract video quality information from the title or fallback resolution
  */
 export function getQuality(title: string, fallbackResolution?: string): string | undefined {
+  logger.debug(`Getting quality for: "${title}", fallback: ${fallbackResolution}`);
   const { resolution } = parseTorrentTitle(title);
 
   // Try to find quality indicators in the title if resolution not found
@@ -262,12 +293,31 @@ export function getQuality(title: string, fallbackResolution?: string): string |
 
     for (const { pattern, quality } of qualityPatterns) {
       if (pattern.test(title)) {
+        logger.debug(`Quality found by pattern: ${quality}`);
         return quality;
       }
     }
   }
 
-  return resolution ?? fallbackResolution;
+  // Return resolution found by parser
+  if (resolution) {
+    // Map common resolution formats to standard quality names
+    if (resolution === '2160p' || resolution.includes('4k') || resolution.includes('4K')) {
+      logger.debug(`Quality found by parser: 4K`);
+      return '4K';
+    }
+    logger.debug(`Quality found by parser: ${resolution}`);
+    return resolution;
+  }
+
+  // Use fallback if provided
+  if (fallbackResolution) {
+    logger.debug(`Using fallback quality: ${fallbackResolution}`);
+    return fallbackResolution;
+  }
+
+  logger.debug(`No quality found`);
+  return undefined;
 }
 
 export function createThumbnailUrl(res: EasynewsSearchResponse, file: FileData) {
@@ -305,66 +355,41 @@ export function getAlternativeTitles(
   title: string,
   customTitlesInput: Record<string, string[]> = customTitlesJson
 ): string[] {
-  // Use the provided (or default) object
-  const combined = customTitlesInput;
+  logger.debug(`Getting alternative titles for: "${title}"`);
 
-  // If no custom titles available, just return the original title
-  if (Object.keys(combined).length === 0) {
-    return [title];
-  }
-
-  // First check for exact matches
-  if (combined[title]) {
-    return [title, ...combined[title]];
-  }
-
-  // Check for case-insensitive matches
-  const lowerCaseTitle = title.toLowerCase();
-  for (const [key, values] of Object.entries(combined)) {
-    if (key.toLowerCase() === lowerCaseTitle) {
-      return [title, ...values];
-    }
-  }
-
-  // Then check for partial matches (e.g. "The Lion King 2" should match "The Lion King")
+  // Start with an empty array
   const alternatives: string[] = [title];
 
-  let foundMatch = false;
+  // Check direct match first
+  if (customTitlesInput[title]) {
+    logger.debug(`Found direct match in custom titles for: "${title}"`);
+    alternatives.push(...customTitlesInput[title]);
+  }
 
-  // Check for sub-string matches
-  for (const [englishTitle, customTitles] of Object.entries(combined)) {
-    // Skip checking very short titles (3 characters or less) to avoid false matches
-    if (englishTitle.length <= 3) continue;
+  // Then check partial matches
+  for (const [key, values] of Object.entries(customTitlesInput)) {
+    // Skip direct matches that we've already handled
+    if (key === title) continue;
 
-    if (title.toLowerCase().includes(englishTitle.toLowerCase())) {
-      foundMatch = true;
-      // Title contains a known English title, add the custom equivalents
-      for (const customTitle of customTitles) {
-        const customTitleReplaced = title.replace(new RegExp(englishTitle, 'i'), customTitle);
-        if (!alternatives.includes(customTitleReplaced)) {
-          alternatives.push(customTitleReplaced);
-        }
-      }
-    }
+    // Check if either string contains the other
+    if (
+      title.toLowerCase().includes(key.toLowerCase()) ||
+      key.toLowerCase().includes(title.toLowerCase())
+    ) {
+      logger.debug(`Found partial match between "${title}" and "${key}"`);
 
-    // Also check if the title might be a custom title we know
-    for (const customTitle of customTitles) {
-      // Skip checking very short titles to avoid false matches
-      if (customTitle.length <= 3) continue;
-
-      if (title.toLowerCase().includes(customTitle.toLowerCase())) {
-        foundMatch = true;
-        // Title contains a known custom title, add the English equivalent
-        const englishTitle1 = title.replace(new RegExp(customTitle, 'i'), englishTitle);
-        if (!alternatives.includes(englishTitle1)) {
-          alternatives.push(englishTitle1);
-        }
+      // Check if any of these alternatives are already in our list
+      const newValues = values.filter(v => !alternatives.includes(v));
+      if (newValues.length > 0) {
+        logger.debug(
+          `Adding ${newValues.length} new alternatives from partial match: ${newValues.join(', ')}`
+        );
+        alternatives.push(...newValues);
       }
     }
   }
 
-  // Log whether we found any matches
-  if (foundMatch) {
+  if (alternatives.length > 1) {
     logger.debug(`Found ${alternatives.length - 1} alternative titles for "${title}"`);
   } else {
     logger.debug(`No alternative titles found for "${title}"`);
@@ -377,22 +402,34 @@ export function getAlternativeTitles(
  * Build a search query for different content types
  */
 export function buildSearchQuery(type: ContentType, meta: MetaProviderResponse) {
-  let query = `${meta.name}`;
+  logger.debug(`Building search query for ${type}: ${meta.name} (year: ${meta.year || 'none'})`);
 
-  if (type === 'series') {
-    if (meta.season) {
-      query += ` S${meta.season.toString().padStart(2, '0')}`;
-    }
+  let query = '';
 
-    if (meta.episode) {
-      query += `${!meta.season ? ' ' : ''}E${meta.episode.toString().padStart(2, '0')}`;
-    }
+  // Build advanced query with specific formats based on content type
+  switch (type) {
+    case 'movie':
+      // For movies, we can search directly by name (and year if available)
+      query = meta.year ? `${meta.name} ${meta.year}` : meta.name;
+      break;
+    case 'series':
+      // For series, we need to include the season and episode
+      if (meta.episode && meta.season) {
+        // Format: Name S01E01
+        query = `${meta.name} S${meta.season.toString().padStart(2, '0')}E${meta.episode
+          .toString()
+          .padStart(2, '0')}`;
+      } else {
+        // Just the name as fallback
+        query = meta.name;
+      }
+      break;
+    default:
+      // Default to just the name
+      query = meta.name;
   }
 
-  if (meta.year) {
-    query += ` ${meta.year}`;
-  }
-
+  logger.debug(`Final search query: ${query}`);
   return query;
 }
 
