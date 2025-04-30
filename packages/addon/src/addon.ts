@@ -20,6 +20,7 @@ import { EasynewsAPI, SearchOptions, EasynewsSearchResponse } from 'easynews-plu
 import { publicMetaProvider } from './meta';
 import { Stream } from './types';
 import customTitlesJson from '../../../custom-titles.json';
+import { getUILanguage, translations } from './i18n';
 
 // Extended configuration interface
 interface AddonConfig {
@@ -138,7 +139,22 @@ builder.defineStreamHandler(
 
     try {
       if (!username || !password) {
-        throw new Error('Missing username or password');
+        // Instead of throwing error, return a single stream with error message
+        const lang = getUILanguage(config.preferredLanguage || '');
+        const errorMessage = translations[lang].errors.authFailed;
+
+        return {
+          streams: [
+            {
+              name: 'Easynews++ Error',
+              description: errorMessage,
+              url: 'https://example.com/error', // Dummy URL that won't play
+              behaviorHints: {
+                notWebReady: true,
+              },
+            },
+          ],
+        };
       }
 
       const useStrictMatching = strictTitleMatching === 'on' || strictTitleMatching === 'true';
@@ -257,7 +273,28 @@ builder.defineStreamHandler(
         }
       }
 
-      const api = new EasynewsAPI({ username, password });
+      // Initialize the API with user credentials
+      let api;
+      try {
+        api = new EasynewsAPI({ username, password });
+      } catch (error) {
+        logger.error(`API initialization error: ${error}`);
+        const lang = getUILanguage(config.preferredLanguage || '');
+        const errorMessage = translations[lang].errors.authFailed;
+
+        return {
+          streams: [
+            {
+              name: 'Easynews++ Auth Error',
+              description: errorMessage,
+              url: 'https://example.com/error', // Dummy URL that won't play
+              behaviorHints: {
+                notWebReady: true,
+              },
+            },
+          ],
+        };
+      }
 
       logger.debug(`Getting alternative titles for: ${meta.name}`);
 
@@ -356,6 +393,35 @@ builder.defineStreamHandler(
           }
         } catch (error) {
           logger.error(`Error searching for "${query}":`, error);
+
+          // Check if it's an authentication error
+          const errorString = String(error).toLowerCase();
+          if (
+            errorString.includes('auth') ||
+            errorString.includes('login') ||
+            errorString.includes('username') ||
+            errorString.includes('password') ||
+            errorString.includes('credentials') ||
+            errorString.includes('unauthorized') ||
+            errorString.includes('forbidden')
+          ) {
+            const lang = getUILanguage(config.preferredLanguage || '');
+            const errorMessage = translations[lang].errors.authFailed;
+
+            return {
+              streams: [
+                {
+                  name: 'Easynews++ Auth Error',
+                  description: errorMessage,
+                  url: 'https://example.com/error', // Dummy URL that won't play
+                  behaviorHints: {
+                    notWebReady: true,
+                  },
+                },
+              ],
+            };
+          }
+
           // Continue with other titles even if one fails
         }
       }
@@ -416,6 +482,35 @@ builder.defineStreamHandler(
               }
             } catch (error) {
               logger.error(`Error searching for "${query}":`, error);
+
+              // Check if it's an authentication error
+              const errorString = String(error).toLowerCase();
+              if (
+                errorString.includes('auth') ||
+                errorString.includes('login') ||
+                errorString.includes('username') ||
+                errorString.includes('password') ||
+                errorString.includes('credentials') ||
+                errorString.includes('unauthorized') ||
+                errorString.includes('forbidden')
+              ) {
+                const lang = getUILanguage(config.preferredLanguage || '');
+                const errorMessage = translations[lang].errors.authFailed;
+
+                return {
+                  streams: [
+                    {
+                      name: 'Easynews++ Auth Error',
+                      description: errorMessage,
+                      url: 'https://example.com/error', // Dummy URL that won't play
+                      behaviorHints: {
+                        notWebReady: true,
+                      },
+                    },
+                  ],
+                };
+              }
+
               // Continue with other titles even if one fails
             }
           }
@@ -1164,6 +1259,34 @@ builder.defineStreamHandler(
         error,
         context: { resource: 'stream', id, type },
       });
+
+      // Check if the error is related to authentication
+      const lang = getUILanguage(config.preferredLanguage || '');
+      const errorMessage = translations[lang].errors.authFailed;
+
+      // If error message contains 'auth' related words, return auth error stream
+      const errorString = String(error).toLowerCase();
+      if (
+        errorString.includes('auth') ||
+        errorString.includes('login') ||
+        errorString.includes('username') ||
+        errorString.includes('password') ||
+        errorString.includes('credentials')
+      ) {
+        return {
+          streams: [
+            {
+              name: 'Easynews++ Auth Error',
+              description: errorMessage,
+              url: 'https://example.com/error', // Dummy URL that won't play
+              behaviorHints: {
+                notWebReady: true,
+              },
+            },
+          ],
+        };
+      }
+
       return { streams: [] };
     }
   }
