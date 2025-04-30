@@ -161,7 +161,15 @@ serveHTTP(addonInterface, { port: +(process.env.PORT ?? 1337) }).catch(err => {
 });
 
 // Log environment configuration
-logger.info('Server initialization complete, logging configuration');
-logger.info(`PORT: ${process.env.PORT || 1337}`);
-logger.info(`LOG_LEVEL: ${logger.level}`);
-logger.info(`VERSION: ${getVersion()}`);
+logger.info('--- Environment configuration ---');
+logger.info(`PORT: ${process.env.PORT || 'undefined'}`);
+logger.info(`LOG_LEVEL: ${logger.level || 'undefined'}`);
+logger.info(`VERSION: ${getVersion() || 'undefined'}`);
+
+// Log API search configuration
+logger.info('--- API search configuration ---');
+logger.info(`TOTAL_MAX_RESULTS: ${process.env.TOTAL_MAX_RESULTS || 'undefined'}`);
+logger.info(`MAX_PAGES: ${process.env.MAX_PAGES || 'undefined'}`);
+logger.info(`MAX_RESULTS_PER_PAGE: ${process.env.MAX_RESULTS_PER_PAGE || 'undefined'}`);
+logger.info(`CACHE_TTL: ${process.env.CACHE_TTL || 'undefined'}`);
+logger.info('--- End of configuration ---');
