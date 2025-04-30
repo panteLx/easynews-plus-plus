@@ -12,6 +12,7 @@ COPY custom-titles.json ./
 COPY package*.json ./
 COPY packages/api/package*.json ./packages/api/
 COPY packages/addon/package*.json ./packages/addon/
+COPY packages/shared/package*.json ./packages/shared/
 
 # Install dependencies.
 RUN npm install
@@ -20,7 +21,7 @@ RUN npm install
 COPY tsconfig.*json ./
 COPY packages/api ./packages/api
 COPY packages/addon ./packages/addon
-
+COPY packages/shared ./packages/shared
 # Build the project.
 RUN npm run build
 
@@ -34,10 +35,14 @@ WORKDIR /app
 # Copy the built files from the builder.
 # The package.json files must be copied as well for NPM workspace symlinks between local packages to work.
 COPY --from=builder /build/package*.json /build/LICENSE ./
+
 COPY --from=builder /build/packages/addon/package.*json ./packages/addon/
 COPY --from=builder /build/packages/api/package.*json ./packages/api/
+COPY --from=builder /build/packages/shared/package.*json ./packages/shared/
+
 COPY --from=builder /build/packages/addon/dist ./packages/addon/dist
 COPY --from=builder /build/packages/api/dist ./packages/api/dist
+COPY --from=builder /build/packages/shared/dist ./packages/shared/dist
 
 # Copy the custom-titles.json file.
 COPY --from=builder /build/custom-titles.json ./custom-titles.json

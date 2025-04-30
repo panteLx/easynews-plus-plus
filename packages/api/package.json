@@ -6,5 +6,8 @@
     "test": "vitest run --passWithNoTests",
     "build": "tsc"
   },
-  "description": "API package for Easynews++"
+  "description": "API package for Easynews++",
+  "dependencies": {
+    "easynews-plus-plus-shared": "file:../shared"
+  }
 }
