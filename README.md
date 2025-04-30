@@ -266,7 +266,14 @@ You can configure the addon server using environment variables:
 
 1. **Port Configuration**: Change the default port (1337) by setting the `PORT` environment variable
 2. **Logging Level**: Adjust the verbosity of logs with the `EASYNEWS_LOG_LEVEL` variable
-3. **API Search Configuration**:
+   - Options: `error`, `warn`, `info`, `debug`, `silly`, `silent`
+   - Set to `debug` or `silly` for verbose logging during troubleshooting
+   - Default: `info`
+3. **Log Summarization**: Control debug log grouping with `EASYNEWS_SUMMARIZE_LOGS`
+   - Set to `false` to see all individual debug logs (useful for detailed troubleshooting)
+   - Set to `true` to group similar debug logs and reduce log volume
+   - Default: `true` (enabled)
+4. **API Search Configuration**:
    - `TOTAL_MAX_RESULTS`: Maximum total results to return
    - `MAX_PAGES`: Maximum number of pages to search
    - `MAX_RESULTS_PER_PAGE`: Maximum results per page

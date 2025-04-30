@@ -101,8 +101,8 @@ try {
   logger.info(`Successfully loaded ${numCustomTitles} custom titles`);
 
   if (numCustomTitles > 0) {
-    // Log a few examples to verify they're loaded correctly
-    const examples = Object.entries(titlesFromFile).slice(0, 3);
+    // Log an example to verify they're loaded correctly
+    const examples = Object.entries(titlesFromFile).slice(0, 1);
     for (const [original, customTitles] of examples) {
       logger.debug(`Example custom title: "${original}" -> "${customTitles.join('", "')}"`);
     }
