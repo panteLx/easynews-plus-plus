@@ -101,29 +101,29 @@
 - tvOS (Omni & Vidi)
 - iOS (Fusion)
 - Stremio
-  - Windows 4.x
-  - Windows 5.x (beta)
+  - Windows (4.x (stable) & 5.x (beta))
   - Linux
   - Web (Browser)
   - Android Mobile (beta)
+  - iOS (Web & TestFlight)
 
-#### ⚠️ **Should Work (Untested):**
+#### ⚠️ **Partially Supported or Untested:**
 
 - Stremio:
   - macOS
-  - Android TV
+  - Android TV (when using a different player than ExoPlayer)
   - Android Mobile (stable)
   - Steam Deck
   - Raspberry Pi
   - Sony TV
   - Philips TV
+  - Samsung TV (some models might have playback issues with the internal player)
 
 #### ❌ **Currently Not Supported:**
 
 - Stremio:
-  - webOS (confirmed not working)
-  - iOS
-  - Samsung TV
+  - webOS
+  - Android TV (when using ExoPlayer (NVIDIA Shield, Onn Pro 4K, Chromecast 4K))
 
 > [!NOTE]  
 > We are actively working on expanding platform support. If you encounter any issues with a specific platform, please report them in our [Discord community](https://discord.gg/Ma4SnagqwE) or create a new issue on GitHub.
