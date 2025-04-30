@@ -15,11 +15,13 @@ import {
   logError,
   matchesTitle,
   getAlternativeTitles,
+  isAuthError,
 } from './utils';
 import { EasynewsAPI, SearchOptions, EasynewsSearchResponse } from 'easynews-plus-plus-api';
 import { publicMetaProvider } from './meta';
 import { Stream } from './types';
 import customTitlesJson from '../../../custom-titles.json';
+import { getUILanguage, translations } from './i18n';
 
 // Extended configuration interface
 interface AddonConfig {
@@ -33,6 +35,33 @@ interface AddonConfig {
   maxFileSize?: string; // Max file size in GB
   [key: string]: any;
 }
+
+// Helper to create a localized auth error stream
+function authErrorStream(langCode: string) {
+  const lang = getUILanguage(langCode);
+  return {
+    streams: [
+      {
+        name: 'Easynews++ Auth Error',
+        description: translations[lang].errors.authFailed,
+        url: 'https://example.com/error', // Dummy URL that won't play
+        behaviorHints: {
+          notWebReady: true,
+        },
+      },
+    ],
+  };
+}
+
+// Default configuration values
+const DEFAULT_CONFIG = {
+  strictTitleMatching: 'true',
+  preferredLanguage: '',
+  sortingPreference: 'quality_first',
+  showQualities: '4k,1080p,720p,480p',
+  maxResultsPerQuality: '0',
+  maxFileSize: '0',
+};
 
 const builder = new addonBuilder(manifest);
 
@@ -96,15 +125,16 @@ export const landingHTML = customTemplate(manifest);
 
 builder.defineStreamHandler(
   async ({ id, type, config }: { id: string; type: ContentType; config: AddonConfig }) => {
+    // Apply default values for any missing configuration options
     const {
       username,
       password,
-      strictTitleMatching,
-      preferredLanguage,
-      sortingPreference,
-      showQualities,
-      maxResultsPerQuality,
-      maxFileSize,
+      strictTitleMatching = DEFAULT_CONFIG.strictTitleMatching,
+      preferredLanguage = DEFAULT_CONFIG.preferredLanguage,
+      sortingPreference = DEFAULT_CONFIG.sortingPreference,
+      showQualities = DEFAULT_CONFIG.showQualities,
+      maxResultsPerQuality = DEFAULT_CONFIG.maxResultsPerQuality,
+      maxFileSize = DEFAULT_CONFIG.maxFileSize,
       ...options
     } = config;
 
@@ -127,16 +157,27 @@ builder.defineStreamHandler(
 
     try {
       if (!username || !password) {
-        throw new Error('Missing username or password');
+        // Instead of throwing error, return a single stream with error message
+        return authErrorStream(config.preferredLanguage || '');
       }
 
-      // Parse strictTitleMatching option (checkbox returns string 'on' or undefined)
       const useStrictMatching = strictTitleMatching === 'on' || strictTitleMatching === 'true';
-      logger.info(`Strict title matching: ${useStrictMatching ? 'enabled' : 'disabled'}`);
+      if (!config.strictTitleMatching) {
+        logger.info(`Using default strictTitleMatching: ${strictTitleMatching}`);
+      } else {
+        // Parse strictTitleMatching option (checkbox returns string 'on' or undefined)
+        logger.info(`Strict title matching: ${useStrictMatching ? 'enabled' : 'disabled'}`);
+      }
 
-      // Get preferred language from configuration
       const preferredLang = preferredLanguage || '';
-      logger.info(`Preferred language: ${preferredLang ? preferredLang : 'No preference'}`);
+      if (!config.preferredLanguage) {
+        logger.info(`Using default preferredLanguage: ${preferredLanguage || 'No preference'}`);
+      } else {
+        // Get preferred language from configuration
+        logger.info(
+          `Preferred language: ${preferredLanguage ? preferredLanguage : 'No preference'}`
+        );
+      }
 
       // Parse quality filters
       const qualityFilters = showQualities
@@ -146,23 +187,35 @@ builder.defineStreamHandler(
             .filter(Boolean)
         : ['4k', '1080p', '720p', '480p'];
 
-      logger.info(`Quality filters: ${qualityFilters.join(', ')}`);
+      if (!config.showQualities) {
+        logger.info('Using default showQualities: ' + showQualities);
+      } else {
+        logger.info(`Quality filters: ${qualityFilters.join(', ')}`);
+      }
 
       // Parse max results per quality (0 = no limit)
       let maxResultsPerQualityValue = parseInt(maxResultsPerQuality ?? '0', 10);
       if (Number.isNaN(maxResultsPerQualityValue) || maxResultsPerQualityValue < 0) {
         maxResultsPerQualityValue = 0;
       }
-      logger.info(
-        `Max results per quality: ${maxResultsPerQualityValue === 0 ? 'No limit' : maxResultsPerQualityValue}`
-      );
+      if (!config.maxResultsPerQuality) {
+        logger.info('Using default maxResultsPerQuality: ' + maxResultsPerQuality);
+      } else {
+        logger.info(
+          `Max results per quality: ${maxResultsPerQualityValue === 0 ? 'No limit' : maxResultsPerQualityValue}`
+        );
+      }
 
       // Parse max file size (0 = no limit)
       let maxFileSizeGB = parseFloat(maxFileSize ?? '0');
       if (Number.isNaN(maxFileSizeGB) || maxFileSizeGB < 0) {
         maxFileSizeGB = 0;
       }
-      logger.info(`Max file size: ${maxFileSizeGB === 0 ? 'No limit' : maxFileSizeGB + ' GB'}`);
+      if (!config.maxFileSize) {
+        logger.info('Using default maxFileSize: ' + maxFileSize);
+      } else {
+        logger.info(`Max file size: ${maxFileSizeGB === 0 ? 'No limit' : maxFileSizeGB + ' GB'}`);
+      }
 
       // Use custom titles from custom-titles.json
       const customTitles = { ...titlesFromFile };
@@ -171,8 +224,11 @@ builder.defineStreamHandler(
         `Using ${Object.keys(customTitles).length} custom titles from custom-titles.json`
       );
 
-      // For troubleshooting:
-      logger.info(`Sorting preference from config: ${sortingPreference}`);
+      if (!config.sortingPreference) {
+        logger.info(`Using default sortingPreference: ${sortingPreference}`);
+      } else {
+        logger.info(`Sorting preference from config: ${sortingPreference}`);
+      }
 
       // Configure API sorting options based on user sorting preference
       const sortOptions: Partial<SearchOptions> = {
@@ -221,7 +277,14 @@ builder.defineStreamHandler(
         }
       }
 
-      const api = new EasynewsAPI({ username, password });
+      // Initialize the API with user credentials
+      let api;
+      try {
+        api = new EasynewsAPI({ username, password });
+      } catch (error) {
+        logger.error(`API initialization error: ${error}`);
+        return authErrorStream(config.preferredLanguage || '');
+      }
 
       logger.debug(`Getting alternative titles for: ${meta.name}`);
 
@@ -320,6 +383,10 @@ builder.defineStreamHandler(
           }
         } catch (error) {
           logger.error(`Error searching for "${query}":`, error);
+
+          // Check if it's an authentication error
+          if (isAuthError(error)) return authErrorStream(config.preferredLanguage || '');
+
           // Continue with other titles even if one fails
         }
       }
@@ -380,6 +447,10 @@ builder.defineStreamHandler(
               }
             } catch (error) {
               logger.error(`Error searching for "${query}":`, error);
+
+              // Check if it's an authentication error
+              if (isAuthError(error)) return authErrorStream(config.preferredLanguage || '');
+
               // Continue with other titles even if one fails
             }
           }
@@ -1128,6 +1199,10 @@ builder.defineStreamHandler(
         error,
         context: { resource: 'stream', id, type },
       });
+
+      // Check if the error is related to authentication
+      if (isAuthError(error)) return authErrorStream(config.preferredLanguage || '');
+
       return { streams: [] };
     }
   }

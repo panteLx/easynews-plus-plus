@@ -72,6 +72,9 @@ type TranslationKeys = {
   qualityOptions: {
     allQualities: string;
   };
+  errors: {
+    authFailed: string;
+  };
 };
 
 // Translation dictionary type
@@ -211,6 +214,10 @@ export const translations: Translations = {
     qualityOptions: {
       allQualities: 'All Qualities',
     },
+    errors: {
+      authFailed:
+        'Authentication Failed: Invalid username or password\nCheck your credentials & reconfigure addon',
+    },
   },
   // German
   de: {
@@ -264,6 +271,10 @@ export const translations: Translations = {
     },
     qualityOptions: {
       allQualities: 'Alle Qualitäten',
+    },
+    errors: {
+      authFailed:
+        'Authentifizierung fehlgeschlagen: Ungültiger Benutzername oder Passwort\nÜberprüfen Sie Ihre Anmeldeinformationen und konfigurieren Sie das Addon erneut',
     },
   },
   // Spanish
@@ -319,6 +330,10 @@ export const translations: Translations = {
     qualityOptions: {
       allQualities: 'Todas las calidades',
     },
+    errors: {
+      authFailed:
+        'Autenticación fallida: Nombre de usuario o contraseña inválidos\nVerifique sus credenciales y reconfigure el addon',
+    },
   },
   // French
   fr: {
@@ -372,6 +387,10 @@ export const translations: Translations = {
     },
     qualityOptions: {
       allQualities: 'Toutes les qualités',
+    },
+    errors: {
+      authFailed:
+        "Authentification échouée : Nom d'utilisateur ou mot de passe invalide\nVérifiez vos identifiants et reconfigurez l'addon",
     },
   },
   // Italian
@@ -427,6 +446,10 @@ export const translations: Translations = {
     qualityOptions: {
       allQualities: 'Tutte le qualità',
     },
+    errors: {
+      authFailed:
+        'Autenticazione fallita: Nome utente o password non validi\nVerifica le tue credenziali e riconfigura l addon',
+    },
   },
   // Japanese
   ja: {
@@ -480,6 +503,10 @@ export const translations: Translations = {
     },
     qualityOptions: {
       allQualities: 'すべての画質',
+    },
+    errors: {
+      authFailed:
+        '認証失敗：ユーザー名またはパスワードが無効です\n資格情報を確認し、アドオンを再構成してください',
     },
   },
   // Portuguese
@@ -535,6 +562,10 @@ export const translations: Translations = {
     qualityOptions: {
       allQualities: 'Todas as qualidades',
     },
+    errors: {
+      authFailed:
+        'Falha na autenticação: Nome de usuário ou senha inválidos\nVerifique suas credenciais e reconfigure o addon',
+    },
   },
   // Russian
   ru: {
@@ -588,6 +619,10 @@ export const translations: Translations = {
     },
     qualityOptions: {
       allQualities: 'Все качества',
+    },
+    errors: {
+      authFailed:
+        'Ошибка аутентификации: Неверное имя пользователя или пароль\nПроверьте свои учетные данные и перенастройте addon',
     },
   },
   // Korean
@@ -643,6 +678,10 @@ export const translations: Translations = {
     qualityOptions: {
       allQualities: '모든 화질',
     },
+    errors: {
+      authFailed:
+        '인증 실패: 잘못된 사용자 이름 또는 비밀번호\n사용자 이름과 비밀번호를 확인하고 addon을 다시 구성하세요',
+    },
   },
   // Chinese
   zh: {
@@ -694,6 +733,9 @@ export const translations: Translations = {
     },
     qualityOptions: {
       allQualities: '所有画质',
+    },
+    errors: {
+      authFailed: '身份验证失败：用户名或密码无效\n检查您的凭据并重新配置addon',
     },
   },
   // Dutch
@@ -749,6 +791,10 @@ export const translations: Translations = {
     qualityOptions: {
       allQualities: 'Alle kwaliteiten',
     },
+    errors: {
+      authFailed:
+        'Authenticatie mislukt: Ongeldige gebruikersnaam of wachtwoord\nControleer uw referenties en configureer het addon opnieuw',
+    },
   },
   // Romanian
   ro: {
@@ -803,6 +849,10 @@ export const translations: Translations = {
     qualityOptions: {
       allQualities: 'Toate calitățile',
     },
+    errors: {
+      authFailed:
+        'Autentificare eșuată: Nume de utilizator sau parolă nevalidă\nVerificați datele dumneavoastră și reconfigurați addon',
+    },
   },
   // Bulgarian
   bg: {
@@ -856,6 +906,10 @@ export const translations: Translations = {
     },
     qualityOptions: {
       allQualities: 'Всички качества',
+    },
+    errors: {
+      authFailed:
+        'Неуспешна аутентикация: Невалидно потребителско име или парола\nПроверете вашите данни и реконфигурирайте addon',
     },
   },
 };

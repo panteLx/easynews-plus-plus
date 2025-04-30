@@ -564,3 +564,12 @@ export function capitalizeFirstLetter(str: string): string {
   if (!str) return str;
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
+/**
+ * Checks if an error is related to authentication
+ * @param err Any error object or string
+ * @returns True if the error appears to be authentication-related
+ */
+export function isAuthError(err: unknown): boolean {
+  return /auth|login|username|password|credentials|unauthorized|forbidden/i.test(String(err));
+}
