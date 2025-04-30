@@ -15,6 +15,7 @@ import {
   logError,
   matchesTitle,
   getAlternativeTitles,
+  isAuthError,
 } from './utils';
 import { EasynewsAPI, SearchOptions, EasynewsSearchResponse } from 'easynews-plus-plus-api';
 import { publicMetaProvider } from './meta';
@@ -33,6 +34,23 @@ interface AddonConfig {
   maxResultsPerQuality?: string; // Max results per quality
   maxFileSize?: string; // Max file size in GB
   [key: string]: any;
+}
+
+// Helper to create a localized auth error stream
+function authErrorStream(langCode: string) {
+  const lang = getUILanguage(langCode);
+  return {
+    streams: [
+      {
+        name: 'Easynews++ Auth Error',
+        description: translations[lang].errors.authFailed,
+        url: 'https://example.com/error', // Dummy URL that won't play
+        behaviorHints: {
+          notWebReady: true,
+        },
+      },
+    ],
+  };
 }
 
 // Default configuration values
@@ -140,21 +158,7 @@ builder.defineStreamHandler(
     try {
       if (!username || !password) {
         // Instead of throwing error, return a single stream with error message
-        const lang = getUILanguage(config.preferredLanguage || '');
-        const errorMessage = translations[lang].errors.authFailed;
-
-        return {
-          streams: [
-            {
-              name: 'Easynews++ Error',
-              description: errorMessage,
-              url: 'https://example.com/error', // Dummy URL that won't play
-              behaviorHints: {
-                notWebReady: true,
-              },
-            },
-          ],
-        };
+        return authErrorStream(config.preferredLanguage || '');
       }
 
       const useStrictMatching = strictTitleMatching === 'on' || strictTitleMatching === 'true';
@@ -279,21 +283,7 @@ builder.defineStreamHandler(
         api = new EasynewsAPI({ username, password });
       } catch (error) {
         logger.error(`API initialization error: ${error}`);
-        const lang = getUILanguage(config.preferredLanguage || '');
-        const errorMessage = translations[lang].errors.authFailed;
-
-        return {
-          streams: [
-            {
-              name: 'Easynews++ Auth Error',
-              description: errorMessage,
-              url: 'https://example.com/error', // Dummy URL that won't play
-              behaviorHints: {
-                notWebReady: true,
-              },
-            },
-          ],
-        };
+        return authErrorStream(config.preferredLanguage || '');
       }
 
       logger.debug(`Getting alternative titles for: ${meta.name}`);
@@ -395,32 +385,7 @@ builder.defineStreamHandler(
           logger.error(`Error searching for "${query}":`, error);
 
           // Check if it's an authentication error
-          const errorString = String(error).toLowerCase();
-          if (
-            errorString.includes('auth') ||
-            errorString.includes('login') ||
-            errorString.includes('username') ||
-            errorString.includes('password') ||
-            errorString.includes('credentials') ||
-            errorString.includes('unauthorized') ||
-            errorString.includes('forbidden')
-          ) {
-            const lang = getUILanguage(config.preferredLanguage || '');
-            const errorMessage = translations[lang].errors.authFailed;
-
-            return {
-              streams: [
-                {
-                  name: 'Easynews++ Auth Error',
-                  description: errorMessage,
-                  url: 'https://example.com/error', // Dummy URL that won't play
-                  behaviorHints: {
-                    notWebReady: true,
-                  },
-                },
-              ],
-            };
-          }
+          if (isAuthError(error)) return authErrorStream(config.preferredLanguage || '');
 
           // Continue with other titles even if one fails
         }
@@ -484,32 +449,7 @@ builder.defineStreamHandler(
               logger.error(`Error searching for "${query}":`, error);
 
               // Check if it's an authentication error
-              const errorString = String(error).toLowerCase();
-              if (
-                errorString.includes('auth') ||
-                errorString.includes('login') ||
-                errorString.includes('username') ||
-                errorString.includes('password') ||
-                errorString.includes('credentials') ||
-                errorString.includes('unauthorized') ||
-                errorString.includes('forbidden')
-              ) {
-                const lang = getUILanguage(config.preferredLanguage || '');
-                const errorMessage = translations[lang].errors.authFailed;
-
-                return {
-                  streams: [
-                    {
-                      name: 'Easynews++ Auth Error',
-                      description: errorMessage,
-                      url: 'https://example.com/error', // Dummy URL that won't play
-                      behaviorHints: {
-                        notWebReady: true,
-                      },
-                    },
-                  ],
-                };
-              }
+              if (isAuthError(error)) return authErrorStream(config.preferredLanguage || '');
 
               // Continue with other titles even if one fails
             }
@@ -1261,31 +1201,7 @@ builder.defineStreamHandler(
       });
 
       // Check if the error is related to authentication
-      const lang = getUILanguage(config.preferredLanguage || '');
-      const errorMessage = translations[lang].errors.authFailed;
-
-      // If error message contains 'auth' related words, return auth error stream
-      const errorString = String(error).toLowerCase();
-      if (
-        errorString.includes('auth') ||
-        errorString.includes('login') ||
-        errorString.includes('username') ||
-        errorString.includes('password') ||
-        errorString.includes('credentials')
-      ) {
-        return {
-          streams: [
-            {
-              name: 'Easynews++ Auth Error',
-              description: errorMessage,
-              url: 'https://example.com/error', // Dummy URL that won't play
-              behaviorHints: {
-                notWebReady: true,
-              },
-            },
-          ],
-        };
-      }
+      if (isAuthError(error)) return authErrorStream(config.preferredLanguage || '');
 
       return { streams: [] };
     }
