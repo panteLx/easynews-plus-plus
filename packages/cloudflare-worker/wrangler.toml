@@ -11,3 +11,7 @@ head_sampling_rate = 1
 PORT = "1337"
 EASYNEWS_LOG_LEVEL = "info"
 CLOUDFLARE = "true"
+CACHE_TTL = "6"
+TOTAL_MAX_RESULTS = "500"
+MAX_PAGES = "10"
+MAX_RESULTS_PER_PAGE = "250"

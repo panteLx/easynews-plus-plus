@@ -264,10 +264,34 @@ builder.defineStreamHandler(
         result: EasynewsSearchResponse;
       }[] = [];
 
+      // Early exit condition - limit API calls
+      const TOTAL_MAX_RESULTS = parseInt(process.env.TOTAL_MAX_RESULTS || '500');
+      let totalFoundResults = 0;
+
+      // Helper function to count total unique results across all searches
+      const countTotalUniqueResults = () => {
+        const uniqueHashes = new Set<string>();
+        for (const { result } of allSearchResults) {
+          for (const file of result.data ?? []) {
+            const fileHash = file['0'];
+            uniqueHashes.add(fileHash);
+          }
+        }
+        return uniqueHashes.size;
+      };
+
       // First try without year for each title variant
       for (const titleVariant of allTitles) {
         // Skip empty titles
         if (!titleVariant.trim()) continue;
+
+        // Stop searching if we already have enough results
+        if (totalFoundResults >= TOTAL_MAX_RESULTS) {
+          logger.debug(
+            `Already found ${totalFoundResults} unique results, skipping additional title searches`
+          );
+          break;
+        }
 
         const titleMeta = { ...meta, name: titleVariant, year: undefined };
         const query = buildSearchQuery(type, titleMeta);
@@ -284,6 +308,8 @@ builder.defineStreamHandler(
 
           if (resultCount > 0) {
             allSearchResults.push({ query, result: res });
+            totalFoundResults = countTotalUniqueResults();
+            logger.debug(`Total unique results so far: ${totalFoundResults}`);
 
             // Log a few examples of the results
             const examples = res.data.slice(0, 2);
@@ -300,45 +326,62 @@ builder.defineStreamHandler(
 
       // If meta.year is defined, also search with year included (regardless of whether we found results without year)
       if (meta.year !== undefined) {
-        // If we already found results without year, log that we're still searching with year
-        if (allSearchResults.length > 0) {
+        // Skip year search if we already have enough results
+        if (totalFoundResults >= TOTAL_MAX_RESULTS) {
           logger.debug(
-            `Found ${allSearchResults.length} results without year, also trying with year: ${meta.year}`
+            `Already found ${totalFoundResults} unique results, skipping year-based searches`
           );
         } else {
-          logger.debug(`No results found without year, trying with year: ${meta.year}`);
-        }
+          // If we already found results without year, log that we're still searching with year
+          if (allSearchResults.length > 0) {
+            logger.debug(
+              `Found ${totalFoundResults} unique results without year, also trying with year: ${meta.year}`
+            );
+          } else {
+            logger.debug(`No results found without year, trying with year: ${meta.year}`);
+          }
 
-        for (const titleVariant of allTitles) {
-          // Skip empty titles
-          if (!titleVariant.trim()) continue;
+          for (const titleVariant of allTitles) {
+            // Skip empty titles
+            if (!titleVariant.trim()) continue;
 
-          const titleMeta = { ...meta, name: titleVariant, year: meta.year };
-          const query = buildSearchQuery(type, titleMeta);
-          logger.debug(`Searching with year for: "${query}"`);
-
-          try {
-            const res = await api.search({
-              ...sortOptions,
-              query,
-            });
-
-            const resultCount = res?.data?.length || 0;
-            logger.debug(`Found ${resultCount} results for "${query}" with year`);
-
-            if (resultCount > 0) {
-              allSearchResults.push({ query, result: res });
-
-              // Log a few examples of the results
-              const examples = res.data.slice(0, 2);
-              for (const file of examples) {
-                const title = getPostTitle(file);
-                logger.debug(`Example result: "${title}" (${file['4'] || 'unknown size'})`);
-              }
+            // Stop searching if we already have enough results
+            if (totalFoundResults >= TOTAL_MAX_RESULTS) {
+              logger.debug(
+                `Already found ${totalFoundResults} unique results, skipping additional title searches with year`
+              );
+              break;
             }
-          } catch (error) {
-            logger.error(`Error searching for "${query}":`, error);
-            // Continue with other titles even if one fails
+
+            const titleMeta = { ...meta, name: titleVariant, year: meta.year };
+            const query = buildSearchQuery(type, titleMeta);
+            logger.debug(`Searching with year for: "${query}"`);
+
+            try {
+              const res = await api.search({
+                ...sortOptions,
+                query,
+              });
+
+              const resultCount = res?.data?.length || 0;
+              logger.debug(`Found ${resultCount} results for "${query}" with year`);
+
+              if (resultCount > 0) {
+                allSearchResults.push({ query, result: res });
+                totalFoundResults = countTotalUniqueResults();
+                logger.debug(`Total unique results so far: ${totalFoundResults}`);
+
+                // Log a few examples of the results
+                const examples = res.data.slice(0, 2);
+                for (const file of examples) {
+                  const title = getPostTitle(file);
+                  logger.debug(`Example result: "${title}" (${file['4'] || 'unknown size'})`);
+                }
+              }
+            } catch (error) {
+              logger.error(`Error searching for "${query}":`, error);
+              // Continue with other titles even if one fails
+            }
           }
         }
       }
@@ -352,9 +395,26 @@ builder.defineStreamHandler(
       // Store all streams here
       let streams: Stream[] = [];
 
+      // Apply global limit across all search results
+      logger.debug(`Global stream limit: ${TOTAL_MAX_RESULTS} results across all searches`);
+
       // Process each search result
       for (const { query, result: res } of allSearchResults) {
+        // Skip adding more results if we've already reached the limit
+        if (streams.length >= TOTAL_MAX_RESULTS) {
+          logger.debug(`Reached global limit of ${TOTAL_MAX_RESULTS} streams, stopping processing`);
+          break;
+        }
+
         for (const file of res.data ?? []) {
+          // Check if we've reached the global limit
+          if (streams.length >= TOTAL_MAX_RESULTS) {
+            logger.debug(
+              `Reached global limit of ${TOTAL_MAX_RESULTS} streams, stopping processing`
+            );
+            break;
+          }
+
           const title = getPostTitle(file);
           const fileHash = file['0']; // Use file hash to detect duplicates
 

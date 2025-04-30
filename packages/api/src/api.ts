@@ -6,27 +6,22 @@ export class EasynewsAPI {
   private readonly username: string;
   private readonly password: string;
   private readonly cache = new Map<string, { data: EasynewsSearchResponse; timestamp: number }>();
-  private readonly cacheTTL = 1000 * 60 * 15; // 15 minutes
+  private readonly cacheTTL = 1000 * 60 * 60 * parseInt(process.env.CACHE_TTL || '24'); // 24 hours
 
-  constructor(options: { username: string; password: string; cacheTTL?: number }) {
+  constructor(options: { username: string; password: string }) {
     if (!options) {
       throw new Error('Missing options');
     }
 
     this.username = options.username;
     this.password = options.password;
-
-    if (options.cacheTTL) {
-      this.cacheTTL = options.cacheTTL;
-      console.debug(`[EasynewsAPI] Custom cache TTL set: ${this.cacheTTL}ms`);
-    }
   }
 
   private getCacheKey(options: SearchOptions): string {
     return JSON.stringify({
       query: options.query,
       pageNr: options.pageNr || 1,
-      maxResults: options.maxResults || 100,
+      maxResults: parseInt(process.env.MAX_RESULTS_PER_PAGE || '250'),
       sort1: options.sort1 || 'dsize',
       sort1Direction: options.sort1Direction || '-',
       sort2: options.sort2 || 'relevance',
@@ -64,7 +59,7 @@ export class EasynewsAPI {
   async search({
     query,
     pageNr = 1,
-    maxResults = 250,
+    maxResults = parseInt(process.env.MAX_RESULTS_PER_PAGE || '250'),
     sort1 = 'dsize',
     sort1Direction = '-',
     sort2 = 'relevance',
@@ -173,11 +168,11 @@ export class EasynewsAPI {
     };
 
     // Set constants for result limits
-    const TOTAL_MAX_RESULTS = 500; // Maximum total results to return
-    const MAX_PAGES = 10; // Safety limit on number of page requests
-    const MAX_RESULTS_PER_PAGE = 250; // Maximum results per page Easynews API supports
+    const TOTAL_MAX_RESULTS = parseInt(process.env.TOTAL_MAX_RESULTS || '500'); // Maximum total results to return
+    const MAX_PAGES = parseInt(process.env.MAX_PAGES || '10'); // Safety limit on number of page requests
+    const MAX_RESULTS_PER_PAGE = parseInt(process.env.MAX_RESULTS_PER_PAGE || '250'); // Maximum results per page
 
-    console.debug(
+    console.info(
       `[EasynewsAPI] Search limits: max ${TOTAL_MAX_RESULTS} results, max ${MAX_PAGES} pages, ${MAX_RESULTS_PER_PAGE} per page`
     );
 
@@ -187,11 +182,9 @@ export class EasynewsAPI {
     try {
       while (pageCount < MAX_PAGES) {
         // Calculate optimal page size for each request
-        // For first page, request maximum supported size
-        // For subsequent pages, request either the maximum or what's left to reach TOTAL_MAX_RESULTS
+        // Always respect TOTAL_MAX_RESULTS even on the first page
         const remainingResults = TOTAL_MAX_RESULTS - data.length;
-        const optimalPageSize =
-          pageNr === 1 ? MAX_RESULTS_PER_PAGE : Math.min(MAX_RESULTS_PER_PAGE, remainingResults);
+        const optimalPageSize = Math.min(MAX_RESULTS_PER_PAGE, remainingResults);
 
         // If we've already reached our limit, stop fetching
         if (remainingResults <= 0) {

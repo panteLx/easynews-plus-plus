@@ -266,6 +266,11 @@ You can configure the addon server using environment variables:
 
 1. **Port Configuration**: Change the default port (1337) by setting the `PORT` environment variable
 2. **Logging Level**: Adjust the verbosity of logs with the `EASYNEWS_LOG_LEVEL` variable
+3. **API Search Configuration**:
+   - `TOTAL_MAX_RESULTS`: Maximum total results to return
+   - `MAX_PAGES`: Maximum number of pages to search
+   - `MAX_RESULTS_PER_PAGE`: Maximum results per page
+   - `CACHE_TTL`: Cache time-to-live in hours
 
 The easiest way to configure these settings is by copying the `.env.example` file to `.env` in the project root.
 
