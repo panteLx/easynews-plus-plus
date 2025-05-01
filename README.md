@@ -1,9 +1,8 @@
 <div align="center"><img src="https://i.imgur.com/1adWebT.png" alt="Easynews++ Logo"></div>
 
 <h1 align="center" id="title">Easynews++</h1>
-
 <div align="center">
-  
+
 ![Easynews++ Logo](https://img.shields.io/badge/Easynews%2B%2B-Addon-blue?style=for-the-badge)
 ![Version](https://img.shields.io/github/v/release/pantelx/easynews-plus-plus?style=for-the-badge&label=Version)
 ![Checks](https://img.shields.io/github/checks-status/pantelx/easynews-plus-plus/main?style=for-the-badge&label=Checks)
