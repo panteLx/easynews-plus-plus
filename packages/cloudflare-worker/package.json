@@ -4,6 +4,8 @@
   "description": "Cloudflare Worker package for Easynews++",
   "scripts": {
     "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest run --passWithNoTests",
     "dev": "wrangler dev src/index.ts",
     "deploy": "wrangler deploy --minify src/index.ts",
     "preview": "wrangler versions upload --script src/index.ts",

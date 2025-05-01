@@ -1,0 +1,17 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["vitest/globals", "node"],
+    "rootDir": "..",
+    "outDir": "../dist-tests"
+  },
+  "include": ["./**/*.ts", "../src/**/*.ts"],
+  "references": [
+    {
+      "path": "../../api"
+    },
+    {
+      "path": "../../shared"
+    }
+  ]
+}

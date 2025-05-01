@@ -6,6 +6,8 @@
     "composite": true,
     "declaration": true
   },
+  "include": ["src/**/*"],
+  "exclude": ["**/*.test.ts"],
   "references": [
     {
       "path": "../shared"

@@ -14,7 +14,7 @@ import {
   getSize,
   getAlternativeTitles,
   buildSearchQuery,
-} from './utils.js';
+} from '../src/utils';
 import { FileData } from 'easynews-plus-plus-api';
 import * as parseTorrentTitle from 'parse-torrent-title';
 import type { ContentType } from 'stremio-addon-sdk';
