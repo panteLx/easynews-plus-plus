@@ -264,11 +264,11 @@ builder.defineStreamHandler(
 
       // Check if we have a custom title for this title directly
       if (customTitles[meta.name]) {
-        logger.debug(
+        logger.info(
           `Direct custom title found for "${meta.name}": "${customTitles[meta.name].join('", "')}"`
         );
       } else {
-        logger.debug(`No direct custom title found for "${meta.name}", checking partial matches`);
+        logger.info(`No direct custom title found for "${meta.name}", checking partial matches`);
 
         // Look for partial matches in title keys
         for (const [key, values] of Object.entries(customTitles)) {
