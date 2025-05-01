@@ -1,10 +1,15 @@
-# Easynews++
+<div align="center"><img src="https://pbs.twimg.com/profile_images/479627852757733376/8v9zH7Yo_400x400.jpeg" alt="Easynews++ Logo"></div>
+
+<h1 align="center" id="title">Easynews++</h1>
 
 <div align="center">
   
 ![Easynews++ Logo](https://img.shields.io/badge/Easynews%2B%2B-Addon-blue?style=for-the-badge)
 [![Discord](https://img.shields.io/badge/Discord-Join%20our%20Community-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/Ma4SnagqwE)
 [![Buy Me A Coffee](https://img.shields.io/badge/Support-Buy%20Me%20A%20Coffee-orange?style=for-the-badge)](https://buymeacoffee.com/pantel)
+[![GitHub Sponsors](https://img.shields.io/badge/Sponsor-GitHub-ea4aaa?style=for-the-badge&logo=github&logoColor=white)](https://github.com/sponsors/pantelx)
+![Version](https://img.shields.io/github/v/release/pantelx/easynews-plus-plus?style=for-the-badge&label=Version)
+![Checks](https://img.shields.io/github/checks-status/pantelx/easynews-plus-plus/main?style=for-the-badge&label=Checks)
 
 </div>
 
@@ -407,6 +412,7 @@ This approach eliminates the platform-specific issues commonly found in other ad
 Your support helps maintain and improve this project! Consider:
 
 - [Buying me a coffee](https://buymeacoffee.com/pantel)
+- [Becoming a GitHub Sponsor](https://github.com/sponsors/pantelx)
 - Joining our [Discord community](https://discord.gg/Ma4SnagqwE) for support and updates
 - Contributing on [GitHub](https://github.com/panteLx/easynews-plus-plus)
 
