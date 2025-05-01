@@ -3,6 +3,8 @@ description: Report a bug you encountered
 title: 'bug: '
 labels:
   - bug
+projects:
+  - panteLx/2
 body:
   - type: dropdown
     id: 'deployment'
