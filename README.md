@@ -273,6 +273,7 @@ You can configure the addon server using environment variables:
    - Set to `false` to see all individual debug logs (useful for detailed troubleshooting)
    - Set to `true` to group similar debug logs and reduce log volume
    - Default: `true` (enabled)
+   - Note: This feature is not available in the Cloudflare Worker deployment
 4. **API Search Configuration**:
    - `TOTAL_MAX_RESULTS`: Maximum total results to return
    - `MAX_PAGES`: Maximum number of pages to search
