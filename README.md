@@ -1,4 +1,4 @@
-<div align="center"><img src="https://pbs.twimg.com/profile_images/479627852757733376/8v9zH7Yo_400x400.jpeg" alt="Easynews++ Logo" style="border-radius: 10px;"></div>
+<div align="center"><img src="https://i.imgur.com/1adWebT.png" alt="Easynews++ Logo"></div>
 
 <h1 align="center" id="title">Easynews++</h1>
 
@@ -25,7 +25,7 @@
 
 **Self-Hosting:** [Check out the Self-Hosting Guide](#%EF%B8%8F-self-hosting-guide)
 
-**Support the Project:** [Buy Me A Coffee](https://buymeacoffee.com/pantel)
+**Support the Project:** [Buy Me A Coffee](https://buymeacoffee.com/pantel) or [Become a GitHub Sponsor](https://github.com/sponsors/pantelx)
 
 ---
 
