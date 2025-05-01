@@ -1,6 +1,6 @@
 {
   "name": "easynews-plus-plus",
-  "version": "2.4.1",
+  "version": "2.4.2",
   "main": "dist/server.js",
   "scripts": {
     "test": "npm run test --workspaces",
