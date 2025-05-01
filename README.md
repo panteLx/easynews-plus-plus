@@ -223,6 +223,8 @@ $ git clone https://github.com/pantelx/easynews-plus-plus.git && cd easynews-plu
 $ npm i
 # Copy the .env.example file to .env
 $ cp .env.example .env
+# Build the addon
+$ npm run build
 ```
 
 Development modes:
