@@ -417,6 +417,16 @@ Your support helps maintain and improve this project! Consider:
 - Joining our [Discord community](https://discord.gg/Ma4SnagqwE) for support and updates
 - Contributing on [GitHub](https://github.com/panteLx/easynews-plus-plus)
 
+## 🙏 Credits
+
+Special thanks to:
+
+- [sleeyax/stremio-easynews-addon](https://github.com/Sleeyax/stremio-easynews-addon) for the repository structure, base code and inspiration
+- [Viren070/AIOStreams](https://github.com/Viren070/AIOStreams) for the issue templates
+- All contributors who have contributed through code, testing and ideas
+- The community for their feedback, support and patience
+- Project supporters who have financially supported this initiative
+
 ## 📄 License
 
 [MIT](./LICENSE)
