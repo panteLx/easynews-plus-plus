@@ -1,4 +1,5 @@
-import * as winston from 'winston';
+// Defer winston import so the module is pulled in **only** when required.
+let winston: typeof import('winston') | undefined;
 
 /**
  * Get the addon version from package.json
@@ -85,7 +86,7 @@ export class CloudflareLogger {
  * Logger that summarizes similar debug messages to reduce log volume
  */
 export class SummaryLogger {
-  private logger: winston.Logger | CloudflareLogger;
+  private logger: any;
   private messageCounters: Map<string, number> = new Map();
   private messagePatterns: RegExp[] = [
     // Qualitätsprüfungen
@@ -180,7 +181,7 @@ export class SummaryLogger {
   private flushDelay: number = 1000; // 1 Sekunde Verzögerung
   level: string;
 
-  constructor(logger: winston.Logger | CloudflareLogger) {
+  constructor(logger: any) {
     this.logger = logger;
     this.level = (logger as any).level || 'info';
 
@@ -373,13 +374,17 @@ export function createLogger(options?: {
     baseLogger = new CloudflareLogger(logLevel);
   } else {
     // Use Winston for all other environments
+    if (!winston) {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      winston = require('winston');
+    }
     const prefix = opts.prefix ? `[${opts.prefix}] ` : '';
 
-    baseLogger = winston.createLogger({
+    baseLogger = winston!.createLogger({
       level: logLevel,
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.printf(info => {
+      format: winston!.format.combine(
+        winston!.format.colorize(),
+        winston!.format.printf(info => {
           // Handle multiple arguments passed to the logger
           const splat = info[Symbol.for('splat')] || [];
           let message = prefix + info.message;
@@ -395,7 +400,7 @@ export function createLogger(options?: {
           return `[v${getVersion()}] ${info.level}: ${message}`;
         })
       ),
-      transports: [new winston.transports.Console()],
+      transports: [new winston!.transports.Console()],
     });
   }
 
