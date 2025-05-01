@@ -9,6 +9,7 @@ const englishTranslations = translations[DEFAULT_LANGUAGE];
 // Language options for the preferred language selector
 const languageOptions = {
   '': englishTranslations.languages.noPreference,
+  // Core languages with UI translations
   eng: englishTranslations.languages.english,
   ger: englishTranslations.languages.german,
   spa: englishTranslations.languages.spanish,
@@ -22,6 +23,26 @@ const languageOptions = {
   dut: englishTranslations.languages.dutch,
   rum: englishTranslations.languages.romanian,
   bul: englishTranslations.languages.bulgarian,
+  // Additional language options for audio selection (without UI translations)
+  ara: 'Arabic (العربية)',
+  cze: 'Czech (Čeština)',
+  dan: 'Danish (Dansk)',
+  fin: 'Finnish (Suomi)',
+  gre: 'Greek (Ελληνικά)',
+  heb: 'Hebrew (עברית)',
+  hin: 'Hindi (हिन्दी)',
+  hun: 'Hungarian (Magyar)',
+  ice: 'Icelandic (Íslenska)',
+  ind: 'Indonesian (Bahasa Indonesia)',
+  may: 'Malay (Bahasa Melayu)',
+  nor: 'Norwegian (Norsk)',
+  per: 'Persian (فارسی)',
+  pol: 'Polish (Polski)',
+  swe: 'Swedish (Svenska)',
+  tha: 'Thai (ไทย)',
+  tur: 'Turkish (Türkçe)',
+  ukr: 'Ukrainian (Українська)',
+  vie: 'Vietnamese (Tiếng Việt)',
 } as any;
 
 // Sorting preference options

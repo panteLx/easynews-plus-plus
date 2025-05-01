@@ -90,52 +90,19 @@ function landingTemplate(manifest: Manifest): string {
     } else if (field.key === 'maxFileSize' && translations.form.maxFileSize) {
       return { ...field, title: translations.form.maxFileSize };
     } else if (field.key === 'preferredLanguage' && translations.form.preferredLanguage) {
-      // For language selection field, translate both title and options
+      // For language selection field, translate the title and the "No preference" option
       const translatedOptions: Record<string, string> = {};
       if (field.options) {
-        // Safely access options and translations
-        if (field.options[''] !== undefined && translations.languages?.noPreference) {
-          translatedOptions[''] = translations.languages.noPreference;
-        }
-        if (field.options['eng'] !== undefined && translations.languages?.english) {
-          translatedOptions['eng'] = translations.languages.english;
-        }
-        if (field.options['ger'] !== undefined && translations.languages?.german) {
-          translatedOptions['ger'] = translations.languages.german;
-        }
-        if (field.options['spa'] !== undefined && translations.languages?.spanish) {
-          translatedOptions['spa'] = translations.languages.spanish;
-        }
-        if (field.options['fre'] !== undefined && translations.languages?.french) {
-          translatedOptions['fre'] = translations.languages.french;
-        }
-        if (field.options['ita'] !== undefined && translations.languages?.italian) {
-          translatedOptions['ita'] = translations.languages.italian;
-        }
-        if (field.options['jpn'] !== undefined && translations.languages?.japanese) {
-          translatedOptions['jpn'] = translations.languages.japanese;
-        }
-        if (field.options['por'] !== undefined && translations.languages?.portuguese) {
-          translatedOptions['por'] = translations.languages.portuguese;
-        }
-        if (field.options['rus'] !== undefined && translations.languages?.russian) {
-          translatedOptions['rus'] = translations.languages.russian;
-        }
-        if (field.options['kor'] !== undefined && translations.languages?.korean) {
-          translatedOptions['kor'] = translations.languages.korean;
-        }
-        if (field.options['chi'] !== undefined && translations.languages?.chinese) {
-          translatedOptions['chi'] = translations.languages.chinese;
-        }
-        if (field.options['dut'] !== undefined && translations.languages?.dutch) {
-          translatedOptions['dut'] = translations.languages.dutch;
-        }
-        if (field.options['rum'] !== undefined && translations.languages?.romanian) {
-          translatedOptions['rum'] = translations.languages.romanian;
-        }
-        if (field.options['bul'] !== undefined && translations.languages?.bulgarian) {
-          translatedOptions['bul'] = translations.languages.bulgarian;
-        }
+        // Handle empty key ("No preference") specially
+        Object.entries(field.options).forEach(([key, value]) => {
+          if (key === '' && translations.languages.noPreference) {
+            // Translate "No preference"
+            translatedOptions[key] = translations.languages.noPreference;
+          } else {
+            // Keep other options as is
+            translatedOptions[key] = value as string;
+          }
+        });
       }
       return {
         ...field,

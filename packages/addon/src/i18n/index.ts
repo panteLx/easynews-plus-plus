@@ -61,6 +61,7 @@ type TranslationKeys = {
     dutch: string;
     romanian: string;
     bulgarian: string;
+    // Note: Additional languages are defined only in the manifest for preferred audio language selection
   };
   // Sorting options
   sortingOptions: {
