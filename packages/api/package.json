@@ -1,10 +1,11 @@
 {
   "name": "easynews-plus-plus-api",
   "version": "1.0.0",
-  "main": "./dist/index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "vitest run --passWithNoTests",
-    "build": "tsc"
+    "build": "tsc --build"
   },
   "description": "API package for Easynews++",
   "dependencies": {

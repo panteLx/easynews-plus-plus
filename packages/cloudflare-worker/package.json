@@ -7,7 +7,7 @@
     "dev": "wrangler dev src/index.ts",
     "deploy": "wrangler deploy --minify src/index.ts",
     "preview": "wrangler versions upload --script src/index.ts",
-    "build": "exit 0"
+    "build": "tsc --build"
   },
   "dependencies": {
     "easynews-plus-plus-addon": "file:../addon",
