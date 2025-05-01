@@ -5,6 +5,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest run --coverage",
     "build": "tsc --build"
   },
   "description": "API package for Easynews++",

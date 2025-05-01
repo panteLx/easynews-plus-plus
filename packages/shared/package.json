@@ -6,6 +6,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc --build",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest run --passWithNoTests"
   }
 }

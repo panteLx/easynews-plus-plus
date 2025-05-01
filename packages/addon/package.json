@@ -6,6 +6,7 @@
   "scripts": {
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest watch",
+    "test:coverage": "vitest run --coverage",
     "build": "tsc --build",
     "prepublish": "npm run build",
     "start": "node dist/server.js",
