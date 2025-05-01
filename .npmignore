@@ -1,0 +1,37 @@
+# Source files
+src/
+packages/
+.github/
+.vscode/
+reddit/
+
+# Config files
+.prettierrc
+tsconfig*.json
+Dockerfile
+.gitignore
+.npmignore
+
+# Development files
+node_modules/
+package-lock.json
+yarn.lock
+.git/
+*.tsbuildinfo
+
+# Testing
+coverage/
+__tests__/
+*.test.ts
+*.spec.ts
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# Environment files
+.env*
+.env
+.env.local
+.env.*.local 

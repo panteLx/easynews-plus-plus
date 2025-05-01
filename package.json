@@ -16,7 +16,8 @@
     "deploy:cf": "npm run build:cf && npm -w packages/cloudflare-worker run deploy",
     "deploy:beamup": "beamup",
     "preview:cf": "npm run build:cf && npm -w packages/cloudflare-worker run preview",
-    "release": "bumpp"
+    "release": "bumpp && npm run publish:npm",
+    "publish:npm": "bash ./packages/scripts/npm-publish.sh"
   },
   "keywords": [
     "stremio easynews addon",
