@@ -1,14 +1,9 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "dist",
-    "rootDir": "src",
+    "outDir": "./dist",
+    "rootDir": "./src",
     "composite": true,
     "declaration": true
-  },
-  "references": [
-    {
-      "path": "../shared"
-    }
-  ]
+  }
 }

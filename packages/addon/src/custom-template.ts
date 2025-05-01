@@ -935,9 +935,19 @@ function landingTemplate(manifest: Manifest): string {
   </div>
   
   <script>
+    // Use the ClientLogger from the shared package
+    // Define a simple client-side logger
+    const logger = {
+      error: (message, ...args) => console.error('[Easynews++]', message, ...args),
+      warn: (message, ...args) => console.warn('[Easynews++]', message, ...args),
+      info: (message, ...args) => console.log('[Easynews++]', message, ...args),
+      debug: (message, ...args) => console.log('[Easynews++]', message, ...args),
+      silly: (message, ...args) => console.log('[Easynews++]', message, ...args)
+    };
+    
     // Store the current language for debugging
     const currentLanguage = "${defaultUILanguage}";
-    console.log("Page loaded with language:", currentLanguage);
+    logger.debug("Page loaded with language:", currentLanguage);
     
     // Store translations in JS for debugging
     const pageTranslations = {
@@ -946,7 +956,7 @@ function landingTemplate(manifest: Manifest): string {
       configCopied: "${translations.configPage.configCopied}",
       version: "${translations.configPage.version}"
     };
-    console.log("Translations loaded:", pageTranslations);
+    logger.debug("Translations loaded:", pageTranslations);
     
     const configForm = document.getElementById('configForm');
     const installLink = document.getElementById('installLink');
@@ -993,13 +1003,13 @@ function landingTemplate(manifest: Manifest): string {
       
       // Reload with the new language parameter
       const newLang = this.value;
-      console.log('Language change requested to:', newLang, 'from:', '${defaultUILanguage}');
+      logger.info('Language change requested to:', newLang, 'from:', '${defaultUILanguage}');
       
       // Always use the full URL to ensure proper navigation
       const baseUrl = window.location.pathname;
       // Add cache breaker to force the browser to get a fresh page
       const newUrl = baseUrl + '?lang=' + newLang + '&cache=' + new Date().getTime();
-      console.log('Navigating to:', newUrl);
+      logger.debug('Navigating to:', newUrl);
       
       // Force navigation to the new URL
       window.location.href = newUrl;
@@ -1016,13 +1026,13 @@ function landingTemplate(manifest: Manifest): string {
     // Initialize on load
     document.addEventListener('DOMContentLoaded', function() {
       // Log the current URL and form values for debugging
-      console.log('Current URL:', window.location.href);
-      console.log('Form has language selector:', !!document.getElementById('uiLanguage'));
+      logger.debug('Current URL:', window.location.href);
+      logger.debug('Form has language selector:', !!document.getElementById('uiLanguage'));
     
       // Set up language selector
       const uiLanguageSelect = document.getElementById('uiLanguage');
       if (uiLanguageSelect) {
-        console.log('Language selector found with value:', uiLanguageSelect.value);
+        logger.debug('Language selector found with value:', uiLanguageSelect.value);
         // Remove any existing event listeners
         uiLanguageSelect.removeEventListener('change', handleLanguageChange);
         // Add event listener
@@ -1037,7 +1047,7 @@ function landingTemplate(manifest: Manifest): string {
       if (savedValues) {
         try {
           const values = JSON.parse(savedValues);
-          console.log('Restoring saved values:', values);
+          logger.debug('Restoring saved values:', values);
           
           // Fill in the form
           Object.entries(values).forEach(([key, value]) => {
@@ -1057,7 +1067,7 @@ function landingTemplate(manifest: Manifest): string {
           // Update links with restored values
           updateLink();
         } catch (e) {
-          console.error('Error restoring saved values:', e);
+          logger.error('Error restoring saved values:', e);
           localStorage.removeItem('formValues');
         }
       }

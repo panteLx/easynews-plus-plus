@@ -6,7 +6,13 @@ import path from 'path';
 import getRouter from 'stremio-addon-sdk/src/getRouter';
 import customTemplate from './custom-template';
 import { addonInterface } from './addon';
-import { logger, getVersion } from './utils';
+import { createLogger, getVersion } from 'easynews-plus-plus-shared';
+
+// Create a logger with server prefix and explicitly set the level from environment variable
+export const logger = createLogger({
+  prefix: 'Server',
+  level: process.env.EASYNEWS_LOG_LEVEL || undefined, // Use the environment variable if set
+});
 
 type ServerOptions = {
   port?: number;

@@ -10,6 +10,7 @@ head_sampling_rate = 1
 [vars]
 PORT = "1337"
 EASYNEWS_LOG_LEVEL = "info"
+EASYNEWS_SUMMARIZE_LOGS = "false" # IMPORTANT: You must disable summary logging in Cloudflare Workers
 CLOUDFLARE = "true"
 CACHE_TTL = "6"
 TOTAL_MAX_RESULTS = "500"

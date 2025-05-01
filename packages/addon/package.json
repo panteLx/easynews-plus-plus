@@ -2,10 +2,11 @@
   "name": "easynews-plus-plus-addon",
   "version": "1.0.0",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest watch",
-    "build": "tsc",
+    "build": "tsc --build",
     "prepublish": "npm run build",
     "start": "node dist/server.js",
     "start:dev": "tsx watch src/server.ts"
@@ -16,6 +17,7 @@
   },
   "dependencies": {
     "easynews-plus-plus-api": "file:../api",
+    "easynews-plus-plus-shared": "file:../shared",
     "parse-torrent-title": "^1.4.0",
     "stremio-addon-sdk": "^1.6.10"
   }

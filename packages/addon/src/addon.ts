@@ -11,7 +11,6 @@ import {
   getQuality,
   getSize,
   isBadVideo,
-  logger,
   logError,
   matchesTitle,
   getAlternativeTitles,
@@ -22,6 +21,7 @@ import { publicMetaProvider } from './meta';
 import { Stream } from './types';
 import customTitlesJson from '../../../custom-titles.json';
 import { getUILanguage, translations } from './i18n';
+import { createLogger } from 'easynews-plus-plus-shared';
 
 // Extended configuration interface
 interface AddonConfig {
@@ -35,6 +35,12 @@ interface AddonConfig {
   maxFileSize?: string; // Max file size in GB
   [key: string]: any;
 }
+
+// Create a logger with Addon prefix and explicitly set the level from environment variable
+export const logger = createLogger({
+  prefix: 'Addon',
+  level: process.env.EASYNEWS_LOG_LEVEL || undefined, // Use the environment variable if set
+});
 
 // Helper to create a localized auth error stream
 function authErrorStream(langCode: string) {
@@ -101,8 +107,8 @@ try {
   logger.info(`Successfully loaded ${numCustomTitles} custom titles`);
 
   if (numCustomTitles > 0) {
-    // Log a few examples to verify they're loaded correctly
-    const examples = Object.entries(titlesFromFile).slice(0, 3);
+    // Log an example to verify they're loaded correctly
+    const examples = Object.entries(titlesFromFile).slice(0, 1);
     for (const [original, customTitles] of examples) {
       logger.debug(`Example custom title: "${original}" -> "${customTitles.join('", "')}"`);
     }

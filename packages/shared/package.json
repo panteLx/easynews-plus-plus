@@ -1,0 +1,11 @@
+{
+  "name": "easynews-plus-plus-shared",
+  "version": "1.0.0",
+  "description": "Shared utilities for Easynews++",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc --build",
+    "test": "vitest run --passWithNoTests"
+  }
+}
