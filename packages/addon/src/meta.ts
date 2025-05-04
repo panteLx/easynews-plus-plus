@@ -17,10 +17,17 @@ interface AlternativeTitle {
 
 async function getAlternativeTMDBTitles(
   id: string,
+  type: 'movie' | 'tv',
   language: string,
   apiKey: string
 ): Promise<string[]> {
-  const url = `https://api.themoviedb.org/3/movie/${id}/alternative_titles?country=${language}`;
+  console.log('type', type);
+  //const url = `https://api.themoviedb.org/3/${type}/${id}/alternative_titles?country=${language}`;
+  let url = `https://api.themoviedb.org/3/${type}/${id}/alternative_titles`;
+
+  if (type === 'movie' && language) {
+    url += `?country=${language}`;
+  }
   const options = {
     method: 'GET',
     headers: {
@@ -29,14 +36,19 @@ async function getAlternativeTMDBTitles(
     },
   };
 
-  return fetch(url, options)
-    .then(res => res.json())
-    .then(data => {
-      const alternativeTitles = data.titles
-        .filter((title: AlternativeTitle) => title.iso_3166_1 === language.toUpperCase())
-        .map((title: AlternativeTitle) => title.title);
-      return alternativeTitles;
-    });
+  const response = await fetch(url, options);
+  const data = await response.json();
+
+  let titles: { title: string; iso_3166_1: string }[];
+
+  if (type === 'movie') {
+    titles = data.titles;
+  } else {
+    titles = data.results.filter(
+      (result: AlternativeTitle) => result.iso_3166_1 === language.toUpperCase()
+    );
+  }
+  return titles.map(title => title.title);
 }
 
 async function tmdbMetaProvider(
@@ -75,7 +87,7 @@ async function tmdbMetaProvider(
       const releaseYear =
         result.release_date?.split('-')[0] || result.first_air_date?.split('-')[0];
 
-      return getAlternativeTMDBTitles(result.id, preferredLanguage, apiKey).then(
+      return getAlternativeTMDBTitles(result.id, result.media_type, preferredLanguage, apiKey).then(
         alternativeNames => {
           return {
             name: title,
