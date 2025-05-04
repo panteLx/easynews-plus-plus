@@ -1,4 +1,4 @@
-import { extractDigits, getAlternativeTitles, sanitizeTitle } from './utils';
+import { extractDigits, getAlternativeTitles } from './utils';
 
 export type MetaProviderResponse = {
   name: string;
