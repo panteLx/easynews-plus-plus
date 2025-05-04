@@ -285,6 +285,7 @@ You can configure the addon server using environment variables:
    - `MAX_PAGES`: Maximum number of pages to search
    - `MAX_RESULTS_PER_PAGE`: Maximum results per page
    - `CACHE_TTL`: Cache time-to-live in hours
+   - `TMDB_API_KEY`: TMDB API key for searchin movies and tv shows (**required**)
 
 The easiest way to configure these settings is by copying the `.env.example` file to `.env` in the project root.
 

@@ -15,6 +15,7 @@ import {
   matchesTitle,
   getAlternativeTitles,
   isAuthError,
+  sanitizeTitle,
 } from './utils';
 import { EasynewsAPI, SearchOptions, EasynewsSearchResponse } from 'easynews-plus-plus-api';
 import { publicMetaProvider } from './meta';
@@ -259,7 +260,12 @@ builder.defineStreamHandler(
         `API Sorting: ${sortOptions.sort1} (${sortOptions.sort1Direction}), ${sortOptions.sort2} (${sortOptions.sort2Direction}), ${sortOptions.sort3} (${sortOptions.sort3Direction})`
       );
 
-      const meta = await publicMetaProvider(id, type);
+      const meta = await publicMetaProvider(
+        id,
+        getUILanguage(preferredLang),
+        type,
+        process.env.TMDB_API_KEY
+      );
       logger.info(`Searching for: ${meta.name}`);
 
       // Check if we have a custom title for this title directly
@@ -324,6 +330,7 @@ builder.defineStreamHandler(
         logger.debug(`Adding ${additionalTitles.length} additional titles from partial matches`);
         allTitles = [...allTitles, ...additionalTitles];
       }
+      allTitles = allTitles.map(title => sanitizeTitle(title));
 
       logger.debug(`Will search for ${allTitles.length} titles: ${allTitles.join(', ')}`);
 
