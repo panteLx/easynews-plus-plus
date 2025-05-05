@@ -240,6 +240,11 @@ builder.defineStreamHandler(
       // Initialize with the original title
       let allTitles = [meta.name];
 
+      // Add the original name from meta (if available)
+      if (meta.originalName && meta.originalName !== meta.name) {
+        allTitles.push(meta.originalName);
+      }
+
       // Add any alternative names from meta (if available)
       if (meta.alternativeNames && meta.alternativeNames.length > 0) {
         logger.debug(
@@ -253,7 +258,7 @@ builder.defineStreamHandler(
       // prepare titles for searching
       allTitles = allTitles.map(title => sanitizeTitle(title));
 
-      logger.debug(`Will search for ${allTitles.length} titles: ${allTitles.join(', ')}`);
+      logger.info(`Will search for ${allTitles.length} titles: ${allTitles.join(', ')}`);
 
       // Store all search results here
       const allSearchResults: {
@@ -1168,6 +1173,7 @@ function mapStream({
   preferredLang: string;
 }): Stream {
   logger.debug(`Mapping stream: "${title}" (${fileExtension}, ${size}, ${duration})`);
+  logger.debug(`URL: ${url}`);
 
   const quality = getQuality(title, fullResolution);
 

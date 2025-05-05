@@ -79,7 +79,9 @@ async function tmdbMetaProvider(
 ): Promise<MetaProviderResponse> {
   var [tt, season, episode] = id.split(':');
 
-  const url = `https://api.themoviedb.org/3/find/${tt}?language=${preferredLanguage}&external_source=imdb_id`;
+  // Use the preferred language if provided, otherwise fall back to English
+  const languageParam = preferredLanguage || 'en-US';
+  const url = `https://api.themoviedb.org/3/find/${tt}?language=${languageParam}&external_source=imdb_id`;
 
   const options = {
     method: 'GET',
@@ -105,11 +107,17 @@ async function tmdbMetaProvider(
 
   let alternativeNames: string[] = [];
   try {
+    logger.debug(
+      `Fetching alternative titles for ${result.id} (${result.media_type}) in language ${preferredLanguage}`
+    );
     alternativeNames = await getAlternativeTMDBTitles(
       result.id,
       result.media_type,
       preferredLanguage,
       apiKey
+    );
+    logger.debug(
+      `Found ${alternativeNames.length} alternative titles: ${alternativeNames.join(', ')}`
     );
   } catch (err) {
     logger.warn(`Failed to fetch alternative titles: ${(err as Error).message}`);
