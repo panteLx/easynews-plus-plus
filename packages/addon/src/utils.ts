@@ -107,7 +107,6 @@ export function sanitizeTitle(title: string) {
     .replace(/Ä/g, 'Ae')
     .replace(/Ö/g, 'Oe')
     .replace(/Ü/g, 'Ue')
-    .replace(/ß/g, 'ss')
     // replace common symbols with words
     .replaceAll('&', 'and')
     // replace common separators (., _, -, whitespace) with a single space

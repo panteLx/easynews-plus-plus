@@ -15,7 +15,7 @@ export type MetaProviderResponse = {
   year?: number;
   season?: string;
   episode?: string;
-  tmdbId?: string; // Add TMDB ID for fetching translations
+  tmdbId?: string | null; // Add TMDB ID for fetching translations
 };
 
 // API Key for TMDB - should be added to environment variables in a production app
@@ -182,6 +182,9 @@ async function imdbMetaProvider(
       const originalName = l;
       const alternativeNames = getAlternativeTitles(originalName);
 
+      // Variable to store the actual TMDB ID if we can retrieve it
+      let tmdbId: string | null = null;
+
       // If preferred language is provided, try to get a translated title
       if (preferredLanguage && preferredLanguage !== '') {
         const translatedTitle = await getTMDBTranslatedTitle(tt, preferredLanguage);
@@ -198,7 +201,13 @@ async function imdbMetaProvider(
             alternativeNames.push(sanitizedTitle);
             logger.info(`Added sanitized TMDB title: ${sanitizedTitle}`);
           }
+
+          // Try to get the actual TMDB ID
+          tmdbId = await getTMDBId(tt);
         }
+      } else if (useTMDB) {
+        // Even if we don't need translations, try to get the TMDB ID if TMDB is enabled
+        tmdbId = await getTMDBId(tt);
       }
 
       return {
@@ -208,9 +217,46 @@ async function imdbMetaProvider(
         year: y,
         season,
         episode,
-        tmdbId: tt,
+        tmdbId, // Use the actual TMDB ID if available
       };
     });
+}
+
+/**
+ * Helper function to get TMDB ID from IMDb ID
+ */
+async function getTMDBId(imdbId: string): Promise<string | null> {
+  if (!useTMDB) {
+    return null;
+  }
+
+  try {
+    const findResponse = await fetch(
+      `https://api.themoviedb.org/3/find/${imdbId}?api_key=${TMDB_API_KEY}&external_source=imdb_id`
+    );
+
+    if (!findResponse.ok) {
+      logger.error(`TMDB API error: ${findResponse.status}`);
+      return null;
+    }
+
+    const findData = await findResponse.json();
+
+    // Check if we found a movie or TV show
+    const isMovie = findData.movie_results && findData.movie_results.length > 0;
+    const isTVShow = findData.tv_results && findData.tv_results.length > 0;
+
+    if (!isMovie && !isTVShow) {
+      return null;
+    }
+
+    // Get the TMDB ID
+    const tmdbId = isMovie ? findData.movie_results[0].id : findData.tv_results[0].id;
+    return tmdbId.toString();
+  } catch (error) {
+    logger.error(`Error fetching TMDB ID for ${imdbId}: ${error}`);
+    return null;
+  }
 }
 
 async function cinemetaMetaProvider(
@@ -231,9 +277,12 @@ async function cinemetaMetaProvider(
       const originalName = name;
       const alternativeNames = getAlternativeTitles(originalName);
 
+      // Variable to store the actual TMDB ID if we can retrieve it
+      let tmdbId: string | null = null;
+
       // If preferred language is provided, try to get a translated title
       if (preferredLanguage && preferredLanguage !== '') {
-        return getTMDBTranslatedTitle(tt, preferredLanguage).then(translatedTitle => {
+        return getTMDBTranslatedTitle(tt, preferredLanguage).then(async translatedTitle => {
           if (translatedTitle) {
             // Add both original translated title and sanitized version
             if (!alternativeNames.includes(translatedTitle)) {
@@ -247,6 +296,12 @@ async function cinemetaMetaProvider(
               alternativeNames.push(sanitizedTitle);
               logger.debug(`Added sanitized TMDB title: ${sanitizedTitle}`);
             }
+
+            // Try to get the actual TMDB ID
+            tmdbId = await getTMDBId(tt);
+          } else if (useTMDB) {
+            // Even if we don't need translations, try to get the TMDB ID if TMDB is enabled
+            tmdbId = await getTMDBId(tt);
           }
 
           return {
@@ -256,7 +311,22 @@ async function cinemetaMetaProvider(
             year,
             episode,
             season,
-            tmdbId: tt,
+            tmdbId, // Use the actual TMDB ID if available
+          } satisfies MetaProviderResponse;
+        });
+      }
+
+      // If no language preference, still try to get TMDB ID if enabled
+      if (useTMDB) {
+        return getTMDBId(tt).then(id => {
+          return {
+            name,
+            originalName,
+            alternativeNames,
+            year,
+            episode,
+            season,
+            tmdbId: id, // Use the actual TMDB ID if available
           } satisfies MetaProviderResponse;
         });
       }
@@ -268,7 +338,7 @@ async function cinemetaMetaProvider(
         year,
         episode,
         season,
-        tmdbId: tt,
+        tmdbId: null,
       } satisfies MetaProviderResponse;
     });
 }
