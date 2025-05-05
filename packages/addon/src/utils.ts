@@ -6,9 +6,6 @@ import path from 'path';
 import dotenv from 'dotenv';
 import { createLogger } from 'easynews-plus-plus-shared';
 
-// Import the custom titles JSON directly
-import customTitlesJson from '../../../custom-titles.json';
-
 // Load .env file to ensure we have all environment variables
 function loadEnv() {
   // Skip .env loading for Cloudflare Workers environment
@@ -442,59 +439,6 @@ export function extractDigits(value: string) {
   }
 
   return undefined;
-}
-
-/**
- * Gets potential alternative titles based on the original title
- * @param title The original title
- * @param customTitlesInput Optional custom titles object
- * @returns Array of potential alternative titles including the original one
- */
-export function getAlternativeTitles(
-  title: string,
-  customTitlesInput: Record<string, string[]> = customTitlesJson
-): string[] {
-  logger.debug(`Getting alternative titles for: "${title}"`);
-
-  // Start with an empty array
-  const alternatives: string[] = [title];
-
-  // Check direct match first
-  if (customTitlesInput[title]) {
-    logger.debug(`Found direct match in custom titles for: "${title}"`);
-    alternatives.push(...customTitlesInput[title]);
-  }
-
-  // Then check partial matches
-  for (const [key, values] of Object.entries(customTitlesInput)) {
-    // Skip direct matches that we've already handled
-    if (key === title) continue;
-
-    // Check if either string contains the other
-    if (
-      title.toLowerCase().includes(key.toLowerCase()) ||
-      key.toLowerCase().includes(title.toLowerCase())
-    ) {
-      logger.debug(`Found partial match between "${title}" and "${key}"`);
-
-      // Check if any of these alternatives are already in our list
-      const newValues = values.filter(v => !alternatives.includes(v));
-      if (newValues.length > 0) {
-        logger.debug(
-          `Adding ${newValues.length} new alternatives from partial match: ${newValues.join(', ')}`
-        );
-        alternatives.push(...newValues);
-      }
-    }
-  }
-
-  if (alternatives.length > 1) {
-    logger.debug(`Found ${alternatives.length - 1} alternative titles for "${title}"`);
-  } else {
-    logger.debug(`No alternative titles found for "${title}"`);
-  }
-
-  return alternatives;
 }
 
 /**

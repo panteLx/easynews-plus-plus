@@ -13,14 +13,12 @@ import {
   isBadVideo,
   logError,
   matchesTitle,
-  getAlternativeTitles,
   isAuthError,
   sanitizeTitle,
 } from './utils';
 import { EasynewsAPI, SearchOptions, EasynewsSearchResponse } from 'easynews-plus-plus-api';
 import { publicMetaProvider } from './meta';
 import { Stream } from './types';
-import customTitlesJson from '../../../custom-titles.json';
 import { getUILanguage, translations } from './i18n';
 import { createLogger } from 'easynews-plus-plus-shared';
 
@@ -91,37 +89,6 @@ function getFromCache<T>(key: string): T | null {
 
 function setCache<T>(key: string, data: T): void {
   requestCache.set(key, { data, timestamp: Date.now() });
-}
-
-// Load custom titles
-let titlesFromFile: Record<string, string[]> = {};
-let loadedPath = '';
-
-try {
-  // Always use the imported JSON by default
-  logger.debug('Loading custom titles from imported custom-titles.json');
-  titlesFromFile = customTitlesJson;
-  loadedPath = 'imported';
-
-  // Log some details about the loaded custom titles
-  const numCustomTitles = Object.keys(titlesFromFile).length;
-  logger.info(`Successfully loaded ${numCustomTitles} custom titles`);
-
-  if (numCustomTitles > 0) {
-    // Log an example to verify they're loaded correctly
-    const examples = Object.entries(titlesFromFile).slice(0, 1);
-    for (const [original, customTitles] of examples) {
-      logger.debug(`Example custom title: "${original}" -> "${customTitles.join('", "')}"`);
-    }
-  } else {
-    logger.warn(
-      'No custom titles were loaded from the file. The file might be empty or have invalid format.'
-    );
-  }
-} catch (error) {
-  logger.error('Error loading custom titles file:', error);
-  logger.info('Using imported custom titles as fallback');
-  titlesFromFile = customTitlesJson;
 }
 
 // Import custom template for landing page
@@ -224,13 +191,6 @@ builder.defineStreamHandler(
         logger.info(`Max file size: ${maxFileSizeGB === 0 ? 'No limit' : maxFileSizeGB + ' GB'}`);
       }
 
-      // Use custom titles from custom-titles.json
-      const customTitles = { ...titlesFromFile };
-
-      logger.debug(
-        `Using ${Object.keys(customTitles).length} custom titles from custom-titles.json`
-      );
-
       if (!config.sortingPreference) {
         logger.info(`Using default sortingPreference: ${sortingPreference}`);
       } else {
@@ -268,27 +228,6 @@ builder.defineStreamHandler(
       );
       logger.info(`Searching for: ${meta.name}`);
 
-      // Check if we have a custom title for this title directly
-      if (customTitles[meta.name]) {
-        logger.info(
-          `Direct custom title found for "${meta.name}": "${customTitles[meta.name].join('", "')}"`
-        );
-      } else {
-        logger.info(`No direct custom title found for "${meta.name}", checking partial matches`);
-
-        // Look for partial matches in title keys
-        for (const [key, values] of Object.entries(customTitles)) {
-          if (
-            meta.name.toLowerCase().includes(key.toLowerCase()) ||
-            key.toLowerCase().includes(meta.name.toLowerCase())
-          ) {
-            logger.debug(
-              `Possible title match: "${meta.name}" ~ "${key}" -> "${values.join('", "')}"`
-            );
-          }
-        }
-      }
-
       // Initialize the API with user credentials
       let api;
       try {
@@ -298,18 +237,8 @@ builder.defineStreamHandler(
         return authErrorStream(config.preferredLanguage || '');
       }
 
-      logger.debug(`Getting alternative titles for: ${meta.name}`);
-
       // Initialize with the original title
       let allTitles = [meta.name];
-
-      // Add any direct custom titles found in customTitles
-      if (customTitles[meta.name] && customTitles[meta.name].length > 0) {
-        logger.debug(
-          `Adding direct custom titles for "${meta.name}": "${customTitles[meta.name].join('", "')}"`
-        );
-        allTitles = [...allTitles, ...customTitles[meta.name]];
-      }
 
       // Add any alternative names from meta (if available)
       if (meta.alternativeNames && meta.alternativeNames.length > 0) {
@@ -321,15 +250,7 @@ builder.defineStreamHandler(
         allTitles = [...allTitles, ...newAlternatives];
       }
 
-      // Use getAlternativeTitles to find additional matches (like partial matches)
-      const additionalTitles = getAlternativeTitles(meta.name, customTitles).filter(
-        alt => !allTitles.includes(alt) && alt !== meta.name
-      );
-
-      if (additionalTitles.length > 0) {
-        logger.debug(`Adding ${additionalTitles.length} additional titles from partial matches`);
-        allTitles = [...allTitles, ...additionalTitles];
-      }
+      // prepare titles for searching
       allTitles = allTitles.map(title => sanitizeTitle(title));
 
       logger.debug(`Will search for ${allTitles.length} titles: ${allTitles.join(', ')}`);

@@ -1,4 +1,11 @@
-import { extractDigits, getAlternativeTitles } from './utils';
+import { extractDigits } from './utils';
+import { createLogger } from 'easynews-plus-plus-shared';
+
+// Create a logger with metadata prefix and explicitly set the level from environment variable
+export const logger = createLogger({
+  prefix: 'Metadata',
+  level: process.env.EASYNEWS_LOG_LEVEL || undefined, // Use the environment variable if set
+});
 
 export type MetaProviderResponse = {
   name: string;
@@ -15,16 +22,19 @@ interface AlternativeTitle {
   type: string;
 }
 
+/**
+ * Fetches foreign titles from TMDB.
+ */
 async function getAlternativeTMDBTitles(
   id: string,
   type: 'movie' | 'tv',
   language: string,
   apiKey: string
 ): Promise<string[]> {
-  console.log('type', type);
-  //const url = `https://api.themoviedb.org/3/${type}/${id}/alternative_titles?country=${language}`;
   let url = `https://api.themoviedb.org/3/${type}/${id}/alternative_titles`;
 
+  // If the type is movie, we can add the country code as a query parameter
+  // to get the foreign titles for that country
   if (type === 'movie' && language) {
     url += `?country=${language}`;
   }
@@ -40,17 +50,28 @@ async function getAlternativeTMDBTitles(
   const data = await response.json();
 
   let titles: { title: string; iso_3166_1: string }[];
-
+  if (!data) {
+    logger.warn('No data found for TMDB alternative titles');
+    return [];
+  } else if (data.status_code === 34) {
+    logger.warn('TMDB error: No results found');
+    return [];
+  }
+  // If the type is movie, we can get the titles from the data
+  // If the type is tv, we need to filter the results by the language
   if (type === 'movie') {
-    titles = data.titles;
+    titles = data.titles || [];
   } else {
-    titles = data.results.filter(
+    titles = (data.results || []).filter(
       (result: AlternativeTitle) => result.iso_3166_1 === language.toUpperCase()
     );
   }
   return titles.map(title => title.title);
 }
 
+/**
+ * Fetches metadata from TMDB.
+ */
 async function tmdbMetaProvider(
   id: string,
   preferredLanguage: string,
@@ -68,40 +89,45 @@ async function tmdbMetaProvider(
     },
   };
 
-  return fetch(url, options)
-    .then(res => res.json())
-    .then(data => {
-      const result =
-        data.movie_results && data.movie_results.length > 0
-          ? data.movie_results[0]
-          : data.tv_results && data.tv_results.length > 0
-            ? data.tv_results[0]
-            : null;
+  const res = await fetch(url, options);
+  const data = await res.json();
 
-      if (!result) {
-        throw new Error(`No results found for IMDB ID ${id}`);
-      }
+  const result = data.movie_results?.[0] ?? data.tv_results?.[0] ?? null;
 
-      const title = result.title || result.name;
-      const originalTitle = result.original_title || result.original_name;
-      const releaseYear =
-        result.release_date?.split('-')[0] || result.first_air_date?.split('-')[0];
+  if (!result) {
+    throw new Error(`No TMDB results found for IMDB ID ${id}`);
+  }
 
-      return getAlternativeTMDBTitles(result.id, result.media_type, preferredLanguage, apiKey).then(
-        alternativeNames => {
-          return {
-            name: title,
-            originalName: originalTitle,
-            alternativeNames,
-            year: parseInt(releaseYear),
-            season,
-            episode,
-          };
-        }
-      );
-    });
+  const title = result.title || result.name;
+  const originalTitle = result.original_title || result.original_name;
+  const releaseDate = result.release_date || result.first_air_date;
+  const releaseYear = releaseDate?.split('-')[0];
+
+  let alternativeNames: string[] = [];
+  try {
+    alternativeNames = await getAlternativeTMDBTitles(
+      result.id,
+      result.media_type,
+      preferredLanguage,
+      apiKey
+    );
+  } catch (err) {
+    logger.warn(`Failed to fetch alternative titles: ${(err as Error).message}`);
+  }
+
+  return {
+    name: title,
+    originalName: originalTitle,
+    alternativeNames,
+    year: parseInt(releaseYear),
+    season,
+    episode,
+  };
 }
 
+/**
+ * Fetches metadata from IMDB.
+ */
 async function imdbMetaProvider(id: string): Promise<MetaProviderResponse> {
   var [tt, season, episode] = id.split(':');
 
@@ -111,9 +137,9 @@ async function imdbMetaProvider(id: string): Promise<MetaProviderResponse> {
       return json.d.find((item: { id: string }) => item.id === tt);
     })
     .then(({ l, y }) => {
-      // Get original name and potential custom titles
+      // Get original name
       const originalName = l;
-      const alternativeNames = getAlternativeTitles(originalName);
+      const alternativeNames: string[] = [];
 
       return {
         name: originalName,
@@ -126,6 +152,9 @@ async function imdbMetaProvider(id: string): Promise<MetaProviderResponse> {
     });
 }
 
+/**
+ * Fetches metadata from Cinemeta.
+ */
 async function cinemetaMetaProvider(id: string, type: string): Promise<MetaProviderResponse> {
   var [tt, season, episode] = id.split(':');
 
@@ -138,7 +167,7 @@ async function cinemetaMetaProvider(id: string, type: string): Promise<MetaProvi
 
       // Get original name and potential custom titles
       const originalName = name;
-      const alternativeNames = getAlternativeTitles(originalName);
+      const alternativeNames: string[] = [];
 
       return {
         name,
@@ -158,21 +187,22 @@ export async function publicMetaProvider(
   id: string,
   preferredLanguage: string,
   type: string,
-  apiKey: string = ''
+  apiKey?: string
 ): Promise<MetaProviderResponse> {
-  return tmdbMetaProvider(id, preferredLanguage, apiKey)
-    .then(meta => {
-      if (meta.name) {
-        return meta;
-      }
+  if (apiKey) {
+    const tmdbMeta = await tmdbMetaProvider(id, preferredLanguage, apiKey);
+    if (tmdbMeta?.name) return tmdbMeta;
+    logger.warn('TMDB failed, falling back to IMDB');
+  } else {
+    logger.warn('No TMDB API key provided, skipping TMDB and trying IMDB');
+  }
+  logger.warn('TMDB failed, falling back to IMDB (no foreign titles)');
+  const imdbMeta = await imdbMetaProvider(id);
+  if (imdbMeta?.name) return imdbMeta;
 
-      return cinemetaMetaProvider(id, type);
-    })
-    .then(meta => {
-      if (meta.name) {
-        return meta;
-      }
+  logger.warn('IMDB failed, falling back to Cinemeta');
+  const cinemetaMeta = await cinemetaMetaProvider(id, type);
+  if (cinemetaMeta?.name) return cinemetaMeta;
 
-      throw new Error('Failed to find metadata');
-    });
+  throw new Error('Failed to find metadata');
 }
