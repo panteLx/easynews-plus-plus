@@ -1,5 +1,5 @@
 import { Manifest, ContentType } from 'stremio-addon-sdk';
-import { translations, DEFAULT_LANGUAGE } from './i18n';
+import { translations, DEFAULT_LANGUAGE, LANGUAGE_DISPLAY_NAMES } from './i18n';
 
 import { version, description } from '../../../package.json';
 
@@ -9,40 +9,7 @@ const englishTranslations = translations[DEFAULT_LANGUAGE];
 // Language options for the preferred language selector
 const languageOptions = {
   '': englishTranslations.languages.noPreference,
-  // Core languages with UI translations
-  eng: englishTranslations.languages.english,
-  ger: englishTranslations.languages.german,
-  spa: englishTranslations.languages.spanish,
-  fre: englishTranslations.languages.french,
-  ita: englishTranslations.languages.italian,
-  jpn: englishTranslations.languages.japanese,
-  por: englishTranslations.languages.portuguese,
-  rus: englishTranslations.languages.russian,
-  kor: englishTranslations.languages.korean,
-  chi: englishTranslations.languages.chinese,
-  dut: englishTranslations.languages.dutch,
-  rum: englishTranslations.languages.romanian,
-  bul: englishTranslations.languages.bulgarian,
-  // Additional language options for audio selection (without UI translations)
-  ara: 'Arabic (العربية)',
-  cze: 'Czech (Čeština)',
-  dan: 'Danish (Dansk)',
-  fin: 'Finnish (Suomi)',
-  gre: 'Greek (Ελληνικά)',
-  heb: 'Hebrew (עברית)',
-  hin: 'Hindi (हिन्दी)',
-  hun: 'Hungarian (Magyar)',
-  ice: 'Icelandic (Íslenska)',
-  ind: 'Indonesian (Bahasa Indonesia)',
-  may: 'Malay (Bahasa Melayu)',
-  nor: 'Norwegian (Norsk)',
-  per: 'Persian (فارسی)',
-  pol: 'Polish (Polski)',
-  swe: 'Swedish (Svenska)',
-  tha: 'Thai (ไทย)',
-  tur: 'Turkish (Türkçe)',
-  ukr: 'Ukrainian (Українська)',
-  vie: 'Vietnamese (Tiếng Việt)',
+  ...LANGUAGE_DISPLAY_NAMES,
 } as any;
 
 // Sorting preference options
@@ -54,7 +21,7 @@ const sortingOptions = {
   default: 'quality_first',
 } as any;
 
-// Create UI language options
+// Create UI language options from the core languages
 const uiLanguageOptions = {
   eng: 'English',
   ger: 'Deutsch (German)',
