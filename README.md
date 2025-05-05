@@ -40,6 +40,7 @@
 
 - Sophisticated title matching with percentage-based similarity for multi-word titles
 - Custom title support for enhanced content discovery
+- TMDB integration for localized title search in preferred language
 - Comprehensive support for various naming conventions and special characters
 - Advanced content filtering (removes samples, broken files, etc.)
 - Multiple fallback search strategies for challenging content
@@ -114,7 +115,7 @@
 #### ⚠️ **Partially Supported or Untested:**
 
 - Stremio:
-  - macOS
+  - macOS (there may be issues with the internal player)
   - Android TV (when using a different player than ExoPlayer)
   - Android Mobile (stable)
   - Steam Deck
@@ -285,6 +286,8 @@ You can configure the addon server using environment variables:
    - `MAX_PAGES`: Maximum number of pages to search
    - `MAX_RESULTS_PER_PAGE`: Maximum results per page
    - `CACHE_TTL`: Cache time-to-live in hours
+5. **TMDB Integration**:
+   - `TMDB_API_KEY`: TMDB API key for translated title search
 
 The easiest way to configure these settings is by copying the `.env.example` file to `.env` in the project root.
 
@@ -312,14 +315,16 @@ The title matching system uses several advanced techniques:
 
 When strict matching is enabled, only exact title matches are returned. When disabled, the addon uses smart matching to find related content. By default, strict matching is enabled.
 
-### How does the custom title system work?
+### How does the custom title & TMDB integration system work?
 
-The custom title system helps find content with alternative titles or translations:
+The custom title & TMDB integration system helps find content with alternative titles or translations:
 
-1. Original titles are combined with custom translations
+1. Original titles are combined with custom translations and TMDB translations
 2. Additional titles from metadata are incorporated
-3. Partial matching enables finding related content
-4. Self-hosted users can add custom titles via custom-titles.json
+3. TMDB API integration fetches localized titles in your preferred language
+4. Translated titles are automatically sanitized for improved search accuracy
+5. Partial matching enables finding related content
+6. Self-hosted users can add custom titles via custom-titles.json
 
 > [!NOTE]  
 > To add custom titles to the public instance, please create a new issue with your suggestions.

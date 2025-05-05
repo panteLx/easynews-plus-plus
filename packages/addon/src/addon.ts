@@ -259,7 +259,7 @@ builder.defineStreamHandler(
         `API Sorting: ${sortOptions.sort1} (${sortOptions.sort1Direction}), ${sortOptions.sort2} (${sortOptions.sort2Direction}), ${sortOptions.sort3} (${sortOptions.sort3Direction})`
       );
 
-      const meta = await publicMetaProvider(id, type);
+      const meta = await publicMetaProvider(id, type, preferredLanguage);
       logger.info(`Searching for: ${meta.name}`);
 
       // Check if we have a custom title for this title directly

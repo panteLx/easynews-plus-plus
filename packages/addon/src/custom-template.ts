@@ -107,6 +107,7 @@ function landingTemplate(manifest: Manifest): string {
       return {
         ...field,
         title: translations.form.preferredLanguage,
+        hint: translations.form.preferredLanguageHint,
         options: Object.keys(translatedOptions).length > 0 ? translatedOptions : field.options,
       };
     }

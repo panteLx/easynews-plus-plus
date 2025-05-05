@@ -178,4 +178,8 @@ logger.info(`TOTAL_MAX_RESULTS: ${process.env.TOTAL_MAX_RESULTS || 'undefined'}`
 logger.info(`MAX_PAGES: ${process.env.MAX_PAGES || 'undefined'}`);
 logger.info(`MAX_RESULTS_PER_PAGE: ${process.env.MAX_RESULTS_PER_PAGE || 'undefined'}`);
 logger.info(`CACHE_TTL: ${process.env.CACHE_TTL || 'undefined'}`);
+
+// Log if TMDB is enabled
+logger.info('--- TMDB configuration ---');
+logger.info(`TMDB Integration: ${process.env.TMDB_API_KEY ? 'Enabled' : 'Disabled'}`);
 logger.info('--- End of configuration ---');

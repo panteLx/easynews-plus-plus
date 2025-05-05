@@ -37,6 +37,7 @@ type TranslationKeys = {
     strictTitleMatching: string;
     strictTitleMatchingHint: string;
     preferredLanguage: string;
+    preferredLanguageHint: string;
     sortingMethod: string;
     sortingMethodHint: string;
     uiLanguage: string;
@@ -101,6 +102,69 @@ export const ISO_TO_LANGUAGE: Record<string, Language> = {
   bul: 'bg',
   // Default to English if not found
   '': 'en',
+};
+
+// Additional ISO 639-2 to ISO 639-1 mappings for languages not in our UI
+export const ADDITIONAL_LANGUAGE_CODES: Record<string, string> = {
+  ara: 'ar', // Arabic
+  cze: 'cs', // Czech
+  dan: 'da', // Danish
+  fin: 'fi', // Finnish
+  gre: 'el', // Greek
+  heb: 'he', // Hebrew
+  hin: 'hi', // Hindi
+  hun: 'hu', // Hungarian
+  ice: 'is', // Icelandic
+  ind: 'id', // Indonesian
+  may: 'ms', // Malay
+  nor: 'no', // Norwegian
+  per: 'fa', // Persian
+  pol: 'pl', // Polish
+  swe: 'sv', // Swedish
+  tha: 'th', // Thai
+  tur: 'tr', // Turkish
+  ukr: 'uk', // Ukrainian
+  vie: 'vi', // Vietnamese
+};
+
+// Full display names for all supported languages (both UI and additional)
+export const LANGUAGE_DISPLAY_NAMES: Record<string, string> = {
+  // Core languages with UI translations
+  eng: 'English',
+  ger: 'Deutsch (German)',
+  spa: 'Español (Spanish)',
+  fre: 'Français (French)',
+  ita: 'Italiano (Italian)',
+  jpn: '日本語 (Japanese)',
+  por: 'Português (Portuguese)',
+  rus: 'Русский (Russian)',
+  kor: '한국어 (Korean)',
+  chi: '中文 (Chinese)',
+  dut: 'Nederlands (Dutch)',
+  rum: 'Română (Romanian)',
+  bul: 'Български (Bulgarian)',
+  // Additional languages without UI translations
+  ara: 'Arabic (العربية)',
+  cze: 'Czech (Čeština)',
+  dan: 'Danish (Dansk)',
+  fin: 'Finnish (Suomi)',
+  gre: 'Greek (Ελληνικά)',
+  heb: 'Hebrew (עברית)',
+  hin: 'Hindi (हिन्दी)',
+  hun: 'Hungarian (Magyar)',
+  ice: 'Icelandic (Íslenska)',
+  ind: 'Indonesian (Bahasa Indonesia)',
+  may: 'Malay (Bahasa Melayu)',
+  nor: 'Norwegian (Norsk)',
+  per: 'Persian (فارسی)',
+  pol: 'Polish (Polski)',
+  swe: 'Swedish (Svenska)',
+  tha: 'Thai (ไทย)',
+  tur: 'Turkish (Türkçe)',
+  ukr: 'Ukrainian (Українська)',
+  vie: 'Vietnamese (Tiếng Việt)',
+  // Empty string for "no preference" option
+  '': 'No preference',
 };
 
 // Language to ISO mapping (reverse of above)
@@ -181,6 +245,8 @@ export const translations: Translations = {
       strictTitleMatchingHint:
         "Recommended: Filters out results that don't exactly match the movie or series title",
       preferredLanguage: 'Preferred Audio Language',
+      preferredLanguageHint:
+        'Used to find and prioritize content with localized titles in the preferred language',
       sortingMethod: 'Sorting Method',
       sortingMethodHint:
         'All options use the same relevance-first API search, then sort results locally',
@@ -239,6 +305,8 @@ export const translations: Translations = {
       strictTitleMatchingHint:
         'Empfohlen: Filtert Ergebnisse heraus, die nicht exakt mit dem Film- oder Serientitel übereinstimmen',
       preferredLanguage: 'Bevorzugte Audiosprache',
+      preferredLanguageHint:
+        'Wird verwendet, um Inhalte mit lokalisierten Titeln in der bevorzugten Sprache zu finden und zu priorisieren',
       sortingMethod: 'Sortiermethode',
       sortingMethodHint:
         'Alle Optionen verwenden die gleiche relevanz-basierte API-Suche und sortieren die Ergebnisse dann lokal',
@@ -297,6 +365,8 @@ export const translations: Translations = {
       strictTitleMatchingHint:
         'Recomendado: Filtra resultados que no coincidan exactamente con el título de la película o serie',
       preferredLanguage: 'Idioma de audio preferido',
+      preferredLanguageHint:
+        'Se utiliza para encontrar y priorizar contenido con títulos localizados en el idioma preferido',
       sortingMethod: 'Método de clasificación',
       sortingMethodHint:
         'Todas las opciones utilizan la misma búsqueda API basada en relevancia y luego ordenan los resultados localmente',
@@ -355,6 +425,8 @@ export const translations: Translations = {
       strictTitleMatchingHint:
         'Recommandé: Filtre les résultats qui ne correspondent pas exactement au titre du film ou de la série',
       preferredLanguage: 'Langue audio préférée',
+      preferredLanguageHint:
+        'Utilisé pour trouver et prioriser le contenu avec des titres localisés dans la langue préférée',
       sortingMethod: 'Méthode de tri',
       sortingMethodHint:
         'Toutes les options utilisent la même recherche API basée sur la pertinence puis trient les résultats localement',
@@ -413,6 +485,8 @@ export const translations: Translations = {
       strictTitleMatchingHint:
         'Consigliato: Filtra i risultati che non corrispondono esattamente al titolo del film o della serie',
       preferredLanguage: 'Lingua audio preferita',
+      preferredLanguageHint:
+        'Utilizzato per trovare e dare priorità ai contenuti con titoli localizzati nella lingua preferita',
       sortingMethod: 'Metodo di ordinamento',
       sortingMethodHint:
         'Tutte le opzioni utilizzano la stessa ricerca API basata sulla rilevanza e poi ordinano i risultati localmente',
@@ -471,6 +545,8 @@ export const translations: Translations = {
       strictTitleMatchingHint:
         '推奨：映画やシリーズのタイトルに正確に一致しない結果をフィルタリングします',
       preferredLanguage: '優先する音声言語',
+      preferredLanguageHint:
+        '優先言語でローカライズされたタイトルのコンテンツを検索して優先するために使用されます',
       sortingMethod: '並べ替え方法',
       sortingMethodHint:
         'すべてのオプションは同じ関連性ベースのAPI検索を使用し、結果をローカルで並べ替えます',
@@ -529,6 +605,8 @@ export const translations: Translations = {
       strictTitleMatchingHint:
         'Recomendado: Filtra resultados que não correspondam exatamente ao título do filme ou série',
       preferredLanguage: 'Idioma de áudio preferido',
+      preferredLanguageHint:
+        'Usado para encontrar e priorizar conteúdo com títulos localizados no idioma preferido',
       sortingMethod: 'Método de classificação',
       sortingMethodHint:
         'Todas as opções usam a mesma pesquisa API baseada em relevância e depois classificam os resultados localmente',
@@ -587,6 +665,8 @@ export const translations: Translations = {
       strictTitleMatchingHint:
         'Рекомендуется: Фильтрует результаты, которые не точно соответствуют названию фильма или сериала',
       preferredLanguage: 'Предпочтительный язык аудио',
+      preferredLanguageHint:
+        'Используется для поиска и приоритизации контента с локализованными названиями на предпочтительном языке',
       sortingMethod: 'Метод сортировки',
       sortingMethodHint:
         'Все варианты используют один и тот же поиск по API на основе релевантности, а затем сортируют результаты локально',
@@ -645,6 +725,8 @@ export const translations: Translations = {
       strictTitleMatchingHint:
         '권장: 영화나 시리즈 제목과 정확히 일치하지 않는 결과를 필터링합니다',
       preferredLanguage: '선호하는 오디오 언어',
+      preferredLanguageHint:
+        '선호하는 언어로 현지화된 제목이 있는 콘텐츠를 찾고 우선시하는 데 사용됩니다',
       sortingMethod: '정렬 방법',
       sortingMethodHint:
         '모든 옵션은 동일한 관련성 기반 API 검색을 사용한 다음 결과를 로컬에서 정렬합니다',
@@ -702,6 +784,7 @@ export const translations: Translations = {
       strictTitleMatching: '严格标题匹配',
       strictTitleMatchingHint: '推荐：过滤掉与电影或剧集标题不完全匹配的结果',
       preferredLanguage: '首选音频语言',
+      preferredLanguageHint: '用于查找和优先显示具有首选语言本地化标题的内容',
       sortingMethod: '排序方法',
       sortingMethodHint: '所有选项都使用相同的基于相关性的API搜索，然后在本地对结果进行排序',
       uiLanguage: 'UI 语言',
@@ -758,6 +841,8 @@ export const translations: Translations = {
       strictTitleMatchingHint:
         'Aanbevolen: Filtert resultaten die niet exact overeenkomen met de film- of serie-titel',
       preferredLanguage: 'Voorgestelde audiolanguage',
+      preferredLanguageHint:
+        'Wordt gebruikt om inhoud met gelokaliseerde titels in de voorkeurstaal te vinden en voorrang te geven',
       sortingMethod: 'Sorteermethode',
       sortingMethodHint:
         'Alle opties gebruiken dezelfde relevantie-gebaseerde API-zoekopdracht en sorteren vervolgens de resultaten lokaal',
@@ -816,6 +901,8 @@ export const translations: Translations = {
       strictTitleMatchingHint:
         'Recomandat: Filtrează rezultatele care nu se potrivesc exact cu titlul filmului sau serialului',
       preferredLanguage: 'Limbă audio preferată',
+      preferredLanguageHint:
+        'Utilizat pentru a găsi și prioritiza conținutul cu titluri localizate în limba preferată',
       sortingMethod: 'Metodă de sortare',
       sortingMethodHint:
         'Toate opțiunile folosesc aceeași căutare API bazată pe relevanță și apoi sortează rezultatele local',
@@ -874,6 +961,8 @@ export const translations: Translations = {
       strictTitleMatchingHint:
         'Препоръчително: Филтрира резултати, които не съвпадат точно със заглавието на филма или сериала',
       preferredLanguage: 'Предпочитан аудио език',
+      preferredLanguageHint:
+        'Използва се за намиране и приоритизиране на съдържание с локализирани заглавия на предпочитания език',
       sortingMethod: 'Метод на сортиране',
       sortingMethodHint:
         'Всички опции използват едно и също търсене на API базирано на релевантност и след това сортират резултатите локално',
