@@ -14,7 +14,7 @@
   },
   "description": "Addon package for Easynews++",
   "devDependencies": {
-    "@types/stremio-addon-sdk": "^1.6.11"
+    "@types/stremio-addon-sdk": "^1.6.12"
   },
   "dependencies": {
     "easynews-plus-plus-api": "file:../api",
