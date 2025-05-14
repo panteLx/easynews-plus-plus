@@ -94,7 +94,7 @@ function serveHTTP(addonInterface: AddonInterface, opts: ServerOptions = {}) {
     }
   });
 
-  // Proxy endpoint for stream requests
+  // Resolve endpoint for stream requests
   app.get(
     '/resolve',
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -114,7 +114,8 @@ function serveHTTP(addonInterface: AddonInterface, opts: ServerOptions = {}) {
         return;
       }
       
-      // Only accept Base64-URL with hostname easynews.com
+      // Only accept hosts under easynews.com
+      const parsed = new URL(targetUrl);
       const host = parsed.hostname.toLowerCase();
       if (!host.endsWith('easynews.com')) {
         res.status(403).send('Domain not allowed');
@@ -122,7 +123,6 @@ function serveHTTP(addonInterface: AddonInterface, opts: ServerOptions = {}) {
       }
       
       // Extract and remove credentials
-      const parsed = new URL(targetUrl);
       const username = parsed.searchParams.get('u') || '';
       const password = parsed.searchParams.get('p') || '';
       parsed.searchParams.delete('u');
