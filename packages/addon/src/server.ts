@@ -1,7 +1,8 @@
 import express, { Request, Response, NextFunction } from 'express';
 import { AddonInterface } from 'stremio-addon-sdk';
-import axios from 'axios';
 import { Buffer } from 'buffer';
+import { http, https } from 'follow-redirects';
+import { IncomingMessage } from 'http';
 import path from 'path';
 // Import getRouter manually since TypeScript definitions are incomplete
 // @ts-ignore
@@ -93,73 +94,68 @@ function serveHTTP(addonInterface: AddonInterface, opts: ServerOptions = {}) {
       res.end(landingHTML);
     }
   });
-
+  
   // Resolve endpoint for stream requests
-  app.get(
-    '/resolve',
-    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-      // Expect a base64-encoded URL in the `url` query parameter
-      const encoded = req.query.url as string;
-      if (!encoded) {
-        res.status(400).send('Missing url parameter');
-        return;
-      }
-      
-      let targetUrl: string;
-      try {
-        // Decode the Base64 payload back into the Easynews URL with credentials as query-params
-        targetUrl = Buffer.from(encoded, 'base64').toString('utf-8');
-      } catch {
-        res.status(400).send('Invalid url encoding');
-        return;
-      }
-      
-      // Only accept hosts under easynews.com
-      const parsed = new URL(targetUrl);
-      const host = parsed.hostname.toLowerCase();
-      if (!host.endsWith('easynews.com')) {
-        res.status(403).send('Domain not allowed');
-        return;
-      }
-      
-      // Extract and remove credentials
-      const username = parsed.searchParams.get('u') || '';
-      const password = parsed.searchParams.get('p') || '';
-      parsed.searchParams.delete('u');
-      parsed.searchParams.delete('p');
-      const cleanUrl = parsed.toString();
-      
-      try {
-        // Perform a GET that follows redirects to the final URL (we only need headers)
-        const upstream = await axios.get(cleanUrl, {
-          auth: { username, password },
-          maxRedirects: 1,                // the final URL is provided in the first redirect
-          validateStatus: () => true,     // accept 3xx and 2xx
-          responseType: 'stream'          // stream so we don't buffer the body
-            });
-        
-        // Axios/FOLLOW-REDIRECTS attaches the final URL to:
-        const finalUrl =
-          // @ts-ignore
-          upstream.request?.res?.responseUrl ||
-          // fallback for older versions
-          (upstream.request as any)?._redirectable?._currentUrl ||
-          cleanUrl;
-        
-        if (!finalUrl) {
-          res.status(502).send('Could not determine final URL');
-          return;
-        }
-        
-        // Redirect the client to the real CDN URL
-        res.redirect(307, finalUrl);
-      } catch (err) {
-        console.error(`Error resolving final URL from ${cleanUrl}:`, err);
-        res.status(502).send('Error resolving stream');
-      }
+  app.get('/resolve', (req: Request, res: Response) => {
+    // Expect a base64-encoded URL in the `url` query parameter
+    const encoded = req.query.url as string;
+    if (!encoded) {
+      res.status(400).send('Missing url parameter');
+      return;
     }
-  );
+    
+    let targetUrl: string;
+    try {
+      // Decode the Base64 payload back into the Easynews URL with credentials as query-params
+      targetUrl = Buffer.from(encoded, 'base64').toString('utf-8');
+    } catch {
+      res.status(400).send('Invalid url encoding');
+      return;
+    }
 
+    // Only accept hosts under easynews.com
+    const parsed = new URL(targetUrl);
+    const host = parsed.hostname.toLowerCase();
+    if (!host.endsWith('easynews.com')) {
+      res.status(403).send('Domain not allowed');
+      return;
+    }
+
+    // Extract and remove credentials
+    const username = parsed.searchParams.get('u') || '';
+    const password = parsed.searchParams.get('p') || '';
+    parsed.searchParams.delete('u');
+    parsed.searchParams.delete('p');
+    const cleanUrl = parsed.toString();
+
+    // Choose the correct client
+    const client = cleanUrl.startsWith('https:') ? https : http;
+    
+    // HEAD-only request to follow redirects and get final URL  
+    const request = client.request(
+      cleanUrl,
+      {
+        method: 'HEAD',
+        headers: {
+          Authorization: 'Basic ' + Buffer.from(`${username}:${password}`).toString('base64'),
+        },
+        maxRedirects: 5,
+      },
+      // Redirect the client to the real CDN URL
+      (upstream: IncomingMessage & { responseUrl?: string }) => {
+        const finalUrl = upstream.responseUrl || cleanUrl;
+        res.redirect(307, finalUrl);
+      }
+    );
+    
+    request.on('error', (err: Error) => {
+      console.error(`Error resolving stream ${cleanUrl}:`, err);
+      res.status(502).send('Error resolving stream');
+    });
+    
+    request.end();
+  });
+ 
   if (hasConfig)
     app.get('/configure', (req: Request, res: Response) => {
       // Set no-cache headers
