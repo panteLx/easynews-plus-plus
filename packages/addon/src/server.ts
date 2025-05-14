@@ -94,7 +94,7 @@ function serveHTTP(addonInterface: AddonInterface, opts: ServerOptions = {}) {
       res.end(landingHTML);
     }
   });
-  
+
   // Resolve endpoint for stream requests
   app.get('/resolve', (req: Request, res: Response) => {
     // Expect a base64-encoded URL in the `url` query parameter
@@ -103,7 +103,7 @@ function serveHTTP(addonInterface: AddonInterface, opts: ServerOptions = {}) {
       res.status(400).send('Missing url parameter');
       return;
     }
-    
+
     let targetUrl: string;
     try {
       // Decode the Base64 payload back into the Easynews URL with credentials as query-params
@@ -130,8 +130,8 @@ function serveHTTP(addonInterface: AddonInterface, opts: ServerOptions = {}) {
 
     // Choose the correct client
     const client = cleanUrl.startsWith('https:') ? https : http;
-    
-    // HEAD-only request to follow redirects and get final URL  
+
+    // HEAD-only request to follow redirects and get final URL
     const request = client.request(
       cleanUrl,
       {
@@ -147,15 +147,15 @@ function serveHTTP(addonInterface: AddonInterface, opts: ServerOptions = {}) {
         res.redirect(307, finalUrl);
       }
     );
-    
+
     request.on('error', (err: Error) => {
       console.error(`Error resolving stream ${cleanUrl}:`, err);
       res.status(502).send('Error resolving stream');
     });
-    
+
     request.end();
   });
- 
+
   if (hasConfig)
     app.get('/configure', (req: Request, res: Response) => {
       // Set no-cache headers
@@ -236,6 +236,7 @@ logger.info('--- Environment configuration ---');
 logger.info(`PORT: ${process.env.PORT || 'undefined'}`);
 logger.info(`LOG_LEVEL: ${logger.level || 'undefined'}`);
 logger.info(`VERSION: ${getVersion() || 'undefined'}`);
+logger.info(`BASE_URL: ${process.env.BASE_URL || 'undefined'}`);
 
 // Log API search configuration
 logger.info('--- API search configuration ---');
