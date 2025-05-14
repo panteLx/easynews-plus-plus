@@ -344,7 +344,7 @@ export function createStreamUrl(
   const encoded = Buffer.from(authUrl).toString('base64');
   const base = process.env.BASE_URL || `http://localhost:${process.env.PORT}`;
   logger.debug(
-    `Stream URL created: ${base}/resolve?url=${encoded}`
+    `Stream URL created: ${base}/resolve?url=<encoded-easynews-url>`
   );
   return `${base}/resolve?url=${encoded}`;
 }
