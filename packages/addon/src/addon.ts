@@ -556,7 +556,12 @@ builder.defineStreamHandler(
               duration: getDuration(file),
               size: getSize(file),
               title,
-              url: `${createStreamUrl(res, username, password)}/${createStreamPath(file)}`,
+              url: createStreamUrl(
+                { downURL: res.downURL, dlFarm: res.dlFarm, dlPort: res.dlPort },
+                username,
+                password,
+                createStreamPath(file)
+              ),
               videoSize: file.rawSize,
               file,
               preferredLang,
