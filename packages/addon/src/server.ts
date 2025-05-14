@@ -114,6 +114,13 @@ function serveHTTP(addonInterface: AddonInterface, opts: ServerOptions = {}) {
         return;
       }
       
+      // Only accept Base64-URL with hostname easynews.com
+      const host = parsed.hostname.toLowerCase();
+      if (!host.endsWith('easynews.com')) {
+        res.status(403).send('Domain not allowed');
+        return;
+      }
+      
       // Extract and remove credentials
       const parsed = new URL(targetUrl);
       const username = parsed.searchParams.get('u') || '';
