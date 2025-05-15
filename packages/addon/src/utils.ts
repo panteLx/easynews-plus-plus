@@ -334,21 +334,30 @@ export function createStreamUrl(
   username: string,
   password: string,
   filePath: string,
-  baseUrl: string
+  baseUrl?: string
 ): string {
   logger.debug(`Creating stream URL with farm: ${dlFarm}, port: ${dlPort}`);
-  // Direct URL without embedded credentials
-  const directUrl = `${downURL}/${dlFarm}/${dlPort}/${filePath}`;
-  // Credentials as query‐parameters
-  const authUrl = `${directUrl}?u=${encodeURIComponent(username)}&p=${encodeURIComponent(password)}`;
-  // Base64-encode /resolve endpoint
-  const encoded = Buffer.from(authUrl).toString('base64');
-  // Strip any trailing slash on baseUrl before concatenating
-  const normalizedBase = baseUrl.replace(/\/+$/, '');
-  logger.debug(
-    `Stream URL created: ${normalizedBase}/resolve?url=<encoded-easynews-url>`
-  );
-  return `${normalizedBase}/resolve?url=${encoded}`;
+  if (!baseUrl) {
+    // Legacy mode: credentials in URL
+    const url = `${downURL.replace('https://', `https://${username}:${password}@`)}/${dlFarm}/${dlPort}/${filePath}`;
+    logger.debug(
+      `Stream URL created: ${url.substring(0, url.indexOf('@') + 1)}***/${dlFarm}/${dlPort}/${filePath}`
+    );
+    return url;
+  } else {
+    // Resolve mode: route via addon
+    const url = `${downURL}/${dlFarm}/${dlPort}/${filePath}`;
+    // Credentials as query‐parameters
+    const authUrl = `${url}?u=${encodeURIComponent(username)}&p=${encodeURIComponent(password)}`;
+    // Base64-encode /resolve endpoint
+    const encoded = Buffer.from(authUrl).toString('base64');
+    // Strip any trailing slash on baseUrl before concatenating
+    const normalizedBase = baseUrl.replace(/\/+$/, '');
+    logger.debug(
+      `Stream URL created: ${normalizedBase}/resolve?url=<encoded-easynews-url>`
+    );
+    return `${normalizedBase}/resolve?url=${encoded}`;
+  }
 }
 
 export function createStreamPath(file: FileData) {
