@@ -236,7 +236,6 @@ logger.info('--- Environment configuration ---');
 logger.info(`PORT: ${process.env.PORT || 'undefined'}`);
 logger.info(`LOG_LEVEL: ${logger.level || 'undefined'}`);
 logger.info(`VERSION: ${getVersion() || 'undefined'}`);
-logger.info(`BASE_URL: ${process.env.BASE_URL || 'undefined'}`);
 
 // Log API search configuration
 logger.info('--- API search configuration ---');
