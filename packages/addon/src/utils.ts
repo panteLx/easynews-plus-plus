@@ -333,20 +333,22 @@ export function createStreamUrl(
   { downURL, dlFarm, dlPort }: Pick<EasynewsSearchResponse, 'downURL' | 'dlFarm' | 'dlPort'>,
   username: string,
   password: string,
-  filePath: string
+  filePath: string,
+  baseUrl: string
 ): string {
   logger.debug(`Creating stream URL with farm: ${dlFarm}, port: ${dlPort}`);
-  // Base URL without embedded credentials
+  // Direct URL without embedded credentials
   const directUrl = `${downURL}/${dlFarm}/${dlPort}/${filePath}`;
   // Credentials as query‐parameters
   const authUrl = `${directUrl}?u=${encodeURIComponent(username)}&p=${encodeURIComponent(password)}`;
-  // Base64-encode and via BASE_URL (or fallback to localhost + PORT) /resolve endpoint
+  // Base64-encode /resolve endpoint
   const encoded = Buffer.from(authUrl).toString('base64');
-  const base = process.env.BASE_URL || `http://localhost:${process.env.PORT}`;
+  // Strip any trailing slash on baseUrl before concatenating
+  const normalizedBase = baseUrl.replace(/\/+$/, '');
   logger.debug(
-    `Stream URL created: ${base}/resolve?url=<encoded-easynews-url>`
+    `Stream URL created: ${normalizedBase}/resolve?url=<encoded-easynews-url>`
   );
-  return `${base}/resolve?url=${encoded}`;
+  return `${normalizedBase}/resolve?url=${encoded}`;
 }
 
 export function createStreamPath(file: FileData) {

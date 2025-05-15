@@ -271,24 +271,22 @@ Easynews is a premium Usenet provider offering a web-based Usenet browser. It en
 
 You can configure the addon server using environment variables:
 
-1. **Base URL Configuration**: Change the default base URL (https://en.pantelx.com) by setting the `BASE_URL` environment variable
-   - Without this, the addon falls back to http://localhost:${PORT} to resolve stream links
-3. **Port Configuration**: Change the default port (1337) by setting the `PORT` environment variable
-4. **Logging Level**: Adjust the verbosity of logs with the `EASYNEWS_LOG_LEVEL` variable
+1. **Port Configuration**: Change the default port (1337) by setting the `PORT` environment variable
+2. **Logging Level**: Adjust the verbosity of logs with the `EASYNEWS_LOG_LEVEL` variable
    - Options: `error`, `warn`, `info`, `debug`, `silly`, `silent`
    - Set to `debug` or `silly` for verbose logging during troubleshooting
    - Default: `info`
-5. **Log Summarization**: Control debug log grouping with `EASYNEWS_SUMMARIZE_LOGS`
+3. **Log Summarization**: Control debug log grouping with `EASYNEWS_SUMMARIZE_LOGS`
    - Set to `false` to see all individual debug logs (useful for detailed troubleshooting)
    - Set to `true` to group similar debug logs and reduce log volume
    - Default: `true` (enabled)
    - Note: This feature is not available in the Cloudflare Worker deployment
-6. **API Search Configuration**:
+4. **API Search Configuration**:
    - `TOTAL_MAX_RESULTS`: Maximum total results to return
    - `MAX_PAGES`: Maximum number of pages to search
    - `MAX_RESULTS_PER_PAGE`: Maximum results per page
    - `CACHE_TTL`: Cache time-to-live in hours
-7. **TMDB Integration**:
+5. **TMDB Integration**:
    - `TMDB_API_KEY`: TMDB API key for translated title search
 
 The easiest way to configure these settings is by copying the `.env.example` file to `.env` in the project root.
