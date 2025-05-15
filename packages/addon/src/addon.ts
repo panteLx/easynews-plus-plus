@@ -68,7 +68,6 @@ const DEFAULT_CONFIG = {
   showQualities: '4k,1080p,720p,480p',
   maxResultsPerQuality: '0',
   maxFileSize: '0',
-  baseUrl: `http://localhost:1337`,
 };
 
 const builder = new addonBuilder(manifest);
@@ -143,7 +142,7 @@ builder.defineStreamHandler(
       showQualities = DEFAULT_CONFIG.showQualities,
       maxResultsPerQuality = DEFAULT_CONFIG.maxResultsPerQuality,
       maxFileSize = DEFAULT_CONFIG.maxFileSize,
-      baseUrl = DEFAULT_CONFIG.baseUrl,
+      baseUrl,
       ...options
     } = config;
 
