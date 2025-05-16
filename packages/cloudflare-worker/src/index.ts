@@ -89,7 +89,7 @@ app.get('/resolve', async c => {
     // Redirect to the final URL
     return c.redirect(response.url);
   } catch (err) {
-    console.error(`Error resolving stream ${cleanUrl}:`, err);
+    logger.error(`Error resolving stream ${cleanUrl}:`, err);
     return c.text('Error resolving stream', 502);
   }
 });
