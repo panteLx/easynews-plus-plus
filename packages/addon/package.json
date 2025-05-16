@@ -20,7 +20,6 @@
     "easynews-plus-plus-api": "file:../api",
     "easynews-plus-plus-shared": "file:../shared",
     "parse-torrent-title": "^1.4.0",
-    "stremio-addon-sdk": "^1.6.10",
-    "axios": "^1.5.0"
+    "stremio-addon-sdk": "^1.6.10"
   }
 }

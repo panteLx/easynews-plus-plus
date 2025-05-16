@@ -945,9 +945,6 @@ function landingTemplate(manifest: Manifest): string {
           config[checkbox.name] = 'false';
         }
       });
-
-      // Include the origin the user loaded this page from
-      config.baseUrl = window.location.origin
       
       // Create the stremio:// URL
       installLink.href = 'stremio://' + window.location.host + '/' + encodeURIComponent(JSON.stringify(config)) + '/manifest.json';
