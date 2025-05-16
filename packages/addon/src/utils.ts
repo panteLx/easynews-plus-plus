@@ -5,6 +5,7 @@ import { parse as parseTorrentTitle } from 'parse-torrent-title';
 import path from 'path';
 import dotenv from 'dotenv';
 import { createLogger } from 'easynews-plus-plus-shared';
+import { Buffer } from 'buffer';
 
 // Import the custom titles JSON directly
 import customTitlesJson from '../../../custom-titles.json';
@@ -325,19 +326,38 @@ export function matchesTitle(title: string, query: string, strict: boolean) {
   return allWordsMatch;
 }
 
+/**
+ * Create a stream URL that always routes through the addon's /resolve endpoint.
+ */
 export function createStreamUrl(
   { downURL, dlFarm, dlPort }: Pick<EasynewsSearchResponse, 'downURL' | 'dlFarm' | 'dlPort'>,
   username: string,
-  password: string
-) {
+  password: string,
+  filePath: string,
+  baseUrl?: string
+): string {
   logger.debug(`Creating stream URL with farm: ${dlFarm}, port: ${dlPort}`);
-  // For streaming, we can still use the username:password@ format in the URL
-  // as it will be handled by media players, not the fetch API
-  const url = `${downURL.replace('https://', `https://${username}:${password}@`)}/${dlFarm}/${dlPort}`;
-  logger.debug(
-    `Stream URL created: ${url.substring(0, url.indexOf('@') + 1)}***/${dlFarm}/${dlPort}`
-  );
-  return url;
+  if (!baseUrl) {
+    // Legacy mode: credentials in URL
+    const url = `${downURL.replace('https://', `https://${username}:${password}@`)}/${dlFarm}/${dlPort}/${filePath}`;
+    logger.debug(
+      `Stream URL created: ${url.substring(0, url.indexOf('@') + 1)}***/${dlFarm}/${dlPort}/${filePath}`
+    );
+    return url;
+  } else {
+    // Resolve mode: route via addon
+    const url = `${downURL}/${dlFarm}/${dlPort}/${filePath}`;
+    // Credentials as query‐parameters
+    const authUrl = `${url}?u=${encodeURIComponent(username)}&p=${encodeURIComponent(password)}`;
+    // Base64-encode /resolve endpoint
+    const encoded = Buffer.from(authUrl).toString('base64');
+    // Strip any trailing slash on baseUrl before concatenating
+    const normalizedBase = baseUrl.replace(/\/+$/, '');
+    logger.debug(
+      `Stream URL created: ${normalizedBase}/resolve?url=<encoded-easynews-url>`
+    );
+    return `${normalizedBase}/resolve?url=${encoded}`;
+  }
 }
 
 export function createStreamPath(file: FileData) {
