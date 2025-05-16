@@ -39,6 +39,61 @@ function createManifestWithLanguage(lang: string) {
   return manifest;
 }
 
+// Add resolve endpoint for stream requests
+app.get('/resolve', async c => {
+  // Expect a base64-encoded URL in the `url` query parameter
+  const encoded = c.req.query('url');
+  if (!encoded) {
+    return c.text('Missing url parameter', 400);
+  }
+
+  let targetUrl: string;
+  try {
+    // Decode the Base64 payload back into the Easynews URL with credentials as query-params
+    targetUrl = atob(encoded);
+  } catch {
+    return c.text('Invalid url encoding', 400);
+  }
+
+  // Only accept hosts under easynews.com
+  const parsed = new URL(targetUrl);
+  const host = parsed.hostname.toLowerCase();
+  if (!host.endsWith('easynews.com')) {
+    return c.text('Domain not allowed', 403);
+  }
+
+  // Extract and remove credentials
+  const username = parsed.searchParams.get('u') || '';
+  const password = parsed.searchParams.get('p') || '';
+  parsed.searchParams.delete('u');
+  parsed.searchParams.delete('p');
+  const cleanUrl = parsed.toString();
+
+  try {
+    // Create authorization header
+    const auth = 'Basic ' + btoa(`${username}:${password}`);
+
+    // Make HEAD request to follow redirects and get final URL
+    const response = await fetch(cleanUrl, {
+      method: 'HEAD',
+      headers: {
+        Authorization: auth,
+      },
+      redirect: 'follow',
+    });
+
+    if (!response.ok) {
+      return c.text('Error resolving stream', 502);
+    }
+
+    // Redirect to the final URL
+    return c.redirect(response.url);
+  } catch (err) {
+    logger.error(`Error resolving stream ${cleanUrl}:`, err);
+    return c.text('Error resolving stream', 502);
+  }
+});
+
 // Add the configure route for direct access with language selection
 app.get('/configure', c => {
   logger.info(`Received configure request from: ${c.req.header('user-agent')}`);
