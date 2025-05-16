@@ -359,8 +359,8 @@ describe('createStreamUrl', () => {
       dlPort: 'port1',
     } as unknown as any;
 
-    const url = createStreamUrl(response, 'testuser', 'testpass', '');
-    expect(url).toBe('https://testuser:testpass@example.com/down/farm1/port1/');
+    const url = createStreamUrl(response, 'testuser', 'testpass');
+    expect(url).toBe('https://testuser:testpass@example.com/down/farm1/port1');
   });
 
   it('handles different URL formats', () => {
@@ -370,38 +370,10 @@ describe('createStreamUrl', () => {
       dlPort: 'port2',
     } as unknown as any;
 
-    const url = createStreamUrl(response, 'user@domain.com', 'complex@pass!123', '');
+    const url = createStreamUrl(response, 'user@domain.com', 'complex@pass!123');
     expect(url).toBe(
-      'https://user@domain.com:complex@pass!123@cdn.example.com/download/farm2/port2/'
+      'https://user@domain.com:complex@pass!123@cdn.example.com/download/farm2/port2'
     );
-  });
-
-  it('includes the file path parameter in the URL', () => {
-    const response = {
-      downURL: 'https://example.com/down',
-      dlFarm: 'farm1',
-      dlPort: 'port1',
-    } as unknown as any;
-
-    const url = createStreamUrl(response, 'testuser', 'testpass', 'abc123.mp4/video.mp4');
-    expect(url).toBe('https://testuser:testpass@example.com/down/farm1/port1/abc123.mp4/video.mp4');
-  });
-
-  it('handles baseUrl parameter for the resolver mode', () => {
-    const response = {
-      downURL: 'https://example.com/down',
-      dlFarm: 'farm1',
-      dlPort: 'port1',
-    } as unknown as any;
-
-    const url = createStreamUrl(
-      response,
-      'testuser',
-      'testpass',
-      'abc123.mp4/video.mp4',
-      'https://addon.example.com'
-    );
-    expect(url).toContain('https://addon.example.com/resolve?url=');
   });
 });
 

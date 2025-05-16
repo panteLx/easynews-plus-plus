@@ -353,7 +353,9 @@ export function createStreamUrl(
     const encoded = Buffer.from(authUrl).toString('base64');
     // Strip any trailing slash on baseUrl before concatenating
     const normalizedBase = baseUrl.replace(/\/+$/, '');
-    logger.debug(`Stream URL created: ${normalizedBase}/resolve?url=<encoded-easynews-url>`);
+    logger.debug(
+      `Stream URL created: ${normalizedBase}/resolve?url=<encoded-easynews-url>`
+    );
     return `${normalizedBase}/resolve?url=${encoded}`;
   }
 }

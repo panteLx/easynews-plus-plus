@@ -111,12 +111,12 @@
   - Web (Browser)
   - Android Mobile (beta)
   - iOS (Web & TestFlight)
-  - Android TV
 
 #### ⚠️ **Partially Supported or Untested:**
 
 - Stremio:
   - macOS (there may be issues with the internal player)
+  - Android TV (when using a different player than ExoPlayer)
   - Android Mobile (stable)
   - Steam Deck
   - Raspberry Pi
@@ -128,6 +128,7 @@
 
 - Stremio:
   - webOS
+  - Android TV (when using ExoPlayer (NVIDIA Shield, Onn Pro 4K, Chromecast 4K))
 
 > [!NOTE]  
 > We are actively working on expanding platform support. If you encounter any issues with a specific platform, please report them in our [Discord community](https://discord.gg/Ma4SnagqwE) or create a new issue on GitHub.

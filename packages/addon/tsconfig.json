@@ -7,12 +7,7 @@
     "composite": true,
     "declaration": true
   },
-  "include": [
-    "src/**/*",
-    "stremio-addon-sdk-builder.d.ts",
-    "stremio-addon-sdk.d.ts",
-    "follow-redirects.d.ts"
-  ],
+  "include": ["src/**/*", "stremio-addon-sdk-builder.d.ts", "stremio-addon-sdk.d.ts", "follow-redirects.d.ts"],
   "exclude": ["**/*.test.ts"],
   "references": [
     {
