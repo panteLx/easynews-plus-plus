@@ -111,12 +111,12 @@
   - Web (Browser)
   - Android Mobile (beta)
   - iOS (Web & TestFlight)
+  - Android TV
 
 #### ⚠️ **Partially Supported or Untested:**
 
 - Stremio:
   - macOS (there may be issues with the internal player)
-  - Android TV
   - Android Mobile (stable)
   - Steam Deck
   - Raspberry Pi
