@@ -149,7 +149,7 @@ function serveHTTP(addonInterface: AddonInterface, opts: ServerOptions = {}) {
     );
 
     request.on('error', (err: Error) => {
-      console.error(`Error resolving stream ${cleanUrl}:`, err);
+      logger.error(`Error resolving stream ${cleanUrl}:`, err);
       res.status(502).send('Error resolving stream');
     });
 
