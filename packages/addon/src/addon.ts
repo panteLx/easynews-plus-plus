@@ -33,6 +33,7 @@ interface AddonConfig {
   showQualities?: string; // Comma-separated list of qualities to show
   maxResultsPerQuality?: string; // Max results per quality
   maxFileSize?: string; // Max file size in GB
+  baseUrl?: string; // Scheme, host and (optional port)
   [key: string]: any;
 }
 
@@ -141,6 +142,7 @@ builder.defineStreamHandler(
       showQualities = DEFAULT_CONFIG.showQualities,
       maxResultsPerQuality = DEFAULT_CONFIG.maxResultsPerQuality,
       maxFileSize = DEFAULT_CONFIG.maxFileSize,
+      baseUrl,
       ...options
     } = config;
 
@@ -556,7 +558,13 @@ builder.defineStreamHandler(
               duration: getDuration(file),
               size: getSize(file),
               title,
-              url: `${createStreamUrl(res, username, password)}/${createStreamPath(file)}`,
+              url: createStreamUrl(
+                { downURL: res.downURL, dlFarm: res.dlFarm, dlPort: res.dlPort },
+                username,
+                password,
+                createStreamPath(file),
+                baseUrl
+              ),
               videoSize: file.rawSize,
               file,
               preferredLang,
