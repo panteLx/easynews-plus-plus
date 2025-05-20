@@ -95,7 +95,7 @@ app.get('/resolve', async c => {
 
 // Add the configure route for direct access with language selection
 app.get('/configure', c => {
-  logger.info(`Received configure request from: ${c.req.header('user-agent')}`);
+  logger.debug(`Received configure request from: ${c.req.header('user-agent')}`);
 
   // Set no-cache headers
   c.header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
