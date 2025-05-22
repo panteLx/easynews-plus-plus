@@ -96,10 +96,11 @@ function serveHTTP(addonInterface: AddonInterface, opts: ServerOptions = {}) {
   });
 
   // Resolve endpoint for stream requests
-  app.get('/resolve', (req: Request, res: Response) => {
-    // Expect a base64-encoded URL in the `url` query parameter
-    const encoded = req.query.url as string;
-    if (!encoded) {
+  app.get('/resolve/:payload/:filename', async (req: Request, res: Response) => {
+    // Expect a base64-encoded URL in the payload
+    const { payload }  = req.params;
+    const encodedUrl   = payload as string;
+    if (!encodedUrl) {
       res.status(400).send('Missing url parameter');
       return;
     }
@@ -107,7 +108,7 @@ function serveHTTP(addonInterface: AddonInterface, opts: ServerOptions = {}) {
     let targetUrl: string;
     try {
       // Decode the Base64 payload back into the Easynews URL with credentials as query-params
-      targetUrl = Buffer.from(encoded, 'base64').toString('utf-8');
+      targetUrl = Buffer.from(encodedUrl, 'base64').toString('utf-8');
     } catch {
       res.status(400).send('Invalid url encoding');
       return;

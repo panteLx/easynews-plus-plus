@@ -349,12 +349,15 @@ export function createStreamUrl(
     const url = `${downURL}/${dlFarm}/${dlPort}/${filePath}`;
     // Credentials as query‐parameters
     const authUrl = `${url}?u=${encodeURIComponent(username)}&p=${encodeURIComponent(password)}`;
-    // Base64-encode /resolve endpoint
-    const encoded = Buffer.from(authUrl).toString('base64');
+    // Base64-encode authUrl
+    const encodedUrl = Buffer.from(authUrl).toString('base64');
+    // Extract the filename
+    const fileName = path.basename(filePath);
     // Strip any trailing slash on baseUrl before concatenating
     const normalizedBase = baseUrl.replace(/\/+$/, '');
-    logger.debug(`Stream URL created: ${normalizedBase}/resolve?url=<encoded-easynews-url>`);
-    return `${normalizedBase}/resolve?url=${encoded}`;
+    // Build /resolve/<base64-payload>/<filename>
+    logger.debug(`Stream URL created: ${normalizedBase}/resolve/<encoded-easynews-url>/${fileName}`);
+    return `${normalizedBase}/resolve/${encodedUrl}/${fileName}`;
   }
 }
 
