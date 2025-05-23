@@ -117,7 +117,8 @@ function serveHTTP(addonInterface: AddonInterface, opts: ServerOptions = {}) {
     // Only accept hosts under easynews.com
     const parsed = new URL(targetUrl);
     const host = parsed.hostname.toLowerCase();
-    if (!host.endsWith('easynews.com')) {
+    const allowedDomain = /^([a-z0-9-]+\.)*easynews\.com$/i;
+    if (!allowedDomain.test(host)) {
       res.status(403).send('Domain not allowed');
       return;
     }
