@@ -40,17 +40,17 @@ function createManifestWithLanguage(lang: string) {
 }
 
 // Add resolve endpoint for stream requests
-app.get('/resolve', async c => {
-  // Expect a base64-encoded URL in the `url` query parameter
-  const encoded = c.req.query('url');
-  if (!encoded) {
+app.get('/resolve/:payload/:filename', async c => {
+  // Expect a base64-encoded URL in the payload
+  const encodedUrl = c.req.param('payload');
+  if (!encodedUrl) {
     return c.text('Missing url parameter', 400);
   }
 
   let targetUrl: string;
   try {
     // Decode the Base64 payload back into the Easynews URL with credentials as query-params
-    targetUrl = atob(encoded);
+    targetUrl = atob(encodedUrl);
   } catch {
     return c.text('Invalid url encoding', 400);
   }
@@ -58,7 +58,8 @@ app.get('/resolve', async c => {
   // Only accept hosts under easynews.com
   const parsed = new URL(targetUrl);
   const host = parsed.hostname.toLowerCase();
-  if (!host.endsWith('easynews.com')) {
+  const allowedDomain = /^([a-z0-9-]+\.)*easynews\.com$/i;
+  if (!allowedDomain.test(host)) {
     return c.text('Domain not allowed', 403);
   }
 
