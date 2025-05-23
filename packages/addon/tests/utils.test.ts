@@ -401,7 +401,7 @@ describe('createStreamUrl', () => {
       'abc123.mp4/video.mp4',
       'https://addon.example.com'
     );
-    expect(url).toContain('https://addon.example.com/resolve?url=');
+    expect(url).toContain('https://addon.example.com/resolve/');
   });
 });
 
