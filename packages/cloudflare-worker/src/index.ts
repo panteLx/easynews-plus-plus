@@ -41,7 +41,7 @@ function createManifestWithLanguage(lang: string) {
 
 // Add resolve endpoint for stream requests
 app.get('/resolve/:payload/:filename', async c => {
-  // Expect a base64-encoded URL in the payload
+  // Expect a Base64URL-encoded URL in the payload
   const encodedUrl = c.req.param('payload');
   if (!encodedUrl) {
     return c.text('Missing url parameter', 400);
@@ -49,8 +49,8 @@ app.get('/resolve/:payload/:filename', async c => {
 
   let targetUrl: string;
   try {
-    // Decode the Base64 payload back into the Easynews URL with credentials as query-params
-    targetUrl = atob(encodedUrl);
+    // Decode the Base64URL payload back into the Easynews URL with credentials as query-params
+    targetUrl = Buffer.from(encodedUrl, 'base64url').toString('utf-8');
   } catch {
     return c.text('Invalid url encoding', 400);
   }
@@ -74,16 +74,17 @@ app.get('/resolve/:payload/:filename', async c => {
     // Create authorization header
     const auth = 'Basic ' + btoa(`${username}:${password}`);
 
-    // Make HEAD request to follow redirect and get final URL
+    // Single GET with Range header to follow redirects and only download 1 byte
     const response = await fetch(cleanUrl, {
-      method: 'HEAD',
+      method: 'GET',
       headers: {
         Authorization: auth,
+        Range: 'bytes=0-0',
       },
       redirect: 'manual',
     });
 
-    // If we got a 3xx, grab the Location header; otherwise fall back
+    // If we got a 3xx (redirect), grab the Location header; otherwise fall back
     const location = response.headers.get('Location') || cleanUrl;
 
     // Redirect to the final URL
