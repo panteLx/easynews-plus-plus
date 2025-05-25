@@ -98,8 +98,8 @@ function serveHTTP(addonInterface: AddonInterface, opts: ServerOptions = {}) {
   // Resolve endpoint for stream requests
   app.get('/resolve/:payload/:filename', async (req: Request, res: Response) => {
     // Expect a Base64URL-encoded URL in the payload
-    const { payload }  = req.params;
-    const encodedUrl   = payload as string;
+    const { payload } = req.params;
+    const encodedUrl = payload as string;
     if (!encodedUrl) {
       res.status(400).send('Missing url parameter');
       return;
