@@ -97,7 +97,7 @@ function serveHTTP(addonInterface: AddonInterface, opts: ServerOptions = {}) {
 
   // Resolve endpoint for stream requests
   app.get('/resolve/:payload/:filename', async (req: Request, res: Response) => {
-    // Expect a base64-encoded URL in the payload
+    // Expect a Base64URL-encoded URL in the payload
     const { payload }  = req.params;
     const encodedUrl   = payload as string;
     if (!encodedUrl) {
@@ -107,8 +107,8 @@ function serveHTTP(addonInterface: AddonInterface, opts: ServerOptions = {}) {
 
     let targetUrl: string;
     try {
-      // Decode the Base64 payload back into the Easynews URL with credentials as query-params
-      targetUrl = Buffer.from(encodedUrl, 'base64').toString('utf-8');
+      // Decode the Base64URL payload back into the Easynews URL with credentials as query-params
+      targetUrl = Buffer.from(encodedUrl, 'base64url').toString('utf-8');
     } catch {
       res.status(400).send('Invalid url encoding');
       return;
@@ -133,17 +133,18 @@ function serveHTTP(addonInterface: AddonInterface, opts: ServerOptions = {}) {
     // Choose the correct client
     const client = cleanUrl.startsWith('https:') ? https : http;
 
-    // HEAD-only request to follow redirects and get final URL
+    // GET-only request with Range header to follow redirects and get final URL
     const request = client.request(
       cleanUrl,
       {
-        method: 'HEAD',
+        method: 'GET',
         headers: {
           Authorization: 'Basic ' + Buffer.from(`${username}:${password}`).toString('base64'),
+          Range: 'bytes=0-0', // only fetch first byte
         },
         maxRedirects: 5,
       },
-      // Redirect the client to the real CDN URL
+      // Redirect client to the real CDN URL
       (upstream: IncomingMessage & { responseUrl?: string }) => {
         const finalUrl = upstream.responseUrl || cleanUrl;
         res.redirect(307, finalUrl);

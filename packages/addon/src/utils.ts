@@ -349,8 +349,8 @@ export function createStreamUrl(
     const url = `${downURL}/${dlFarm}/${dlPort}/${filePath}`;
     // Credentials as query‐parameters
     const authUrl = `${url}?u=${encodeURIComponent(username)}&p=${encodeURIComponent(password)}`;
-    // Base64-encode authUrl
-    const encodedUrl = Buffer.from(authUrl).toString('base64');
+    // Base64URL-encode authUrl
+    const encodedUrl = Buffer.from(authUrl).toString('base64url');
     // Extract the filename
     const fileName = path.basename(filePath);
     // Strip any trailing slash on baseUrl before concatenating
