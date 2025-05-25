@@ -356,7 +356,9 @@ export function createStreamUrl(
     // Strip any trailing slash on baseUrl before concatenating
     const normalizedBase = baseUrl.replace(/\/+$/, '');
     // Build /resolve/<base64-payload>/<filename>
-    logger.debug(`Stream URL created: ${normalizedBase}/resolve/<encoded-easynews-url>/${fileName}`);
+    logger.debug(
+      `Stream URL created: ${normalizedBase}/resolve/<encoded-easynews-url>/${fileName}`
+    );
     return `${normalizedBase}/resolve/${encodedUrl}/${fileName}`;
   }
 }
