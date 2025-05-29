@@ -7,6 +7,9 @@ compatibility_flags = ["nodejs_compat", "nodejs_compat_populate_process_env"]
 enabled = true
 head_sampling_rate = 1 
 
+[placement]
+mode = "smart"
+
 [vars]
 PORT = "1337"
 EASYNEWS_LOG_LEVEL = "info"
