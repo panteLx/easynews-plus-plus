@@ -114,6 +114,34 @@ function landingTemplate(manifest: Manifest): string {
     return field;
   });
 
+  // Sanitize configuration values to prevent script injection
+  const sanitizedBaseUrl = process.env.CHATWOOT_BASE_URL
+    ? process.env.CHATWOOT_BASE_URL.replace(/['"<>]/g, '')
+    : '';
+  const sanitizedWebsiteToken = process.env.CHATWOOT_WEBSITE_TOKEN
+    ? process.env.CHATWOOT_WEBSITE_TOKEN.replace(/['"<>]/g, '')
+    : '';
+
+  const chatwootScript = `
+  <script>
+    window.chatwootSettings = {"position":"right","type":"expanded_bubble","launcherTitle":"Chat with us"};
+    (function(d,t) {
+      var BASE_URL="${sanitizedBaseUrl}";
+      var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+      g.src=BASE_URL+"/packs/js/sdk.js";
+      g.defer = true;
+      g.async = true;
+      s.parentNode.insertBefore(g,s);
+      g.onload=function(){
+        window.chatwootSDK.run({
+          websiteToken: '${sanitizedWebsiteToken}',
+          baseUrl: BASE_URL
+        })
+      }
+    })(document,"script");
+  </script>
+`;
+
   return `
 <!DOCTYPE html>
 <html lang="${ISO_TO_LANGUAGE[defaultUILanguage] || 'en'}">
@@ -1076,19 +1104,7 @@ function landingTemplate(manifest: Manifest): string {
       }, 2000);
     });
   </script>
-  <!--Start of Tawk.to Script-->
-  <script type="text/javascript">
-  var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-  (function(){
-  var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-  s1.async=true;
-  s1.src='https://embed.tawk.to/6838da7b18e960190e216bec/1isf1asmt';
-  s1.charset='UTF-8';
-  s1.setAttribute('crossorigin','*');
-  s0.parentNode.insertBefore(s1,s0);
-  })();
-  </script>
-  <!--End of Tawk.to Script-->
+  ${process.env.CHATWOOT_ENABLED === 'true' ? chatwootScript : ''}
 </body>
 </html>
 `;

@@ -287,6 +287,10 @@ You can configure the addon server using environment variables:
    - `CACHE_TTL`: Cache time-to-live in hours
 5. **TMDB Integration**:
    - `TMDB_API_KEY`: TMDB API key for translated title search
+6. **Chatwoot Live Support Chat Settings**:
+   - `CHATWOOT_ENABLED`: Enable or disable Chatwoot integration
+   - `CHATWOOT_BASE_URL`: Base URL for the Chatwoot installation
+   - `CHATWOOT_WEBSITE_TOKEN`: Website token for Chatwoot authentication
 
 The easiest way to configure these settings is by copying the `.env.example` file to `.env` in the project root.
 

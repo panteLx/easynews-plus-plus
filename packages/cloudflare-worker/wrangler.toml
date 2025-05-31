@@ -19,3 +19,7 @@ CACHE_TTL = "6"
 TOTAL_MAX_RESULTS = "500"
 MAX_PAGES = "10"
 MAX_RESULTS_PER_PAGE = "250"
+# TMDB_API_KEY = "" # Add encrypted value to your Cloudflare worker instance
+CHATWOOT_ENABLED = "true"
+CHATWOOT_BASE_URL= "https://support.pantelx.com"
+# CHATWOOT_WEBSITE_TOKEN = "" # Add encrypted value to your Cloudflare worker instance
