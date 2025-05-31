@@ -251,3 +251,11 @@ logger.info(`CACHE_TTL: ${process.env.CACHE_TTL || 'undefined'}`);
 logger.info('--- TMDB configuration ---');
 logger.info(`TMDB Integration: ${process.env.TMDB_API_KEY ? 'Enabled' : 'Disabled'}`);
 logger.info('--- End of configuration ---');
+
+// Log if Chatwoot is enabled
+logger.info('--- Chatwoot configuration ---');
+logger.info(
+  `Chatwoot Integration: ${process.env.CHATWOOT_ENABLED === 'true' ? 'Enabled' : 'Disabled'}`
+);
+logger.info(`Chatwoot URL: ${process.env.CHATWOOT_BASE_URL || 'Not set'}`);
+logger.info(`Chatwoot Token: ${process.env.CHATWOOT_WEBSITE_TOKEN || 'Not set'}`);
