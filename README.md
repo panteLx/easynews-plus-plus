@@ -197,6 +197,8 @@ $ git clone https://github.com/pantelx/easynews-plus-plus.git && cd easynews-plu
 $ npm i
 # Copy the .env.example file to .env
 $ cp .env.example .env
+# Copy the wrangler.toml.example file to wrangler.toml
+$ cp packages/cloudflare-worker/wrangler.toml.example packages/cloudflare-worker/wrangler.toml
 # Deploy to Cloudflare
 $ npm run deploy:cf
 # Preview changes (if enabled in Cloudflare dashboard)
@@ -237,6 +239,8 @@ Development modes:
 # Addon development
 $ npm run dev
 # Cloudflare worker development
+# Copy the wrangler.toml.example file to wrangler.toml
+$ cp packages/cloudflare-worker/wrangler.toml.example packages/cloudflare-worker/wrangler.toml
 $ npm run dev:cf
 ```
 
