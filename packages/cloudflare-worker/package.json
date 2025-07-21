@@ -18,7 +18,7 @@
     "hono-stremio": "^0.1.1"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250507.0",
+    "@cloudflare/workers-types": "^4.20250719.0",
     "wrangler": "^4.14.3"
   }
 }
