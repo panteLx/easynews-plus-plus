@@ -14,7 +14,7 @@
   "dependencies": {
     "easynews-plus-plus-addon": "file:../addon",
     "easynews-plus-plus-shared": "file:../shared",
-    "hono": "^4.5.3",
+    "hono": "^4.9.0",
     "hono-stremio": "^0.1.1"
   },
   "devDependencies": {
