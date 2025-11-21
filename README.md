@@ -116,6 +116,7 @@
   - Android Mobile (beta)
   - iOS (Web & TestFlight)
   - Android TV
+  - webOS
 
 #### ⚠️ **Partially Supported or Untested:**
 
@@ -127,11 +128,6 @@
   - Sony TV
   - Philips TV
   - Samsung TV (some models might have playback issues with the internal player)
-
-#### ❌ **Currently Not Supported:**
-
-- Stremio:
-  - webOS
 
 > [!NOTE]  
 > We are actively working on expanding platform support. If you encounter any issues with a specific platform, please report them in our [Discord community](https://discord.gg/Ma4SnagqwE) or create a new issue on GitHub.
